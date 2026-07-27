@@ -134,7 +134,7 @@ const factRules: FactRule[] = [
     normalize: cleanText,
   },
   {
-    labels: ["成果要求"],
+    labels: ["成果要求", "页面尺寸", "图纸尺寸", "尺寸"],
     fieldPath: "deliverable.page_format",
     category: "deliverable",
     normalize: cleanText,
@@ -247,16 +247,78 @@ function roleToSourceRole(role: SourceRole) {
   return role === "proposal" ? "proposal_fact" : "brief_fact";
 }
 
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function readLabeledValue(line: string, label: string) {
+  const escapedLabel = escapeRegExp(label);
+  const match = line.match(
+    new RegExp(`^\\s*${escapedLabel}\\s*(?:[:：]\\s*)?(.+?)\\s*$`),
+  );
+  return match?.[1]?.trim() || null;
+}
+
+function fallbackFactForLine(line: string) {
+  const normalized = line.replace(/\s+/g, " ").trim();
+  if (
+    normalized.length <= 80 &&
+    /(?:地块|中心|项目).*(?:概念方案设计|建筑方案设计|设计竞赛)/.test(
+      normalized,
+    )
+  ) {
+    return {
+      fieldPath: "project.name",
+      category: "project" as const,
+      value: normalized,
+      locationNote: "项目标题",
+    };
+  }
+  if (/方案设计阶段|概念方案阶段|初步设计阶段/.test(normalized)) {
+    return {
+      fieldPath: "project.design_stage",
+      category: "project" as const,
+      value:
+        normalized.match(/(?:概念)?方案设计阶段|初步设计阶段/)?.[0] ??
+        normalized,
+      locationNote: "阶段表述",
+    };
+  }
+  const program = normalized.match(
+    /(?:业态涵盖|功能包括|主要设置)([^。；;]{2,80})/,
+  );
+  if (program) {
+    return {
+      fieldPath: "program.primary",
+      category: "program" as const,
+      value: program[1].trim(),
+      locationNote: "功能表述",
+    };
+  }
+  const location = normalized.match(
+    /(?:项目|地块|马场)(?:基地)?位于([^。；;]{2,100})/,
+  );
+  if (location) {
+    return {
+      fieldPath: "site.location",
+      category: "site" as const,
+      value: location[1].trim(),
+      locationNote: "区位表述",
+    };
+  }
+  return null;
+}
+
 export function inferRole(fileName: string, text: string): SourceRole {
   const sample = `${fileName}\n${text.slice(0, 1200)}`.toLowerCase();
-  if (/公司|团队|资质|奖项|contact|company|team/.test(sample)) {
-    return "company_info";
-  }
-  if (/参考|案例|历史|style|reference/.test(sample)) {
-    return "reference_style";
-  }
   if (/任务书|招标|答疑|批复|brief|tender/.test(sample)) {
     return "authoritative";
+  }
+  if (/参考|案例|历史|style|reference|presentation|汇报文本|汇报册/.test(sample)) {
+    return "reference_style";
+  }
+  if (/公司简介|团队介绍|企业资质|获奖情况|contact|company profile|team profile/.test(sample)) {
+    return "company_info";
   }
   if (/方案|设计概念|总体布局|proposal|concept/.test(sample)) {
     return "proposal";
@@ -311,37 +373,61 @@ function extractFacts(inputs: InputDocument[], projectId: string) {
 
     for (const { page, lines } of pages) {
       for (const line of lines) {
-        const rule = factRules.find((candidate) =>
-          candidate.labels.some((label) =>
-            new RegExp(`^${label}\\s*[:：]`).test(line),
-          ),
-        );
-        if (!rule) continue;
+        const matched = factRules
+          .flatMap((rule) =>
+            rule.labels.map((label) => ({
+              rule,
+              label,
+              value: readLabeledValue(line, label),
+            })),
+          )
+          .find((item) => item.value !== null);
+        const fallback = matched ? null : fallbackFactForLine(line);
+        if (!matched && !fallback) continue;
+        if (
+          fallback &&
+          facts.some(
+            (fact) =>
+              fact.field_path === fallback.fieldPath &&
+              fact.source.document_id === input.document_id,
+          )
+        ) {
+          continue;
+        }
 
-        const label = rule.labels.find((candidate) =>
-          new RegExp(`^${candidate}\\s*[:：]`).test(line),
-        );
-        if (!label) continue;
+        const rule = matched?.rule;
+        const fieldPath = rule?.fieldPath ?? fallback!.fieldPath;
+        if (
+          facts.some(
+            (fact) =>
+              fact.field_path === fieldPath &&
+              fact.source.document_id === input.document_id &&
+              fact.value_raw === (matched?.value ?? fallback!.value),
+          )
+        ) {
+          continue;
+        }
 
-        const valueRaw = line.replace(new RegExp(`^${label}\\s*[:：]\\s*`), "");
+        const label = matched?.label ?? fallback!.locationNote;
+        const valueRaw = matched?.value ?? fallback!.value;
         const factIndex = facts.length + 1;
         facts.push({
           fact_id: `F_${String(factIndex).padStart(3, "0")}`,
-          category: rule.category,
-          field_path: rule.fieldPath,
+          category: rule?.category ?? fallback!.category,
+          field_path: fieldPath,
           value_raw: valueRaw,
-          value_normalized: (rule.normalize ?? cleanText)(valueRaw),
-          unit: rule.unit ?? null,
+          value_normalized: (rule?.normalize ?? cleanText)(valueRaw),
+          unit: rule?.unit ?? null,
           source: {
             document_id: input.document_id,
             page,
             location_note: label,
             quote: line,
           },
-          source_role: rule.sourceRole ?? roleToSourceRole(input.role),
-          confidence: 1,
+          source_role: rule?.sourceRole ?? roleToSourceRole(input.role),
+          confidence: matched ? 1 : 0.85,
           status: "confirmed",
-          notes: "",
+          notes: matched ? "" : "由页面自然语言规则提取，建议人工复核。",
         });
       }
     }
@@ -954,4 +1040,3 @@ export function runPipeline(
     modelCallCount: 0,
   };
 }
-

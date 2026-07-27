@@ -148,6 +148,8 @@ export function Workbench({
   const [showDebug, setShowDebug] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState("");
+  const [usingFixture, setUsingFixture] = useState(true);
+  const [documentsChanged, setDocumentsChanged] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const facts = result.projectFacts;
@@ -174,6 +176,8 @@ export function Workbench({
       });
       setResult(next);
       setSelectedPageId(next.pagePlan.pages[0]?.page_id);
+      setDocumentsChanged(false);
+      setUsingFixture(false);
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "运行失败");
     } finally {
@@ -227,22 +231,25 @@ export function Workbench({
           : document,
       ),
     );
+    setDocumentsChanged(true);
   };
 
   const addPasted = () => {
     if (!pastedText.trim()) return;
-    setDocuments((current) => [
-      ...current,
-      {
+    setDocuments((current) => {
+      const nextDocument: InputDocument = {
         document_id: `DOC_NOTE_${Date.now()}`,
-        file_name: `用户文字说明_${current.length + 1}.md`,
+        file_name: `用户文字说明_${usingFixture ? 1 : current.length + 1}.md`,
         role: pasteRole,
         version_or_date: new Date().toISOString().slice(0, 10),
         authority_rank: pasteRole === "authoritative" ? 3 : 5,
         page_count: 1,
         text: `===== PAGE 1 =====\n${pastedText.trim()}`,
-      },
-    ]);
+      };
+      return usingFixture ? [nextDocument] : [...current, nextDocument];
+    });
+    setUsingFixture(false);
+    setDocumentsChanged(true);
     setPastedText("");
     setShowPaste(false);
   };
@@ -253,7 +260,9 @@ export function Workbench({
     setError("");
     try {
       const parsed = await Promise.all([...files].map(fileToInputDocument));
-      setDocuments((current) => [...current, ...parsed]);
+      setDocuments((current) => (usingFixture ? parsed : [...current, ...parsed]));
+      setUsingFixture(false);
+      setDocumentsChanged(true);
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "文件读取失败");
     } finally {
@@ -266,6 +275,7 @@ export function Workbench({
     setDocuments((current) =>
       current.filter((document) => document.document_id !== documentId),
     );
+    setDocumentsChanged(true);
   };
 
   const downloadDebug = () => {
@@ -396,6 +406,27 @@ export function Workbench({
                 </button>
               </div>
 
+              {documentsChanged ? (
+                <div className="recognition-notice">
+                  <div>
+                    <strong>资料已读取，尚未重新识别</strong>
+                    <span>请确认资料角色，再运行“事实 → Gate → 目录”。</span>
+                  </div>
+                  <button onClick={run} disabled={Boolean(busy)}>
+                    {busy === "run" ? (
+                      <LoaderCircle className="spin" size={14} />
+                    ) : (
+                      <Play size={13} fill="currentColor" />
+                    )}
+                    开始识别并生成目录
+                  </button>
+                </div>
+              ) : usingFixture ? (
+                <div className="fixture-notice">
+                  当前显示虚拟示例；第一次上传会自动替换示例资料。
+                </div>
+              ) : null}
+
               {showPaste ? (
                 <div className="paste-card">
                   <textarea
@@ -442,8 +473,18 @@ export function Workbench({
                       </div>
                       <div className="document-meta">
                         {document.page_count ?? 1} 页 ·{" "}
-                        {document.version_or_date}
+                        已读取 {document.text.replace(/={3,}\s*PAGE\s+\d+\s*={3,}/gi, "").trim().length.toLocaleString()} 字
                       </div>
+                      {document.text.replace(/={3,}\s*PAGE\s+\d+\s*={3,}/gi, "").trim().length < 30 ? (
+                        <div className="pdf-text-warning">
+                          未读到有效文字层；扫描 PDF 需要 OCR。
+                        </div>
+                      ) : (
+                        <details className="text-preview">
+                          <summary>查看识别文本</summary>
+                          <pre>{document.text.slice(0, 900)}</pre>
+                        </details>
+                      )}
                       <select
                         className={`role-select role-${document.role}`}
                         value={document.role}
@@ -777,4 +818,3 @@ export function Workbench({
     </main>
   );
 }
-

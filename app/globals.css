@@ -345,6 +345,86 @@ button:disabled {
   background: #fafbf9;
 }
 
+.recognition-notice,
+.fixture-notice {
+  margin: 0 16px 12px;
+  border: 1px solid #d8cbb2;
+  background: #fffaf0;
+  color: #53462f;
+  padding: 10px 12px;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.recognition-notice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.recognition-notice div {
+  display: grid;
+  gap: 2px;
+}
+
+.recognition-notice span {
+  color: #7e6d4d;
+}
+
+.recognition-notice button {
+  border: 0;
+  background: #222;
+  color: white;
+  padding: 7px 9px;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+}
+
+.recognition-notice button:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+.fixture-notice {
+  border-color: #d8dde4;
+  background: #f6f8fa;
+  color: #657080;
+}
+
+.pdf-text-warning {
+  margin-top: 5px;
+  color: #aa3f2c;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.text-preview {
+  margin-top: 5px;
+  font-size: 11px;
+  color: #69717d;
+}
+
+.text-preview summary {
+  cursor: pointer;
+  user-select: none;
+}
+
+.text-preview pre {
+  margin: 7px 0 0;
+  padding: 8px;
+  max-height: 120px;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: #f4f5f6;
+  border: 1px solid #e3e6e9;
+  font: 10px/1.45 ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+
 .paste-card textarea {
   width: 100%;
   resize: vertical;

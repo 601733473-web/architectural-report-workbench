@@ -1,6 +1,60 @@
 import type { InputDocument } from "@/app/lib/pipeline";
 import { inferRole } from "@/app/lib/pipeline";
 
+interface PdfTextItem {
+  str: string;
+  hasEOL?: boolean;
+  transform?: number[];
+}
+
+export function pageItemsToLines(items: unknown[]) {
+  const lines: string[] = [];
+  let currentLine: string[] = [];
+  let currentY: number | null = null;
+
+  const flush = () => {
+    const line = currentLine.join(" ").replace(/\s+/g, " ").trim();
+    if (line) lines.push(line);
+    currentLine = [];
+    currentY = null;
+  };
+
+  for (const rawItem of items) {
+    if (
+      !rawItem ||
+      typeof rawItem !== "object" ||
+      !("str" in rawItem) ||
+      typeof rawItem.str !== "string"
+    ) {
+      continue;
+    }
+
+    const item = rawItem as PdfTextItem;
+    const y =
+      Array.isArray(item.transform) && typeof item.transform[5] === "number"
+        ? item.transform[5]
+        : null;
+
+    // Most tender PDFs encode table rows as separate Y coordinates instead of
+    // explicit line breaks. Preserve those rows so facts are not flattened.
+    if (
+      currentLine.length > 0 &&
+      y !== null &&
+      currentY !== null &&
+      Math.abs(y - currentY) > 2
+    ) {
+      flush();
+    }
+
+    if (item.str.trim()) currentLine.push(item.str.trim());
+    if (y !== null) currentY = y;
+    if (item.hasEOL) flush();
+  }
+
+  flush();
+  return lines.join("\n");
+}
+
 async function readPdf(file: File) {
   const pdfjs = await import("pdfjs-dist");
   const workerModule = await import("pdfjs-dist/build/pdf.worker.min.mjs?url");
@@ -13,11 +67,7 @@ async function readPdf(file: File) {
   for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
     const page = await pdf.getPage(pageNumber);
     const content = await page.getTextContent();
-    const text = content.items
-      .map((item) => ("str" in item ? item.str : ""))
-      .join(" ")
-      .replace(/\s+/g, " ")
-      .trim();
+    const text = pageItemsToLines(content.items);
     pages.push(`===== PAGE ${pageNumber} =====\n${text}`);
   }
 
@@ -44,4 +94,3 @@ export async function fileToInputDocument(file: File): Promise<InputDocument> {
     text: parsed.text,
   };
 }
-
