@@ -1,42 +1,26 @@
 {
   "projectFacts": {
-    "project_id": "VIRTUAL_RIVERFRONT_CULTURE",
+    "project_id": "VIRTUAL_BRIEF_ONLY",
     "project_name_anonymized": "滨水文化中心概念方案竞赛",
     "default_page_format": "A3_landscape_420x297mm",
     "language_mode": "zh",
     "ignore_company_info": true,
     "documents": [
       {
-        "document_id": "DOC_BRIEF_V01",
+        "document_id": "SYS_REFERENCE_DK05_PRESENTATION",
+        "file_name": "26_0610 PRESENTATION_LR.pdf",
+        "role": "reference_style",
+        "version_or_date": "2026-06-10",
+        "authority_rank": 6,
+        "notes": "仅用于章节结构、页型与表达风格。"
+      },
+      {
+        "document_id": "DOC_BRIEF_ONLY_V01",
         "file_name": "滨水文化中心_设计任务书.md",
         "role": "authoritative",
         "version_or_date": "2026-07-01",
         "authority_rank": 2,
         "notes": "已读取 4 页文本。"
-      },
-      {
-        "document_id": "DOC_PROPOSAL_V01",
-        "file_name": "潮汐客厅_方案说明.md",
-        "role": "proposal",
-        "version_or_date": "2026-07-12",
-        "authority_rank": 4,
-        "notes": "已读取 3 页文本。"
-      },
-      {
-        "document_id": "DOC_STYLE_V01",
-        "file_name": "历史竞赛汇报_风格参考.md",
-        "role": "reference_style",
-        "version_or_date": "2025-11-20",
-        "authority_rank": 6,
-        "notes": "仅用于章节结构、页型与表达风格。"
-      },
-      {
-        "document_id": "DOC_COMPANY_V01",
-        "file_name": "设计团队与公司介绍.txt",
-        "role": "company_info",
-        "version_or_date": "2026-07-10",
-        "authority_rank": 6,
-        "notes": "已隔离：公司身份信息不进入事实库和设计文案。"
       }
     ],
     "facts": [
@@ -48,7 +32,7 @@
         "value_normalized": "滨水文化中心概念方案竞赛",
         "unit": null,
         "source": {
-          "document_id": "DOC_BRIEF_V01",
+          "document_id": "DOC_BRIEF_ONLY_V01",
           "page": 1,
           "location_note": "项目名称",
           "quote": "项目名称：滨水文化中心概念方案竞赛"
@@ -66,7 +50,7 @@
         "value_normalized": "方案设计",
         "unit": null,
         "source": {
-          "document_id": "DOC_BRIEF_V01",
+          "document_id": "DOC_BRIEF_ONLY_V01",
           "page": 1,
           "location_note": "设计阶段",
           "quote": "设计阶段：方案设计"
@@ -84,7 +68,7 @@
         "value_normalized": "临江市旧港东岸，北邻城市公园，西接轨道站点",
         "unit": null,
         "source": {
-          "document_id": "DOC_BRIEF_V01",
+          "document_id": "DOC_BRIEF_ONLY_V01",
           "page": 1,
           "location_note": "项目区位",
           "quote": "项目区位：临江市旧港东岸，北邻城市公园，西接轨道站点。"
@@ -102,7 +86,7 @@
         "value_normalized": 18600,
         "unit": "m2",
         "source": {
-          "document_id": "DOC_BRIEF_V01",
+          "document_id": "DOC_BRIEF_ONLY_V01",
           "page": 2,
           "location_note": "用地面积",
           "quote": "用地面积：18,600㎡"
@@ -120,7 +104,7 @@
         "value_normalized": 2.5,
         "unit": null,
         "source": {
-          "document_id": "DOC_BRIEF_V01",
+          "document_id": "DOC_BRIEF_ONLY_V01",
           "page": 2,
           "location_note": "容积率",
           "quote": "容积率：2.50"
@@ -138,7 +122,7 @@
         "value_normalized": 48,
         "unit": "m",
         "source": {
-          "document_id": "DOC_BRIEF_V01",
+          "document_id": "DOC_BRIEF_ONLY_V01",
           "page": 2,
           "location_note": "建筑限高",
           "quote": "建筑限高：48m"
@@ -156,14 +140,14 @@
         "value_normalized": 62000,
         "unit": "m2",
         "source": {
-          "document_id": "DOC_BRIEF_V01",
+          "document_id": "DOC_BRIEF_ONLY_V01",
           "page": 2,
           "location_note": "总建筑面积",
           "quote": "总建筑面积：62,000㎡"
         },
         "source_role": "brief_fact",
         "confidence": 1,
-        "status": "conflict",
+        "status": "confirmed",
         "notes": ""
       },
       {
@@ -174,7 +158,7 @@
         "value_normalized": 46000,
         "unit": "m2",
         "source": {
-          "document_id": "DOC_BRIEF_V01",
+          "document_id": "DOC_BRIEF_ONLY_V01",
           "page": 2,
           "location_note": "地上建筑面积",
           "quote": "地上建筑面积：46,000㎡"
@@ -192,7 +176,7 @@
         "value_normalized": 16000,
         "unit": "m2",
         "source": {
-          "document_id": "DOC_BRIEF_V01",
+          "document_id": "DOC_BRIEF_ONLY_V01",
           "page": 2,
           "location_note": "地下建筑面积",
           "quote": "地下建筑面积：16,000㎡"
@@ -210,7 +194,7 @@
         "value_normalized": "展览、图书阅览、公共教育、城市客厅及配套商业",
         "unit": null,
         "source": {
-          "document_id": "DOC_BRIEF_V01",
+          "document_id": "DOC_BRIEF_ONLY_V01",
           "page": 2,
           "location_note": "主要功能",
           "quote": "主要功能：展览、图书阅览、公共教育、城市客厅及配套商业。"
@@ -228,7 +212,7 @@
         "value_normalized": "建立城市与滨水之间连续开放的公共文化界面",
         "unit": null,
         "source": {
-          "document_id": "DOC_BRIEF_V01",
+          "document_id": "DOC_BRIEF_ONLY_V01",
           "page": 3,
           "location_note": "设计目标",
           "quote": "设计目标：建立城市与滨水之间连续开放的公共文化界面。"
@@ -246,7 +230,7 @@
         "value_normalized": "人行主入口面向城市公园，后勤车辆从场地东侧独立进入",
         "unit": null,
         "source": {
-          "document_id": "DOC_BRIEF_V01",
+          "document_id": "DOC_BRIEF_ONLY_V01",
           "page": 3,
           "location_note": "交通要求",
           "quote": "交通要求：人行主入口面向城市公园，后勤车辆从场地东侧独立进入。"
@@ -264,7 +248,7 @@
         "value_normalized": "横版A3，中英文表达，简本控制在12页以内",
         "unit": null,
         "source": {
-          "document_id": "DOC_BRIEF_V01",
+          "document_id": "DOC_BRIEF_ONLY_V01",
           "page": 3,
           "location_note": "成果要求",
           "quote": "成果要求：横版A3，中英文表达，简本控制在12页以内。"
@@ -282,7 +266,7 @@
         "value_normalized": "公共性、滨水连续性、功能复合、交通效率与实施可行性",
         "unit": null,
         "source": {
-          "document_id": "DOC_BRIEF_V01",
+          "document_id": "DOC_BRIEF_ONLY_V01",
           "page": 4,
           "location_note": "评审重点",
           "quote": "评审重点：公共性、滨水连续性、功能复合、交通效率与实施可行性。"
@@ -291,190 +275,170 @@
         "confidence": 1,
         "status": "confirmed",
         "notes": ""
-      },
-      {
-        "fact_id": "F_015",
-        "category": "proposal_design",
-        "field_path": "proposal.design_concept",
-        "value_raw": "潮汐客厅",
-        "value_normalized": "潮汐客厅",
-        "unit": null,
-        "source": {
-          "document_id": "DOC_PROPOSAL_V01",
-          "page": 1,
-          "location_note": "设计概念",
-          "quote": "设计概念：潮汐客厅"
-        },
-        "source_role": "proposal_fact",
-        "confidence": 1,
-        "status": "confirmed",
-        "notes": ""
-      },
-      {
-        "fact_id": "F_016",
-        "category": "proposal_design",
-        "field_path": "proposal.concept_statement",
-        "value_raw": "以可连续步行的公共屋面连接城市公园、文化大厅与滨水平台，使建筑成为城市公共生活的延伸。",
-        "value_normalized": "以可连续步行的公共屋面连接城市公园、文化大厅与滨水平台，使建筑成为城市公共生活的延伸",
-        "unit": null,
-        "source": {
-          "document_id": "DOC_PROPOSAL_V01",
-          "page": 1,
-          "location_note": "概念说明",
-          "quote": "概念说明：以可连续步行的公共屋面连接城市公园、文化大厅与滨水平台，使建筑成为城市公共生活的延伸。"
-        },
-        "source_role": "proposal_fact",
-        "confidence": 1,
-        "status": "confirmed",
-        "notes": ""
-      },
-      {
-        "fact_id": "F_017",
-        "category": "proposal_design",
-        "field_path": "proposal.masterplan",
-        "value_raw": "展览与图书阅览分置南北两翼，共享中央公共大厅；首层架空通廊连接城市公园和滨水步道。",
-        "value_normalized": "展览与图书阅览分置南北两翼，共享中央公共大厅；首层架空通廊连接城市公园和滨水步道",
-        "unit": null,
-        "source": {
-          "document_id": "DOC_PROPOSAL_V01",
-          "page": 2,
-          "location_note": "总体布局",
-          "quote": "总体布局：展览与图书阅览分置南北两翼，共享中央公共大厅；首层架空通廊连接城市公园和滨水步道。"
-        },
-        "source_role": "proposal_fact",
-        "confidence": 1,
-        "status": "confirmed",
-        "notes": ""
-      },
-      {
-        "fact_id": "F_018",
-        "category": "circulation",
-        "field_path": "circulation.design",
-        "value_raw": "观众流线由西北角进入，后勤车辆从东侧独立到达，地下停车与公共大厅通过两组核心筒联系。",
-        "value_normalized": "观众流线由西北角进入，后勤车辆从东侧独立到达，地下停车与公共大厅通过两组核心筒联系",
-        "unit": null,
-        "source": {
-          "document_id": "DOC_PROPOSAL_V01",
-          "page": 2,
-          "location_note": "交通组织",
-          "quote": "交通组织：观众流线由西北角进入，后勤车辆从东侧独立到达，地下停车与公共大厅通过两组核心筒联系。"
-        },
-        "source_role": "proposal_fact",
-        "confidence": 1,
-        "status": "confirmed",
-        "notes": ""
-      },
-      {
-        "fact_id": "F_019",
-        "category": "area",
-        "field_path": "area.total_gfa",
-        "value_raw": "61,800㎡",
-        "value_normalized": 61800,
-        "unit": "m2",
-        "source": {
-          "document_id": "DOC_PROPOSAL_V01",
-          "page": 2,
-          "location_note": "方案总建筑面积",
-          "quote": "方案总建筑面积：61,800㎡"
-        },
-        "source_role": "proposal_fact",
-        "confidence": 1,
-        "status": "conflict",
-        "notes": ""
-      },
-      {
-        "fact_id": "F_020",
-        "category": "space_requirement",
-        "field_path": "proposal.key_spaces",
-        "value_raw": "中央公共大厅、滨水阶梯剧场、可步行屋面花园。",
-        "value_normalized": "中央公共大厅、滨水阶梯剧场、可步行屋面花园",
-        "unit": null,
-        "source": {
-          "document_id": "DOC_PROPOSAL_V01",
-          "page": 3,
-          "location_note": "重点空间",
-          "quote": "重点空间：中央公共大厅、滨水阶梯剧场、可步行屋面花园。"
-        },
-        "source_role": "proposal_fact",
-        "confidence": 1,
-        "status": "confirmed",
-        "notes": ""
-      },
-      {
-        "fact_id": "F_021",
-        "category": "technical_requirement",
-        "field_path": "technical.facade",
-        "value_raw": "尚未确定，需完成耐久性与造价比选。",
-        "value_normalized": "尚未确定，需完成耐久性与造价比选",
-        "unit": null,
-        "source": {
-          "document_id": "DOC_PROPOSAL_V01",
-          "page": 3,
-          "location_note": "立面材料",
-          "quote": "立面材料：尚未确定，需完成耐久性与造价比选。"
-        },
-        "source_role": "proposal_fact",
-        "confidence": 1,
-        "status": "confirmed",
-        "notes": ""
-      },
-      {
-        "fact_id": "F_022",
-        "category": "technical_requirement",
-        "field_path": "technical.structure",
-        "value_raw": "尚未完成专项论证。",
-        "value_normalized": "尚未完成专项论证",
-        "unit": null,
-        "source": {
-          "document_id": "DOC_PROPOSAL_V01",
-          "page": 3,
-          "location_note": "结构体系",
-          "quote": "结构体系：尚未完成专项论证。"
-        },
-        "source_role": "proposal_fact",
-        "confidence": 1,
-        "status": "confirmed",
-        "notes": ""
       }
     ],
     "style_observations": [
       {
-        "observation_id": "S_DOC_STYLE_V01_001",
-        "description": "项目理解、核心问题、规划策略、设计概念、空间落实、技术支撑、价值总结。",
+        "observation_id": "S_SYS_REFERENCE_DK05_PRESENTATION_001",
+        "description": "项目理解、规划策略、设计概念、空间与功能落实、技术支撑、方案总结。",
         "source": {
-          "document_id": "DOC_STYLE_V01",
-          "pages": [
-            1
-          ]
-        }
-      },
-      {
-        "observation_id": "S_DOC_STYLE_V01_002",
-        "description": "一页一个结论；分析页以图解为主；概念页采用短标题与简洁正文；章节页使用大图和少量文字。",
-        "source": {
-          "document_id": "DOC_STYLE_V01",
+          "document_id": "SYS_REFERENCE_DK05_PRESENTATION",
           "pages": [
             2
           ]
         }
-      }
-    ],
-    "conflicts": [
+      },
       {
-        "conflict_id": "C_001",
-        "field_path": "area.total_gfa",
-        "fact_ids": [
-          "F_007",
-          "F_019"
-        ],
-        "severity": "important",
-        "resolution_status": "unresolved",
-        "resolution_note": "保留所有来源值，目录与文案优先引用 authoritative 来源。"
+        "observation_id": "S_SYS_REFERENCE_DK05_PRESENTATION_002",
+        "description": "横版 A3、中英双语、一页一个核心结论，以短标题配合大比例图像。",
+        "source": {
+          "document_id": "SYS_REFERENCE_DK05_PRESENTATION",
+          "pages": [
+            2
+          ]
+        }
+      },
+      {
+        "observation_id": "S_SYS_REFERENCE_DK05_PRESENTATION_003",
+        "description": "项目理解先用城市区位与场地关系建立背景，再进入规划指标和核心问题。",
+        "source": {
+          "document_id": "SYS_REFERENCE_DK05_PRESENTATION",
+          "pages": [
+            4
+          ]
+        }
+      },
+      {
+        "observation_id": "S_SYS_REFERENCE_DK05_PRESENTATION_004",
+        "description": "分析页以白底或深色航拍底图承载图解，左上角保持章节定位。",
+        "source": {
+          "document_id": "SYS_REFERENCE_DK05_PRESENTATION",
+          "pages": [
+            4
+          ]
+        }
+      },
+      {
+        "observation_id": "S_SYS_REFERENCE_DK05_PRESENTATION_005",
+        "description": "方案比选采用并列卡片或分栏布局，每个选项同时说明优点、局限和取舍。",
+        "source": {
+          "document_id": "SYS_REFERENCE_DK05_PRESENTATION",
+          "pages": [
+            9
+          ]
+        }
+      },
+      {
+        "observation_id": "S_SYS_REFERENCE_DK05_PRESENTATION_006",
+        "description": "规划策略采用连续编号的策略链，每项由短标题、关键动作和一张主图组成。",
+        "source": {
+          "document_id": "SYS_REFERENCE_DK05_PRESENTATION",
+          "pages": [
+            11
+          ]
+        }
+      },
+      {
+        "observation_id": "S_SYS_REFERENCE_DK05_PRESENTATION_007",
+        "description": "概念页使用深色全幅背景、居中概念名和短篇幅双语阐释，文字不与分析图争夺层级。",
+        "source": {
+          "document_id": "SYS_REFERENCE_DK05_PRESENTATION",
+          "pages": [
+            26
+          ]
+        }
+      },
+      {
+        "observation_id": "S_SYS_REFERENCE_DK05_PRESENTATION_008",
+        "description": "功能指标页以轴测或体量分解图为主，指标卡作为辅助，视觉占比高于正文。",
+        "source": {
+          "document_id": "SYS_REFERENCE_DK05_PRESENTATION",
+          "pages": [
+            39
+          ]
+        }
+      },
+      {
+        "observation_id": "S_SYS_REFERENCE_DK05_PRESENTATION_009",
+        "description": "重点空间与效果页采用大图主导，底部深色文字带收束空间价值。",
+        "source": {
+          "document_id": "SYS_REFERENCE_DK05_PRESENTATION",
+          "pages": [
+            42
+          ]
+        }
+      },
+      {
+        "observation_id": "S_SYS_REFERENCE_DK05_PRESENTATION_010",
+        "description": "平面页以图纸为主、场景图为辅，用统一色彩和短标签标记流线与功能。",
+        "source": {
+          "document_id": "SYS_REFERENCE_DK05_PRESENTATION",
+          "pages": [
+            45
+          ]
+        }
+      },
+      {
+        "observation_id": "S_SYS_REFERENCE_DK05_PRESENTATION_011",
+        "description": "技术页在设计叙事之后集中呈现幕墙、材料与构造，不提前作无证据承诺。",
+        "source": {
+          "document_id": "SYS_REFERENCE_DK05_PRESENTATION",
+          "pages": [
+            75
+          ]
+        }
+      },
+      {
+        "observation_id": "S_SYS_REFERENCE_DK05_PRESENTATION_012",
+        "description": "章节过渡页保持克制，使用全幅背景与大号章节标题；总结页只回收前文已经证明的价值。",
+        "source": {
+          "document_id": "SYS_REFERENCE_DK05_PRESENTATION",
+          "pages": [
+            96
+          ]
+        }
       }
     ],
+    "conflicts": [],
     "missing_items": [
       {
         "item_id": "M_B_001",
+        "description": "Gate B 缺少：设计概念",
+        "severity": "blocking",
+        "blocks": [
+          "page_generation"
+        ],
+        "suggested_source": "已确认的方案说明、图纸或视觉素材清单"
+      },
+      {
+        "item_id": "M_B_002",
+        "description": "Gate B 缺少：总体布局",
+        "severity": "blocking",
+        "blocks": [
+          "page_generation"
+        ],
+        "suggested_source": "已确认的方案说明、图纸或视觉素材清单"
+      },
+      {
+        "item_id": "M_B_003",
+        "description": "Gate B 缺少：交通组织",
+        "severity": "blocking",
+        "blocks": [
+          "page_generation"
+        ],
+        "suggested_source": "已确认的方案说明、图纸或视觉素材清单"
+      },
+      {
+        "item_id": "M_B_004",
+        "description": "Gate B 缺少：重点空间",
+        "severity": "blocking",
+        "blocks": [
+          "page_generation"
+        ],
+        "suggested_source": "已确认的方案说明、图纸或视觉素材清单"
+      },
+      {
+        "item_id": "M_B_005",
         "description": "Gate B 缺少：立面方案",
         "severity": "important",
         "blocks": [
@@ -483,7 +447,7 @@
         "suggested_source": "已确认的方案说明、图纸或视觉素材清单"
       },
       {
-        "item_id": "M_B_002",
+        "item_id": "M_B_006",
         "description": "Gate B 缺少：结构方案",
         "severity": "important",
         "blocks": [
@@ -492,7 +456,7 @@
         "suggested_source": "已确认的方案说明、图纸或视觉素材清单"
       },
       {
-        "item_id": "M_B_003",
+        "item_id": "M_B_007",
         "description": "Gate B 缺少：效果图或视觉清单",
         "severity": "important",
         "blocks": [
@@ -503,14 +467,18 @@
     ],
     "gate_report": {
       "planner_readiness": "ready",
-      "generation_readiness": "partial",
+      "generation_readiness": "blocked",
       "gate_a_missing": [],
       "gate_b_missing": [
+        "设计概念",
+        "总体布局",
+        "交通组织",
+        "重点空间",
         "立面方案",
         "结构方案",
         "效果图或视觉清单"
       ],
-      "summary": "Gate A 已通过；Gate B 仍缺少 3 类方案证据。"
+      "summary": "Gate A 已通过；Gate B 仍缺少 7 类方案证据。"
     }
   },
   "pagePlan": {
@@ -623,10 +591,9 @@
           "用地面积：18,600㎡",
           "容积率：2.50",
           "建筑限高：48m",
-          "总建筑面积：62,000㎡",
-          "总建筑面积：61,800㎡"
+          "总建筑面积：62,000㎡"
         ],
-        "speaker_notes": "本页结论仅引用 5 条事实。讲述时先说结论，再说明设计动作，最后指出需要由图纸验证的部分。",
+        "speaker_notes": "本页结论仅引用 4 条事实。讲述时先说结论，再说明设计动作，最后指出需要由图纸验证的部分。",
         "visual_requirements": [
           "四项核心指标卡",
           "地上地下规模对照",
@@ -648,10 +615,6 @@
           {
             "label_zh": "总建筑面积：62,000㎡",
             "fact_ref": "F_007"
-          },
-          {
-            "label_zh": "总建筑面积：61,800㎡",
-            "fact_ref": "F_019"
           }
         ],
         "visual_brief": [
@@ -663,8 +626,7 @@
           "F_004",
           "F_005",
           "F_006",
-          "F_007",
-          "F_019"
+          "F_007"
         ],
         "unresolved_items": [],
         "missing_information": [],
@@ -755,13 +717,16 @@
           "概念—空间动作拆解",
           "历史参考页型：以全幅主视觉和短篇幅双语标题建立单页结论"
         ],
-        "fact_refs": [
-          "F_015",
-          "F_016"
+        "fact_refs": [],
+        "unresolved_items": [
+          "设计概念",
+          "概念说明"
         ],
-        "unresolved_items": [],
-        "missing_information": [],
-        "generation_status": "ready"
+        "missing_information": [
+          "设计概念",
+          "概念说明"
+        ],
+        "generation_status": "placeholder"
       },
       {
         "page_id": "P007",
@@ -786,13 +751,17 @@
           "历史参考页型：图纸占据主要版面，以统一色彩和短标签组织证据"
         ],
         "fact_refs": [
-          "F_012",
-          "F_017",
-          "F_018"
+          "F_012"
         ],
-        "unresolved_items": [],
-        "missing_information": [],
-        "generation_status": "ready"
+        "unresolved_items": [
+          "总体布局",
+          "交通组织"
+        ],
+        "missing_information": [
+          "总体布局",
+          "交通组织"
+        ],
+        "generation_status": "placeholder"
       },
       {
         "page_id": "P008",
@@ -816,12 +785,14 @@
           "空间序列剖面",
           "历史参考页型：图纸占据主要版面，以统一色彩和短标签组织证据"
         ],
-        "fact_refs": [
-          "F_020"
+        "fact_refs": [],
+        "unresolved_items": [
+          "重点空间"
         ],
-        "unresolved_items": [],
-        "missing_information": [],
-        "generation_status": "ready"
+        "missing_information": [
+          "重点空间"
+        ],
+        "generation_status": "placeholder"
       },
       {
         "page_id": "P009",
@@ -845,10 +816,7 @@
           "立面材料与构造节点",
           "历史参考页型：图纸占据主要版面，以统一色彩和短标签组织证据"
         ],
-        "fact_refs": [
-          "F_021",
-          "F_022"
-        ],
+        "fact_refs": [],
         "unresolved_items": [
           "立面方案",
           "结构方案"
@@ -881,15 +849,15 @@
           "三项已验证价值",
           "历史参考页型：以全幅主视觉和短篇幅双语标题建立单页结论"
         ],
-        "fact_refs": [
-          "F_015",
-          "F_017",
-          "F_022"
-        ],
+        "fact_refs": [],
         "unresolved_items": [
+          "设计概念",
+          "总体布局",
           "结构方案"
         ],
         "missing_information": [
+          "设计概念",
+          "总体布局",
           "结构方案"
         ],
         "generation_status": "placeholder"
@@ -899,22 +867,8 @@
       "reviewed_page_ids": [
         "P003"
       ],
-      "issues": [
-        {
-          "severity": "major",
-          "pages": [
-            "P003"
-          ],
-          "issue": "页面引用的字段存在未解决冲突。",
-          "evidence": "总建筑面积：62,000㎡；总建筑面积：61,800㎡",
-          "fact_refs": [
-            "F_007",
-            "F_019"
-          ],
-          "recommended_fix": "确认采用值并在事实库记录冲突处理结果。"
-        }
-      ],
-      "summary": "已审核 1 页，发现 1 项问题。"
+      "issues": [],
+      "summary": "已审核 1 页，发现 0 项问题。"
     }
   },
   "nodeOutputs": [
@@ -925,75 +879,44 @@
       "output": {
         "parsing_summary": [
           {
-            "document_id": "DOC_BRIEF_V01",
+            "document_id": "SYS_REFERENCE_DK05_PRESENTATION",
+            "page_count": 109,
+            "character_count": 481,
+            "text_layer_status": "readable"
+          },
+          {
+            "document_id": "DOC_BRIEF_ONLY_V01",
             "page_count": 4,
             "character_count": 281,
-            "text_layer_status": "readable"
-          },
-          {
-            "document_id": "DOC_PROPOSAL_V01",
-            "page_count": 3,
-            "character_count": 237,
-            "text_layer_status": "readable"
-          },
-          {
-            "document_id": "DOC_STYLE_V01",
-            "page_count": 2,
-            "character_count": 111,
-            "text_layer_status": "readable"
-          },
-          {
-            "document_id": "DOC_COMPANY_V01",
-            "page_count": 1,
-            "character_count": 63,
             "text_layer_status": "readable"
           }
         ],
         "documents": [
           {
-            "document_id": "DOC_BRIEF_V01",
+            "document_id": "SYS_REFERENCE_DK05_PRESENTATION",
+            "file_name": "26_0610 PRESENTATION_LR.pdf",
+            "role": "reference_style",
+            "version_or_date": "2026-06-10",
+            "authority_rank": 6,
+            "notes": "仅用于章节结构、页型与表达风格。"
+          },
+          {
+            "document_id": "DOC_BRIEF_ONLY_V01",
             "file_name": "滨水文化中心_设计任务书.md",
             "role": "authoritative",
             "version_or_date": "2026-07-01",
             "authority_rank": 2,
             "notes": "已读取 4 页文本。"
-          },
-          {
-            "document_id": "DOC_PROPOSAL_V01",
-            "file_name": "潮汐客厅_方案说明.md",
-            "role": "proposal",
-            "version_or_date": "2026-07-12",
-            "authority_rank": 4,
-            "notes": "已读取 3 页文本。"
-          },
-          {
-            "document_id": "DOC_STYLE_V01",
-            "file_name": "历史竞赛汇报_风格参考.md",
-            "role": "reference_style",
-            "version_or_date": "2025-11-20",
-            "authority_rank": 6,
-            "notes": "仅用于章节结构、页型与表达风格。"
-          },
-          {
-            "document_id": "DOC_COMPANY_V01",
-            "file_name": "设计团队与公司介绍.txt",
-            "role": "company_info",
-            "version_or_date": "2026-07-10",
-            "authority_rank": 6,
-            "notes": "已隔离：公司身份信息不进入事实库和设计文案。"
           }
         ],
         "data_zones": {
           "current_project_evidence": [
-            "DOC_BRIEF_V01",
-            "DOC_PROPOSAL_V01"
+            "DOC_BRIEF_ONLY_V01"
           ],
           "historical_reference_library": [
-            "DOC_STYLE_V01"
+            "SYS_REFERENCE_DK05_PRESENTATION"
           ],
-          "excluded_company_information": [
-            "DOC_COMPANY_V01"
-          ],
+          "excluded_company_information": [],
           "awaiting_role_confirmation": []
         }
       }
@@ -1003,43 +926,27 @@
       "execution": "local_rule",
       "model_calls": 0,
       "output": {
-        "project_id": "VIRTUAL_RIVERFRONT_CULTURE",
+        "project_id": "VIRTUAL_BRIEF_ONLY",
         "project_name_anonymized": "滨水文化中心概念方案竞赛",
         "default_page_format": "A3_landscape_420x297mm",
         "language_mode": "zh",
         "ignore_company_info": true,
         "documents": [
           {
-            "document_id": "DOC_BRIEF_V01",
+            "document_id": "SYS_REFERENCE_DK05_PRESENTATION",
+            "file_name": "26_0610 PRESENTATION_LR.pdf",
+            "role": "reference_style",
+            "version_or_date": "2026-06-10",
+            "authority_rank": 6,
+            "notes": "仅用于章节结构、页型与表达风格。"
+          },
+          {
+            "document_id": "DOC_BRIEF_ONLY_V01",
             "file_name": "滨水文化中心_设计任务书.md",
             "role": "authoritative",
             "version_or_date": "2026-07-01",
             "authority_rank": 2,
             "notes": "已读取 4 页文本。"
-          },
-          {
-            "document_id": "DOC_PROPOSAL_V01",
-            "file_name": "潮汐客厅_方案说明.md",
-            "role": "proposal",
-            "version_or_date": "2026-07-12",
-            "authority_rank": 4,
-            "notes": "已读取 3 页文本。"
-          },
-          {
-            "document_id": "DOC_STYLE_V01",
-            "file_name": "历史竞赛汇报_风格参考.md",
-            "role": "reference_style",
-            "version_or_date": "2025-11-20",
-            "authority_rank": 6,
-            "notes": "仅用于章节结构、页型与表达风格。"
-          },
-          {
-            "document_id": "DOC_COMPANY_V01",
-            "file_name": "设计团队与公司介绍.txt",
-            "role": "company_info",
-            "version_or_date": "2026-07-10",
-            "authority_rank": 6,
-            "notes": "已隔离：公司身份信息不进入事实库和设计文案。"
           }
         ],
         "facts": [
@@ -1051,7 +958,7 @@
             "value_normalized": "滨水文化中心概念方案竞赛",
             "unit": null,
             "source": {
-              "document_id": "DOC_BRIEF_V01",
+              "document_id": "DOC_BRIEF_ONLY_V01",
               "page": 1,
               "location_note": "项目名称",
               "quote": "项目名称：滨水文化中心概念方案竞赛"
@@ -1069,7 +976,7 @@
             "value_normalized": "方案设计",
             "unit": null,
             "source": {
-              "document_id": "DOC_BRIEF_V01",
+              "document_id": "DOC_BRIEF_ONLY_V01",
               "page": 1,
               "location_note": "设计阶段",
               "quote": "设计阶段：方案设计"
@@ -1087,7 +994,7 @@
             "value_normalized": "临江市旧港东岸，北邻城市公园，西接轨道站点",
             "unit": null,
             "source": {
-              "document_id": "DOC_BRIEF_V01",
+              "document_id": "DOC_BRIEF_ONLY_V01",
               "page": 1,
               "location_note": "项目区位",
               "quote": "项目区位：临江市旧港东岸，北邻城市公园，西接轨道站点。"
@@ -1105,7 +1012,7 @@
             "value_normalized": 18600,
             "unit": "m2",
             "source": {
-              "document_id": "DOC_BRIEF_V01",
+              "document_id": "DOC_BRIEF_ONLY_V01",
               "page": 2,
               "location_note": "用地面积",
               "quote": "用地面积：18,600㎡"
@@ -1123,7 +1030,7 @@
             "value_normalized": 2.5,
             "unit": null,
             "source": {
-              "document_id": "DOC_BRIEF_V01",
+              "document_id": "DOC_BRIEF_ONLY_V01",
               "page": 2,
               "location_note": "容积率",
               "quote": "容积率：2.50"
@@ -1141,7 +1048,7 @@
             "value_normalized": 48,
             "unit": "m",
             "source": {
-              "document_id": "DOC_BRIEF_V01",
+              "document_id": "DOC_BRIEF_ONLY_V01",
               "page": 2,
               "location_note": "建筑限高",
               "quote": "建筑限高：48m"
@@ -1159,14 +1066,14 @@
             "value_normalized": 62000,
             "unit": "m2",
             "source": {
-              "document_id": "DOC_BRIEF_V01",
+              "document_id": "DOC_BRIEF_ONLY_V01",
               "page": 2,
               "location_note": "总建筑面积",
               "quote": "总建筑面积：62,000㎡"
             },
             "source_role": "brief_fact",
             "confidence": 1,
-            "status": "conflict",
+            "status": "confirmed",
             "notes": ""
           },
           {
@@ -1177,7 +1084,7 @@
             "value_normalized": 46000,
             "unit": "m2",
             "source": {
-              "document_id": "DOC_BRIEF_V01",
+              "document_id": "DOC_BRIEF_ONLY_V01",
               "page": 2,
               "location_note": "地上建筑面积",
               "quote": "地上建筑面积：46,000㎡"
@@ -1195,7 +1102,7 @@
             "value_normalized": 16000,
             "unit": "m2",
             "source": {
-              "document_id": "DOC_BRIEF_V01",
+              "document_id": "DOC_BRIEF_ONLY_V01",
               "page": 2,
               "location_note": "地下建筑面积",
               "quote": "地下建筑面积：16,000㎡"
@@ -1213,7 +1120,7 @@
             "value_normalized": "展览、图书阅览、公共教育、城市客厅及配套商业",
             "unit": null,
             "source": {
-              "document_id": "DOC_BRIEF_V01",
+              "document_id": "DOC_BRIEF_ONLY_V01",
               "page": 2,
               "location_note": "主要功能",
               "quote": "主要功能：展览、图书阅览、公共教育、城市客厅及配套商业。"
@@ -1231,7 +1138,7 @@
             "value_normalized": "建立城市与滨水之间连续开放的公共文化界面",
             "unit": null,
             "source": {
-              "document_id": "DOC_BRIEF_V01",
+              "document_id": "DOC_BRIEF_ONLY_V01",
               "page": 3,
               "location_note": "设计目标",
               "quote": "设计目标：建立城市与滨水之间连续开放的公共文化界面。"
@@ -1249,7 +1156,7 @@
             "value_normalized": "人行主入口面向城市公园，后勤车辆从场地东侧独立进入",
             "unit": null,
             "source": {
-              "document_id": "DOC_BRIEF_V01",
+              "document_id": "DOC_BRIEF_ONLY_V01",
               "page": 3,
               "location_note": "交通要求",
               "quote": "交通要求：人行主入口面向城市公园，后勤车辆从场地东侧独立进入。"
@@ -1267,7 +1174,7 @@
             "value_normalized": "横版A3，中英文表达，简本控制在12页以内",
             "unit": null,
             "source": {
-              "document_id": "DOC_BRIEF_V01",
+              "document_id": "DOC_BRIEF_ONLY_V01",
               "page": 3,
               "location_note": "成果要求",
               "quote": "成果要求：横版A3，中英文表达，简本控制在12页以内。"
@@ -1285,7 +1192,7 @@
             "value_normalized": "公共性、滨水连续性、功能复合、交通效率与实施可行性",
             "unit": null,
             "source": {
-              "document_id": "DOC_BRIEF_V01",
+              "document_id": "DOC_BRIEF_ONLY_V01",
               "page": 4,
               "location_note": "评审重点",
               "quote": "评审重点：公共性、滨水连续性、功能复合、交通效率与实施可行性。"
@@ -1294,187 +1201,131 @@
             "confidence": 1,
             "status": "confirmed",
             "notes": ""
-          },
-          {
-            "fact_id": "F_015",
-            "category": "proposal_design",
-            "field_path": "proposal.design_concept",
-            "value_raw": "潮汐客厅",
-            "value_normalized": "潮汐客厅",
-            "unit": null,
-            "source": {
-              "document_id": "DOC_PROPOSAL_V01",
-              "page": 1,
-              "location_note": "设计概念",
-              "quote": "设计概念：潮汐客厅"
-            },
-            "source_role": "proposal_fact",
-            "confidence": 1,
-            "status": "confirmed",
-            "notes": ""
-          },
-          {
-            "fact_id": "F_016",
-            "category": "proposal_design",
-            "field_path": "proposal.concept_statement",
-            "value_raw": "以可连续步行的公共屋面连接城市公园、文化大厅与滨水平台，使建筑成为城市公共生活的延伸。",
-            "value_normalized": "以可连续步行的公共屋面连接城市公园、文化大厅与滨水平台，使建筑成为城市公共生活的延伸",
-            "unit": null,
-            "source": {
-              "document_id": "DOC_PROPOSAL_V01",
-              "page": 1,
-              "location_note": "概念说明",
-              "quote": "概念说明：以可连续步行的公共屋面连接城市公园、文化大厅与滨水平台，使建筑成为城市公共生活的延伸。"
-            },
-            "source_role": "proposal_fact",
-            "confidence": 1,
-            "status": "confirmed",
-            "notes": ""
-          },
-          {
-            "fact_id": "F_017",
-            "category": "proposal_design",
-            "field_path": "proposal.masterplan",
-            "value_raw": "展览与图书阅览分置南北两翼，共享中央公共大厅；首层架空通廊连接城市公园和滨水步道。",
-            "value_normalized": "展览与图书阅览分置南北两翼，共享中央公共大厅；首层架空通廊连接城市公园和滨水步道",
-            "unit": null,
-            "source": {
-              "document_id": "DOC_PROPOSAL_V01",
-              "page": 2,
-              "location_note": "总体布局",
-              "quote": "总体布局：展览与图书阅览分置南北两翼，共享中央公共大厅；首层架空通廊连接城市公园和滨水步道。"
-            },
-            "source_role": "proposal_fact",
-            "confidence": 1,
-            "status": "confirmed",
-            "notes": ""
-          },
-          {
-            "fact_id": "F_018",
-            "category": "circulation",
-            "field_path": "circulation.design",
-            "value_raw": "观众流线由西北角进入，后勤车辆从东侧独立到达，地下停车与公共大厅通过两组核心筒联系。",
-            "value_normalized": "观众流线由西北角进入，后勤车辆从东侧独立到达，地下停车与公共大厅通过两组核心筒联系",
-            "unit": null,
-            "source": {
-              "document_id": "DOC_PROPOSAL_V01",
-              "page": 2,
-              "location_note": "交通组织",
-              "quote": "交通组织：观众流线由西北角进入，后勤车辆从东侧独立到达，地下停车与公共大厅通过两组核心筒联系。"
-            },
-            "source_role": "proposal_fact",
-            "confidence": 1,
-            "status": "confirmed",
-            "notes": ""
-          },
-          {
-            "fact_id": "F_019",
-            "category": "area",
-            "field_path": "area.total_gfa",
-            "value_raw": "61,800㎡",
-            "value_normalized": 61800,
-            "unit": "m2",
-            "source": {
-              "document_id": "DOC_PROPOSAL_V01",
-              "page": 2,
-              "location_note": "方案总建筑面积",
-              "quote": "方案总建筑面积：61,800㎡"
-            },
-            "source_role": "proposal_fact",
-            "confidence": 1,
-            "status": "conflict",
-            "notes": ""
-          },
-          {
-            "fact_id": "F_020",
-            "category": "space_requirement",
-            "field_path": "proposal.key_spaces",
-            "value_raw": "中央公共大厅、滨水阶梯剧场、可步行屋面花园。",
-            "value_normalized": "中央公共大厅、滨水阶梯剧场、可步行屋面花园",
-            "unit": null,
-            "source": {
-              "document_id": "DOC_PROPOSAL_V01",
-              "page": 3,
-              "location_note": "重点空间",
-              "quote": "重点空间：中央公共大厅、滨水阶梯剧场、可步行屋面花园。"
-            },
-            "source_role": "proposal_fact",
-            "confidence": 1,
-            "status": "confirmed",
-            "notes": ""
-          },
-          {
-            "fact_id": "F_021",
-            "category": "technical_requirement",
-            "field_path": "technical.facade",
-            "value_raw": "尚未确定，需完成耐久性与造价比选。",
-            "value_normalized": "尚未确定，需完成耐久性与造价比选",
-            "unit": null,
-            "source": {
-              "document_id": "DOC_PROPOSAL_V01",
-              "page": 3,
-              "location_note": "立面材料",
-              "quote": "立面材料：尚未确定，需完成耐久性与造价比选。"
-            },
-            "source_role": "proposal_fact",
-            "confidence": 1,
-            "status": "confirmed",
-            "notes": ""
-          },
-          {
-            "fact_id": "F_022",
-            "category": "technical_requirement",
-            "field_path": "technical.structure",
-            "value_raw": "尚未完成专项论证。",
-            "value_normalized": "尚未完成专项论证",
-            "unit": null,
-            "source": {
-              "document_id": "DOC_PROPOSAL_V01",
-              "page": 3,
-              "location_note": "结构体系",
-              "quote": "结构体系：尚未完成专项论证。"
-            },
-            "source_role": "proposal_fact",
-            "confidence": 1,
-            "status": "confirmed",
-            "notes": ""
           }
         ],
         "style_observations": [
           {
-            "observation_id": "S_DOC_STYLE_V01_001",
-            "description": "项目理解、核心问题、规划策略、设计概念、空间落实、技术支撑、价值总结。",
+            "observation_id": "S_SYS_REFERENCE_DK05_PRESENTATION_001",
+            "description": "项目理解、规划策略、设计概念、空间与功能落实、技术支撑、方案总结。",
             "source": {
-              "document_id": "DOC_STYLE_V01",
-              "pages": [
-                1
-              ]
-            }
-          },
-          {
-            "observation_id": "S_DOC_STYLE_V01_002",
-            "description": "一页一个结论；分析页以图解为主；概念页采用短标题与简洁正文；章节页使用大图和少量文字。",
-            "source": {
-              "document_id": "DOC_STYLE_V01",
+              "document_id": "SYS_REFERENCE_DK05_PRESENTATION",
               "pages": [
                 2
               ]
             }
-          }
-        ],
-        "conflicts": [
+          },
           {
-            "conflict_id": "C_001",
-            "field_path": "area.total_gfa",
-            "fact_ids": [
-              "F_007",
-              "F_019"
-            ],
-            "severity": "important",
-            "resolution_status": "unresolved",
-            "resolution_note": "保留所有来源值，目录与文案优先引用 authoritative 来源。"
+            "observation_id": "S_SYS_REFERENCE_DK05_PRESENTATION_002",
+            "description": "横版 A3、中英双语、一页一个核心结论，以短标题配合大比例图像。",
+            "source": {
+              "document_id": "SYS_REFERENCE_DK05_PRESENTATION",
+              "pages": [
+                2
+              ]
+            }
+          },
+          {
+            "observation_id": "S_SYS_REFERENCE_DK05_PRESENTATION_003",
+            "description": "项目理解先用城市区位与场地关系建立背景，再进入规划指标和核心问题。",
+            "source": {
+              "document_id": "SYS_REFERENCE_DK05_PRESENTATION",
+              "pages": [
+                4
+              ]
+            }
+          },
+          {
+            "observation_id": "S_SYS_REFERENCE_DK05_PRESENTATION_004",
+            "description": "分析页以白底或深色航拍底图承载图解，左上角保持章节定位。",
+            "source": {
+              "document_id": "SYS_REFERENCE_DK05_PRESENTATION",
+              "pages": [
+                4
+              ]
+            }
+          },
+          {
+            "observation_id": "S_SYS_REFERENCE_DK05_PRESENTATION_005",
+            "description": "方案比选采用并列卡片或分栏布局，每个选项同时说明优点、局限和取舍。",
+            "source": {
+              "document_id": "SYS_REFERENCE_DK05_PRESENTATION",
+              "pages": [
+                9
+              ]
+            }
+          },
+          {
+            "observation_id": "S_SYS_REFERENCE_DK05_PRESENTATION_006",
+            "description": "规划策略采用连续编号的策略链，每项由短标题、关键动作和一张主图组成。",
+            "source": {
+              "document_id": "SYS_REFERENCE_DK05_PRESENTATION",
+              "pages": [
+                11
+              ]
+            }
+          },
+          {
+            "observation_id": "S_SYS_REFERENCE_DK05_PRESENTATION_007",
+            "description": "概念页使用深色全幅背景、居中概念名和短篇幅双语阐释，文字不与分析图争夺层级。",
+            "source": {
+              "document_id": "SYS_REFERENCE_DK05_PRESENTATION",
+              "pages": [
+                26
+              ]
+            }
+          },
+          {
+            "observation_id": "S_SYS_REFERENCE_DK05_PRESENTATION_008",
+            "description": "功能指标页以轴测或体量分解图为主，指标卡作为辅助，视觉占比高于正文。",
+            "source": {
+              "document_id": "SYS_REFERENCE_DK05_PRESENTATION",
+              "pages": [
+                39
+              ]
+            }
+          },
+          {
+            "observation_id": "S_SYS_REFERENCE_DK05_PRESENTATION_009",
+            "description": "重点空间与效果页采用大图主导，底部深色文字带收束空间价值。",
+            "source": {
+              "document_id": "SYS_REFERENCE_DK05_PRESENTATION",
+              "pages": [
+                42
+              ]
+            }
+          },
+          {
+            "observation_id": "S_SYS_REFERENCE_DK05_PRESENTATION_010",
+            "description": "平面页以图纸为主、场景图为辅，用统一色彩和短标签标记流线与功能。",
+            "source": {
+              "document_id": "SYS_REFERENCE_DK05_PRESENTATION",
+              "pages": [
+                45
+              ]
+            }
+          },
+          {
+            "observation_id": "S_SYS_REFERENCE_DK05_PRESENTATION_011",
+            "description": "技术页在设计叙事之后集中呈现幕墙、材料与构造，不提前作无证据承诺。",
+            "source": {
+              "document_id": "SYS_REFERENCE_DK05_PRESENTATION",
+              "pages": [
+                75
+              ]
+            }
+          },
+          {
+            "observation_id": "S_SYS_REFERENCE_DK05_PRESENTATION_012",
+            "description": "章节过渡页保持克制，使用全幅背景与大号章节标题；总结页只回收前文已经证明的价值。",
+            "source": {
+              "document_id": "SYS_REFERENCE_DK05_PRESENTATION",
+              "pages": [
+                96
+              ]
+            }
           }
         ],
+        "conflicts": [],
         "missing_items": []
       }
     },
@@ -1484,14 +1335,18 @@
       "model_calls": 0,
       "output": {
         "planner_readiness": "ready",
-        "generation_readiness": "partial",
+        "generation_readiness": "blocked",
         "gate_a_missing": [],
         "gate_b_missing": [
+          "设计概念",
+          "总体布局",
+          "交通组织",
+          "重点空间",
           "立面方案",
           "结构方案",
           "效果图或视觉清单"
         ],
-        "summary": "Gate A 已通过；Gate B 仍缺少 3 类方案证据。"
+        "summary": "Gate A 已通过；Gate B 仍缺少 7 类方案证据。"
       }
     },
     {
@@ -1621,8 +1476,7 @@
               "F_004",
               "F_005",
               "F_006",
-              "F_007",
-              "F_019"
+              "F_007"
             ],
             "unresolved_items": [],
             "missing_information": [],
@@ -1713,13 +1567,16 @@
               "概念—空间动作拆解",
               "历史参考页型：以全幅主视觉和短篇幅双语标题建立单页结论"
             ],
-            "fact_refs": [
-              "F_015",
-              "F_016"
+            "fact_refs": [],
+            "unresolved_items": [
+              "设计概念",
+              "概念说明"
             ],
-            "unresolved_items": [],
-            "missing_information": [],
-            "generation_status": "ready"
+            "missing_information": [
+              "设计概念",
+              "概念说明"
+            ],
+            "generation_status": "placeholder"
           },
           {
             "page_id": "P007",
@@ -1744,13 +1601,17 @@
               "历史参考页型：图纸占据主要版面，以统一色彩和短标签组织证据"
             ],
             "fact_refs": [
-              "F_012",
-              "F_017",
-              "F_018"
+              "F_012"
             ],
-            "unresolved_items": [],
-            "missing_information": [],
-            "generation_status": "ready"
+            "unresolved_items": [
+              "总体布局",
+              "交通组织"
+            ],
+            "missing_information": [
+              "总体布局",
+              "交通组织"
+            ],
+            "generation_status": "placeholder"
           },
           {
             "page_id": "P008",
@@ -1774,12 +1635,14 @@
               "空间序列剖面",
               "历史参考页型：图纸占据主要版面，以统一色彩和短标签组织证据"
             ],
-            "fact_refs": [
-              "F_020"
+            "fact_refs": [],
+            "unresolved_items": [
+              "重点空间"
             ],
-            "unresolved_items": [],
-            "missing_information": [],
-            "generation_status": "ready"
+            "missing_information": [
+              "重点空间"
+            ],
+            "generation_status": "placeholder"
           },
           {
             "page_id": "P009",
@@ -1803,10 +1666,7 @@
               "立面材料与构造节点",
               "历史参考页型：图纸占据主要版面，以统一色彩和短标签组织证据"
             ],
-            "fact_refs": [
-              "F_021",
-              "F_022"
-            ],
+            "fact_refs": [],
             "unresolved_items": [
               "立面方案",
               "结构方案"
@@ -1839,15 +1699,15 @@
               "三项已验证价值",
               "历史参考页型：以全幅主视觉和短篇幅双语标题建立单页结论"
             ],
-            "fact_refs": [
-              "F_015",
-              "F_017",
-              "F_022"
-            ],
+            "fact_refs": [],
             "unresolved_items": [
+              "设计概念",
+              "总体布局",
               "结构方案"
             ],
             "missing_information": [
+              "设计概念",
+              "总体布局",
               "结构方案"
             ],
             "generation_status": "placeholder"
@@ -1872,10 +1732,9 @@
           "用地面积：18,600㎡",
           "容积率：2.50",
           "建筑限高：48m",
-          "总建筑面积：62,000㎡",
-          "总建筑面积：61,800㎡"
+          "总建筑面积：62,000㎡"
         ],
-        "speaker_notes": "本页结论仅引用 5 条事实。讲述时先说结论，再说明设计动作，最后指出需要由图纸验证的部分。",
+        "speaker_notes": "本页结论仅引用 4 条事实。讲述时先说结论，再说明设计动作，最后指出需要由图纸验证的部分。",
         "visual_requirements": [
           "四项核心指标卡",
           "地上地下规模对照",
@@ -1897,10 +1756,6 @@
           {
             "label_zh": "总建筑面积：62,000㎡",
             "fact_ref": "F_007"
-          },
-          {
-            "label_zh": "总建筑面积：61,800㎡",
-            "fact_ref": "F_019"
           }
         ],
         "visual_brief": [
@@ -1912,8 +1767,7 @@
           "F_004",
           "F_005",
           "F_006",
-          "F_007",
-          "F_019"
+          "F_007"
         ],
         "unresolved_items": [],
         "missing_information": [],
@@ -1928,22 +1782,8 @@
         "reviewed_page_ids": [
           "P003"
         ],
-        "issues": [
-          {
-            "severity": "major",
-            "pages": [
-              "P003"
-            ],
-            "issue": "页面引用的字段存在未解决冲突。",
-            "evidence": "总建筑面积：62,000㎡；总建筑面积：61,800㎡",
-            "fact_refs": [
-              "F_007",
-              "F_019"
-            ],
-            "recommended_fix": "确认采用值并在事实库记录冲突处理结果。"
-          }
-        ],
-        "summary": "已审核 1 页，发现 1 项问题。"
+        "issues": [],
+        "summary": "已审核 1 页，发现 0 项问题。"
       }
     }
   ],

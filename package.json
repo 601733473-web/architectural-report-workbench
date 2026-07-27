@@ -10,11 +10,12 @@
     "contracts:generate": "node scripts/generate-contracts.mjs",
     "schema:check": "node scripts/validate-schemas.mjs",
     "fixture:run": "tsx scripts/run-fixture.ts",
+    "fixture:brief": "tsx scripts/run-brief-fixture.ts",
     "typecheck": "npm run contracts:generate && tsc --noEmit",
     "prebuild": "npm run contracts:generate",
     "build": "vinext build",
     "start": "vinext start",
-    "test": "npm run fixture:run && npm run schema:check && npm run typecheck && npm run build && node --test tests/rendered-html.test.mjs",
+    "test": "npm run fixture:run && npm run fixture:brief && npm run schema:check && npm run typecheck && npm run build && node --test tests/rendered-html.test.mjs",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next"
   },
   "dependencies": {

@@ -342,6 +342,32 @@ function registerDocuments(inputs: InputDocument[]) {
   }));
 }
 
+function buildRegistrationOutput(inputs: InputDocument[]) {
+  const documents = registerDocuments(inputs);
+  const idsFor = (roles: SourceRole[]) =>
+    inputs
+      .filter((input) => roles.includes(input.role))
+      .map((input) => input.document_id);
+
+  return {
+    parsing_summary: inputs.map((input) => ({
+      document_id: input.document_id,
+      page_count: input.page_count ?? splitPages(input.text).length,
+      character_count: input.text
+        .replace(/={3,}\s*PAGE\s+\d+\s*={3,}/gi, "")
+        .trim().length,
+      text_layer_status: input.text.trim() ? "readable" : "empty",
+    })),
+    documents,
+    data_zones: {
+      current_project_evidence: idsFor(["authoritative", "proposal"]),
+      historical_reference_library: idsFor(["reference_style"]),
+      excluded_company_information: idsFor(["company_info"]),
+      awaiting_role_confirmation: idsFor(["unknown"]),
+    },
+  };
+}
+
 function extractFacts(inputs: InputDocument[], projectId: string) {
   const documents = registerDocuments(inputs);
   const facts: ProjectFact[] = [];
@@ -356,7 +382,11 @@ function extractFacts(inputs: InputDocument[], projectId: string) {
     if (input.role === "reference_style") {
       const descriptions = pages.flatMap(({ page, lines }) =>
         lines
-          .filter((line) => /^(推荐章节结构|表达风格)[:：]/.test(line))
+          .filter((line) =>
+            /^(推荐章节结构|表达风格|页型节奏|版面规则|视觉比例|语言规则)[:：]/.test(
+              line,
+            ),
+          )
           .map((line) => ({ page, description: line.split(/[:：]/, 2)[1] })),
       );
       descriptions.forEach((item, index) => {
@@ -554,8 +584,11 @@ function checkCompleteness(projectFacts: DesignReportProjectFacts) {
 
 function selectFacts(
   projectFacts: DesignReportProjectFacts,
-  fieldPaths: string[],
+  fieldExpressions: string[],
 ) {
+  const fieldPaths = fieldExpressions.flatMap((expression) =>
+    expression.split("|"),
+  );
   return projectFacts.facts
     .filter((fact) => fieldPaths.includes(fact.field_path))
     .sort((a, b) => {
@@ -597,6 +630,34 @@ function buildPage(
   };
 }
 
+const fieldLabels: Record<string, string> = {
+  "project.name": "项目名称",
+  "project.design_stage": "设计阶段",
+  "site.location": "项目区位",
+  "planning.site_area": "用地面积",
+  "planning.far": "容积率",
+  "planning.height_limit": "建筑限高",
+  "area.total_gfa": "总建筑面积",
+  "program.primary": "主要功能",
+  "evaluation.priorities": "评审重点",
+  "evaluation.design_goal": "设计目标",
+  "circulation.requirement": "交通要求",
+  "proposal.design_concept": "设计概念",
+  "proposal.concept_statement": "概念说明",
+  "proposal.masterplan": "总体布局",
+  "circulation.design": "交通组织",
+  "proposal.key_spaces": "重点空间",
+  "technical.facade": "立面方案",
+  "technical.structure": "结构方案",
+};
+
+function describeFieldExpression(expression: string) {
+  return expression
+    .split("|")
+    .map((field) => fieldLabels[field] ?? field)
+    .join(" / ");
+}
+
 function pageStatus(
   projectFacts: DesignReportProjectFacts,
   requiredFields: string[],
@@ -606,7 +667,7 @@ function pageStatus(
     (field) => !hasField(projectFacts.facts, field),
   );
   return {
-    missing,
+    missing: missing.map(describeFieldExpression),
     status:
       missing.length === 0
         ? ("ready" as const)
@@ -619,6 +680,10 @@ function pageStatus(
 function planReport(projectFacts: DesignReportProjectFacts) {
   const projectName =
     projectFacts.project_name_anonymized ?? "未命名单项目";
+  const designGoal = selectFacts(projectFacts, [
+    "evaluation.design_goal",
+    "evaluation.priorities",
+  ])[0]?.value_raw;
   const plannerReady =
     projectFacts.gate_report?.planner_readiness !== "blocked";
   const sections: DesignReportPagePlan["sections"] = [
@@ -636,21 +701,21 @@ function planReport(projectFacts: DesignReportProjectFacts) {
     },
     {
       section_id: "S02",
-      title_zh: "策略与概念",
-      purpose: "把任务要求转译为可验证的设计动作。",
-      answers_question: "方案如何回应问题？",
+      title_zh: "规划策略",
+      purpose: "把任务要求转译为可验证的策略框架。",
+      answers_question: "哪些策略能够回应项目的关键条件？",
     },
     {
       section_id: "S03",
-      title_zh: "空间落实",
-      purpose: "说明布局、交通、功能与重点空间。",
-      answers_question: "策略如何落实为空间？",
+      title_zh: "设计概念与空间落实",
+      purpose: "说明概念、布局、交通、功能、重点空间与技术证据。",
+      answers_question: "策略如何落实为可以被图纸证明的空间？",
     },
     {
       section_id: "S04",
-      title_zh: "技术与总结",
-      purpose: "核查实施证据并收束价值。",
-      answers_question: "方案是否可信并可落地？",
+      title_zh: "方案总结",
+      purpose: "回收前文已经被证明的项目价值。",
+      answers_question: "方案最终回答了哪些评审问题？",
     },
   ];
 
@@ -667,9 +732,9 @@ function planReport(projectFacts: DesignReportProjectFacts) {
     {
       section: "S01",
       type: "position" as const,
-      title: "城市与场地共同定义项目机会",
-      message: "项目区位与周边联系决定公共界面的首要价值。",
-      fields: ["site.location", "evaluation.design_goal"],
+      title: "从城市关系识别场地机会",
+      message: "项目区位与周边联系构成后续策略必须回应的空间背景。",
+      fields: ["site.location"],
       visuals: ["城市区位图", "周边关系与到达分析"],
       placeholder: true,
     },
@@ -690,29 +755,33 @@ function planReport(projectFacts: DesignReportProjectFacts) {
     {
       section: "S01",
       type: "analysis" as const,
-      title: "公共性与滨水连续性是核心命题",
-      message: "评审重点应被转译为后续策略与空间证据。",
-      fields: ["evaluation.priorities", "evaluation.design_goal"],
-      visuals: ["任务目标—设计响应矩阵", "核心矛盾图解"],
+      title: "把任务要求转译为可回答的问题",
+      message: "评审重点、功能要求与场地条件共同建立本项目的设计命题。",
+      fields: [
+        "evaluation.priorities|evaluation.design_goal|program.primary",
+      ],
+      visuals: ["任务目标—设计响应矩阵", "3—5 个核心问题图解"],
       placeholder: true,
     },
     {
       section: "S02",
       type: "strategy" as const,
-      title: "从城市到滨水建立连续公共路径",
-      message: "总体布局与交通组织共同形成可验证的公共路径策略。",
-      fields: ["proposal.masterplan", "circulation.design"],
-      visuals: ["总图策略轴线", "人行与后勤分流图"],
+      title: "以策略链回应项目核心条件",
+      message: "先依据任务书建立策略框架，再由总图、交通与空间图纸逐项验证。",
+      fields: [
+        "evaluation.priorities|evaluation.design_goal|circulation.requirement|program.primary",
+      ],
+      visuals: ["四项连续策略卡", "任务—策略—证据对应关系"],
       placeholder: true,
     },
     {
-      section: "S02",
+      section: "S03",
       type: "concept" as const,
       title: "以核心概念统领空间动作",
       message: "设计概念必须由明确的空间组织方式支撑。",
       fields: ["proposal.design_concept", "proposal.concept_statement"],
       visuals: ["概念主图", "概念—空间动作拆解"],
-      placeholder: false,
+      placeholder: true,
     },
     {
       section: "S03",
@@ -725,7 +794,7 @@ function planReport(projectFacts: DesignReportProjectFacts) {
         "circulation.requirement",
       ],
       visuals: ["总平面图", "分层交通组织图"],
-      placeholder: false,
+      placeholder: true,
     },
     {
       section: "S03",
@@ -734,16 +803,16 @@ function planReport(projectFacts: DesignReportProjectFacts) {
       message: "重点空间应形成连续、可识别且有层次的公共序列。",
       fields: ["proposal.key_spaces"],
       visuals: ["首层平面与重点空间索引", "空间序列剖面"],
-      placeholder: false,
+      placeholder: true,
     },
     {
-      section: "S04",
+      section: "S03",
       type: "technical" as const,
       title: "技术策略为设计结论提供落地证据",
       message: "结构与立面结论必须等待专项资料确认后生成。",
       fields: ["technical.facade", "technical.structure"],
       visuals: ["结构体系图", "立面材料与构造节点"],
-      placeholder: false,
+      placeholder: true,
     },
     {
       section: "S04",
@@ -768,6 +837,13 @@ function planReport(projectFacts: DesignReportProjectFacts) {
     );
     const relatedFacts = selectFacts(projectFacts, spec.fields);
     const status = plannerReady ? statusResult.status : "blocked";
+    const referenceStyleHint = projectFacts.style_observations?.length
+      ? ["cover", "concept", "rendering", "summary"].includes(spec.type)
+        ? "历史参考页型：以全幅主视觉和短篇幅双语标题建立单页结论"
+        : ["masterplan", "plan", "technical"].includes(spec.type)
+          ? "历史参考页型：图纸占据主要版面，以统一色彩和短标签组织证据"
+          : "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+      : null;
     return buildPage(
       index + 1,
       spec.section,
@@ -775,7 +851,7 @@ function planReport(projectFacts: DesignReportProjectFacts) {
       spec.title,
       spec.message,
       relatedFacts,
-      spec.visuals,
+      referenceStyleHint ? [...spec.visuals, referenceStyleHint] : spec.visuals,
       statusResult.missing,
       status,
     );
@@ -783,7 +859,9 @@ function planReport(projectFacts: DesignReportProjectFacts) {
 
   return {
     narrative_claim:
-      "以连续公共路径连接城市与滨水，并用可追溯的空间和技术证据支撑方案价值。",
+      designGoal
+        ? `围绕“${String(designGoal)}”组织全篇，并以可追溯的空间、图纸与技术证据逐页验证。`
+        : "以任务书明确的场地、指标、功能与评审要求为边界，建立从问题、策略到空间证据的完整叙事。",
     page_format: "A3_landscape_420x297mm",
     language_mode: "zh",
     target_page_count: pages.length,
@@ -826,13 +904,19 @@ function composeBody(page: ReportPage, facts: ProjectFact[]) {
     case "cover":
       return `${get("project.name")}处于${get("project.design_stage")}阶段。本次汇报将以权威项目条件为起点，逐页建立可追溯的设计证据。`;
     case "position":
-      return `${get("site.location")}。项目应回应“${get("evaluation.design_goal")}”这一目标，首先建立城市公共空间与场地之间清晰、连续的联系。`;
+      return `${get("site.location")}。本页先以权威区位与周边关系识别场地机会，不把尚未形成的设计动作写成既成结论。`;
     case "data":
       return `任务书明确：用地面积${get("planning.site_area")}，容积率${get("planning.far")}，建筑限高${get("planning.height_limit")}，总建筑面积${get("area.total_gfa")}。这些指标共同界定体量、功能与空间组织的基本边界。`;
     case "analysis":
       return `项目的评审重点为${get("evaluation.priorities") || get("evaluation.design_goal")}。后续策略与空间页面需逐项回应这些要求，并配置相应图纸或分析图作为证据。`;
     case "strategy":
-      return `${get("proposal.masterplan")}；同时，${get("circulation.design")}。两项设计动作共同建立从城市到场地内部的公共路径，并避免主要人流与后勤交通互相干扰。`;
+      return `任务书已经明确的策略驱动包括：${[
+        get("evaluation.priorities") || get("evaluation.design_goal"),
+        get("circulation.requirement"),
+        get("program.primary"),
+      ]
+        .filter(Boolean)
+        .join("；")}。本页将这些要求组织为待总图、交通与空间图纸逐项验证的策略框架。`;
     case "concept":
       return `方案以“${get("proposal.design_concept")}”为核心概念。${get("proposal.concept_statement")}。概念由可识别的空间动作支撑，而不是脱离图纸的口号。`;
     case "masterplan":
@@ -1002,7 +1086,7 @@ export function runPipeline(
   inputs: InputDocument[],
   projectId = "SINGLE_PROJECT",
 ): PipelineResult {
-  const registeredDocuments = registerDocuments(inputs);
+  const registrationOutput = buildRegistrationOutput(inputs);
   const extracted = extractFacts(inputs, projectId);
   const checked = checkCompleteness(extracted);
   const planned = planReport(checked);
@@ -1011,7 +1095,7 @@ export function runPipeline(
       node: "registration",
       execution: "local_rule",
       model_calls: 0,
-      output: registeredDocuments,
+      output: registrationOutput,
     },
     {
       node: "fact_extraction",

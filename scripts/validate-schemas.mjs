@@ -15,13 +15,14 @@ const sourceRoot = resolve(
 const readJson = async (path) =>
   JSON.parse(await readFile(path, { encoding: "utf8" }));
 
-const [factsSchema, planSchema, dk05Example, fixtureRun] = await Promise.all([
+const [factsSchema, planSchema, dk05Example, fixtureRun, briefOnlyRun] = await Promise.all([
   readJson(resolve(sourceRoot, "schemas", "project_facts.schema.json")),
   readJson(resolve(sourceRoot, "schemas", "page_plan.schema.json")),
   readJson(resolve(sourceRoot, "examples", "dk05_fact_snapshot.json")),
   readJson(
     resolve(projectRoot, "fixtures", "virtual-project", "full-run.json"),
   ),
+  readJson(resolve(projectRoot, "fixtures", "brief-only", "full-run.json")),
 ]);
 
 const ajv = new Ajv2020({ allErrors: true, strict: false });
@@ -39,6 +40,8 @@ for (const [name, value, validator] of [
   ["DK05 fact example", dk05Example, validateFacts],
   ["fixture facts", fixtureRun.projectFacts, validateFacts],
   ["fixture page plan", fixtureRun.pagePlan, validatePlan],
+  ["brief-only facts", briefOnlyRun.projectFacts, validateFacts],
+  ["brief-only page plan", briefOnlyRun.pagePlan, validatePlan],
 ]) {
   if (!validator(value)) {
     throw new Error(`${name} failed: ${ajv.errorsText(validator.errors)}`);
@@ -46,6 +49,5 @@ for (const [name, value, validator] of [
 }
 
 console.log(
-  "Schema PASS: canonical schemas, DK05 example, fixture facts, and fixture page plan.",
+  "Schema PASS: canonical schemas, DK05 example, full fixture, and brief-only fixture.",
 );
-

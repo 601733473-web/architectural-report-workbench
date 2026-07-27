@@ -32,11 +32,12 @@ test("server-renders the single-project reporting workbench", async () => {
   assert.match(html, /<title>单项目建筑汇报工作台<\/title>/);
   assert.match(html, /单项目建筑汇报工作台/);
   assert.match(html, /页级目录/);
-  assert.match(html, /BODY COPY/);
   assert.match(html, /Gate A/);
   assert.match(html, /Gate B/);
-  assert.match(html, /滨水文化中心概念方案竞赛/);
-  assert.match(html, /以明确指标建立设计边界/);
+  assert.match(html, /历史参考已经准备好/);
+  assert.match(html, /26_0610 PRESENTATION_LR\.pdf/);
+  assert.match(html, /上传本项目任务书/);
+  assert.doesNotMatch(html, /滨水文化中心概念方案竞赛/);
   assert.doesNotMatch(html, /Your site is taking shape|codex-preview/);
 });
 
@@ -105,6 +106,34 @@ test("API runs registration through audit with the canonical contracts", async (
     "reviewed",
   );
   assert.equal(audited.nodeOutputs.length, 6);
+});
+
+test("brief-only flow keeps the built-in reference isolated", async () => {
+  const fixture = await import(
+    "../fixtures/brief-only/full-run.json",
+    { with: { type: "json" } }
+  );
+  const data = fixture.default;
+  const referenceIds = new Set(
+    data.projectFacts.documents
+      .filter((document) => document.role === "reference_style")
+      .map((document) => document.document_id),
+  );
+
+  assert.equal(data.pagePlan.pages.length, 10);
+  assert.ok(data.projectFacts.style_observations.length >= 8);
+  assert.ok(
+    data.projectFacts.facts.every(
+      (fact) => !referenceIds.has(fact.source.document_id),
+    ),
+  );
+  assert.ok(
+    data.pagePlan.pages.some((page) =>
+      page.visual_requirements.some((item) =>
+        item.startsWith("历史参考页型："),
+      ),
+    ),
+  );
 });
 
 test("fixture output keeps company information out of facts and copy", async () => {
