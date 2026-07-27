@@ -15,7 +15,7 @@
     "prebuild": "npm run contracts:generate",
     "build": "vinext build",
     "start": "vinext start",
-    "test": "npm run fixture:run && npm run fixture:brief && npm run schema:check && npm run typecheck && npm run build && node --test tests/rendered-html.test.mjs",
+    "test": "npm run contracts:generate && npm run fixture:run && npm run fixture:brief && npm run schema:check && npm run typecheck && npm run build && node --test tests/rendered-html.test.mjs",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next"
   },
   "dependencies": {

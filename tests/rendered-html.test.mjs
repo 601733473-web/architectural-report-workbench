@@ -51,6 +51,13 @@ function schemaContainsKey(value, target) {
   );
 }
 
+function schemaContainsEmptyObject(value) {
+  if (Array.isArray(value)) return value.some(schemaContainsEmptyObject);
+  if (!value || typeof value !== "object") return false;
+  if (Object.keys(value).length === 0) return true;
+  return Object.values(value).some(schemaContainsEmptyObject);
+}
+
 test("server-renders the single-project reporting workbench", async () => {
   const response = await fetchWorker();
   assert.equal(response.status, 200);
@@ -162,6 +169,7 @@ test("API uses the real-model path and keeps every response schema-bound", async
           schemaContainsKey(body.text.format.schema, "const"),
           false,
         );
+        assert.equal(schemaContainsEmptyObject(body.text.format.schema), false);
 
         if (name === "document_registration") {
           return modelResponse(name, {

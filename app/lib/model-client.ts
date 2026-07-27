@@ -32,6 +32,11 @@ function strictSchema(value: unknown): unknown {
   if (!value || typeof value !== "object") return value;
 
   const source = value as Record<string, unknown>;
+  if (Object.keys(source).length === 0) {
+    // The canonical contract intentionally permits any JSON scalar for raw and
+    // normalized fact values. Structured Outputs requires an explicit type.
+    return { type: ["string", "number", "boolean", "null"] };
+  }
   const result: Record<string, unknown> = {};
   for (const [key, child] of Object.entries(source)) {
     if (["$schema", "title", "default"].includes(key)) continue;
