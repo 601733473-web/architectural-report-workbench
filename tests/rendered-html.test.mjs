@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-async function fetchWorker(path = "/", init = {}) {
+async function fetchWorker(path = "/", init = {}, envOverrides = {}) {
   const workerUrl = new URL("../dist/server/index.js", import.meta.url);
   workerUrl.searchParams.set("test", `${process.pid}-${Date.now()}`);
   const { default: worker } = await import(workerUrl.href);
@@ -15,11 +15,39 @@ async function fetchWorker(path = "/", init = {}) {
       ASSETS: {
         fetch: async () => new Response("Not found", { status: 404 }),
       },
+      ...envOverrides,
     },
     {
       waitUntil() {},
       passThroughOnException() {},
     },
+  );
+}
+
+function modelResponse(name, value) {
+  return new Response(
+    JSON.stringify({
+      id: `resp_test_${name}`,
+      model: "gpt-5.6-sol",
+      output: [
+        {
+          type: "message",
+          content: [{ type: "output_text", text: JSON.stringify(value) }],
+        },
+      ],
+      usage: { input_tokens: 100, output_tokens: 20 },
+    }),
+    { headers: { "content-type": "application/json" } },
+  );
+}
+
+function schemaContainsKey(value, target) {
+  if (Array.isArray(value)) {
+    return value.some((item) => schemaContainsKey(item, target));
+  }
+  if (!value || typeof value !== "object") return false;
+  return Object.entries(value).some(
+    ([key, item]) => key === target || schemaContainsKey(item, target),
   );
 }
 
@@ -106,6 +134,148 @@ test("API runs registration through audit with the canonical contracts", async (
     "reviewed",
   );
   assert.equal(audited.nodeOutputs.length, 6);
+});
+
+test("API uses the real-model path and keeps every response schema-bound", async () => {
+  const sourceFixture = await import(
+    "../fixtures/virtual-project/source-documents.json",
+    { with: { type: "json" } }
+  );
+  const resultFixture = await import(
+    "../fixtures/virtual-project/full-run.json",
+    { with: { type: "json" } }
+  );
+  const expected = resultFixture.default;
+  const requestedSchemas = [];
+  const modelEnv = {
+    OPENAI_API_KEY: "test-key",
+    OPENAI_MODEL: "gpt-5.6-sol",
+    OPENAI_API: {
+      fetch: async (request) => {
+        const body = await request.json();
+        const name = body.text.format.name;
+        requestedSchemas.push(name);
+        assert.equal(body.text.format.type, "json_schema");
+        assert.equal(body.text.format.strict, true);
+        assert.equal(body.store, false);
+        assert.equal(
+          schemaContainsKey(body.text.format.schema, "const"),
+          false,
+        );
+
+        if (name === "document_registration") {
+          return modelResponse(name, {
+            documents: expected.projectFacts.documents,
+          });
+        }
+        if (name === "project_facts" || name === "project_completeness") {
+          return modelResponse(name, expected.projectFacts);
+        }
+        if (name === "page_plan") {
+          return modelResponse(name, expected.pagePlan);
+        }
+        if (name === "report_page") {
+          return modelResponse(
+            name,
+            expected.pagePlan.pages.find((page) => page.page_id === "P003"),
+          );
+        }
+        if (name === "audit_report") {
+          return modelResponse(name, expected.pagePlan.audit_report);
+        }
+        return new Response("Unexpected schema", { status: 400 });
+      },
+    },
+  };
+
+  const pipelineResponse = await fetchWorker(
+    "/api/pipeline",
+    {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        action: "run",
+        projectId: "VIRTUAL_RIVERFRONT_CULTURE",
+        documents: sourceFixture.default,
+      }),
+    },
+    modelEnv,
+  );
+  assert.equal(pipelineResponse.status, 200);
+  const pipeline = await pipelineResponse.json();
+  assert.equal(pipeline.executionMode, "openai_model");
+  assert.equal(pipeline.modelCallCount, 4);
+  assert.deepEqual(requestedSchemas, [
+    "document_registration",
+    "project_facts",
+    "project_completeness",
+    "page_plan",
+  ]);
+  assert.ok(
+    pipeline.nodeOutputs.every(
+      (node) =>
+        node.execution === "openai_model" &&
+        node.model === "gpt-5.6-sol" &&
+        node.response_id,
+    ),
+  );
+  assert.ok(
+    pipeline.projectFacts.facts.every((fact) =>
+      ["DOC_BRIEF_V01", "DOC_PROPOSAL_V01"].includes(
+        fact.source.document_id,
+      ),
+    ),
+  );
+
+  const generationResponse = await fetchWorker(
+    "/api/pipeline",
+    {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        action: "generate_page",
+        projectFacts: pipeline.projectFacts,
+        pagePlan: pipeline.pagePlan,
+        pageId: "P003",
+        nodeOutputs: pipeline.nodeOutputs,
+      }),
+    },
+    modelEnv,
+  );
+  assert.equal(generationResponse.status, 200);
+  const generated = await generationResponse.json();
+  assert.equal(generated.executionMode, "openai_model");
+  assert.equal(generated.modelCallCount, 5);
+  assert.equal(requestedSchemas.at(-1), "report_page");
+
+  const auditResponse = await fetchWorker(
+    "/api/pipeline",
+    {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        action: "audit",
+        projectFacts: generated.projectFacts,
+        pagePlan: generated.pagePlan,
+        nodeOutputs: generated.nodeOutputs,
+      }),
+    },
+    modelEnv,
+  );
+  assert.equal(auditResponse.status, 200);
+  const audited = await auditResponse.json();
+  assert.equal(audited.executionMode, "openai_model");
+  assert.equal(audited.modelCallCount, 6);
+  assert.equal(requestedSchemas.at(-1), "audit_report");
 });
 
 test("brief-only flow keeps the built-in reference isolated", async () => {

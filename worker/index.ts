@@ -13,6 +13,11 @@ interface Env {
       };
     };
   };
+  OPENAI_API_KEY?: string;
+  OPENAI_MODEL?: string;
+  OPENAI_API?: {
+    fetch(request: Request): Promise<Response>;
+  };
 }
 
 interface ExecutionContext {
@@ -28,6 +33,13 @@ interface ExecutionContext {
 
 const worker = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+    globalThis.__ARCH_REPORT_MODEL_RUNTIME__ = {
+      apiKey: env.OPENAI_API_KEY,
+      model: env.OPENAI_MODEL,
+      apiFetch: env.OPENAI_API
+        ? (modelRequest: Request) => env.OPENAI_API!.fetch(modelRequest)
+        : undefined,
+    };
     const url = new URL(request.url);
 
     if (url.pathname === "/_vinext/image") {

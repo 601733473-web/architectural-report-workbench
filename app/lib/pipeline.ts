@@ -16,6 +16,8 @@ export interface InputDocument {
   authority_rank?: number;
   page_count?: number;
   text: string;
+  file_data?: string;
+  mime_type?: string;
 }
 
 export interface NodeOutput {
@@ -26,8 +28,15 @@ export interface NodeOutput {
     | "planner"
     | "page_generation"
     | "consistency_audit";
-  execution: "local_rule";
-  model_calls: 0;
+  execution: "local_rule" | "openai_model" | "local_fallback";
+  model_calls: number;
+  model?: string;
+  response_id?: string;
+  token_usage?: {
+    input: number;
+    output: number;
+  };
+  fallback_reason?: string;
   output: unknown;
 }
 
@@ -35,7 +44,9 @@ export interface PipelineResult {
   projectFacts: DesignReportProjectFacts;
   pagePlan: DesignReportPagePlan;
   nodeOutputs: NodeOutput[];
-  modelCallCount: 0;
+  modelCallCount: number;
+  executionMode?: "openai_model" | "local_fallback";
+  modelName?: string;
 }
 
 type FactCategory = ProjectFact["category"];

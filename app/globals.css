@@ -134,6 +134,27 @@ button {
   white-space: nowrap;
 }
 
+.model-mode {
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 9px;
+  border: 1px solid #c8d9cd;
+  border-radius: 9px;
+  background: var(--forest-soft);
+  color: var(--forest);
+  font-size: 10px;
+  font-weight: 720;
+  white-space: nowrap;
+}
+
+.model-mode-local_fallback {
+  border-color: #ecd4ae;
+  background: var(--amber-soft);
+  color: var(--amber);
+}
+
 .gate-pill {
   height: 34px;
   display: flex;
@@ -249,6 +270,19 @@ button:disabled {
   font-size: 12px;
 }
 
+.model-warning {
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 24px;
+  border-bottom: 1px solid #ecd4ae;
+  background: var(--amber-soft);
+  color: #80551c;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
 .error-banner button {
   display: grid;
   place-items: center;
@@ -271,6 +305,15 @@ button:disabled {
 
 .error-banner + .workbench-grid {
   height: calc(100vh - 120px);
+}
+
+.model-warning + .workbench-grid,
+.error-banner + .model-warning + .workbench-grid {
+  height: calc(100vh - 120px);
+}
+
+.error-banner + .model-warning + .workbench-grid {
+  height: calc(100vh - 158px);
 }
 
 .panel {

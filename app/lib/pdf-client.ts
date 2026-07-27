@@ -74,12 +74,22 @@ async function readPdf(file: File) {
   return { text: pages.join("\n"), pageCount: pdf.numPages };
 }
 
+function fileToDataUrl(file: File) {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result));
+    reader.onerror = () => reject(reader.error ?? new Error("文件编码失败"));
+    reader.readAsDataURL(file);
+  });
+}
+
 export async function fileToInputDocument(file: File): Promise<InputDocument> {
   const isPdf =
     file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
   const parsed = isPdf
     ? await readPdf(file)
     : { text: await file.text(), pageCount: 1 };
+  const fileData = isPdf ? await fileToDataUrl(file) : undefined;
   const id = `DOC_UPLOAD_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
 
   return {
@@ -92,5 +102,7 @@ export async function fileToInputDocument(file: File): Promise<InputDocument> {
     authority_rank: 6,
     page_count: parsed.pageCount,
     text: parsed.text,
+    file_data: fileData,
+    mime_type: file.type || (isPdf ? "application/pdf" : "text/plain"),
   };
 }

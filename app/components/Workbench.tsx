@@ -403,6 +403,16 @@ export function Workbench({
           </div>
         </div>
         <div className="project-summary">
+          <div
+            className={`model-mode model-mode-${result.executionMode ?? "local_fallback"}`}
+          >
+            <Sparkles size={13} />
+            <span>
+              {result.executionMode === "openai_model"
+                ? `${result.modelName ?? "真实模型"} · ${result.modelCallCount} 次调用`
+                : "本地回退"}
+            </span>
+          </div>
           <div className="project-name">
             <span>当前项目</span>
             <strong>
@@ -455,6 +465,17 @@ export function Workbench({
           <button onClick={() => setError("")} aria-label="关闭错误">
             <X size={14} />
           </button>
+        </div>
+      ) : null}
+
+      {result.executionMode === "local_fallback" ? (
+        <div className="model-warning">
+          <AlertTriangle size={15} />
+          <span>
+            真实模型尚未启用；当前结果来自本地规则。
+            {result.nodeOutputs.find((output) => output.fallback_reason)
+              ?.fallback_reason ?? "需要配置 OPENAI_API_KEY。"}
+          </span>
         </div>
       ) : null}
 
@@ -954,7 +975,14 @@ export function Workbench({
                         <details key={`${nodeOutput.node}-${index}`}>
                           <summary>
                             {index + 1}. {nodeOutput.node}
-                            <span>本地规则 · 0 次模型</span>
+                            <span>
+                              {nodeOutput.execution === "openai_model"
+                                ? nodeOutput.model ?? "真实模型"
+                                : nodeOutput.execution === "local_fallback"
+                                  ? "本地回退"
+                                  : "本地规则"}{" "}
+                              · {nodeOutput.model_calls} 次模型
+                            </span>
                           </summary>
                           <pre>
                             {JSON.stringify(nodeOutput.output, null, 2)}
