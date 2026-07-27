@@ -1,0 +1,48 @@
+{
+  "name": "architectural-report-workbench",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "dev": "vinext dev",
+    "contracts:generate": "node scripts/generate-contracts.mjs",
+    "schema:check": "node scripts/validate-schemas.mjs",
+    "fixture:run": "tsx scripts/run-fixture.ts",
+    "typecheck": "npm run contracts:generate && tsc --noEmit",
+    "prebuild": "npm run contracts:generate",
+    "build": "vinext build",
+    "start": "vinext start",
+    "test": "npm run fixture:run && npm run schema:check && npm run typecheck && npm run build && node --test tests/rendered-html.test.mjs",
+    "lint": "eslint . --ignore-pattern dist --ignore-pattern .next"
+  },
+  "dependencies": {
+    "ajv": "^8.20.0",
+    "lucide-react": "^1.27.0",
+    "next": "16.2.6",
+    "pdfjs-dist": "^6.1.200",
+    "react": "19.2.6",
+    "react-dom": "19.2.6"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "1.37.1",
+    "@tailwindcss/postcss": "4.2.1",
+    "@types/node": "22.19.19",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "6.0.2",
+    "@vitejs/plugin-rsc": "0.5.26",
+    "eslint": "9.39.4",
+    "eslint-config-next": "16.2.6",
+    "json-schema-to-typescript": "^15.0.4",
+    "react-server-dom-webpack": "19.2.6",
+    "tailwindcss": "4.2.1",
+    "tsx": "^4.23.1",
+    "typescript": "5.9.3",
+    "vinext": "0.0.50",
+    "vite": "8.0.13",
+    "wrangler": "4.92.0"
+  },
+  "type": "module"
+}
