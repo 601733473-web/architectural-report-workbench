@@ -3,6 +3,8 @@ declare module "*?url" {
   export default url;
 }
 
+// Global runtime bridge assigned by the Cloudflare worker.
+// eslint-disable-next-line no-var
 declare var __ARCH_REPORT_MODEL_RUNTIME__:
   | {
       apiKey?: string;

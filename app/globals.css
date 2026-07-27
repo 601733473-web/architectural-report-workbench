@@ -1120,6 +1120,511 @@ blockquote {
   flex: 1;
 }
 
+.detail-view-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--line);
+  background: #fafbf9;
+}
+
+.detail-view-tabs button {
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 720;
+}
+
+.detail-view-tabs button:hover {
+  color: var(--ink);
+}
+
+.detail-view-tabs button.active {
+  border-color: #d9ddd8;
+  background: white;
+  color: var(--ink);
+  box-shadow: 0 2px 7px rgb(28 35 31 / 6%);
+}
+
+.preview-scroll {
+  padding: 16px;
+  background: #eef0ed;
+}
+
+.a3-preview-frame {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.a3-sheet {
+  --a3-accent: #dd603a;
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  aspect-ratio: 420 / 297;
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: 11.5% minmax(0, 1fr) 9%;
+  background: #f8f7f2;
+  color: #18201c;
+  box-shadow:
+    0 1px 2px rgb(18 24 20 / 10%),
+    0 18px 42px rgb(18 24 20 / 16%);
+}
+
+.a3-grid-lines {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  opacity: 0.22;
+  background:
+    linear-gradient(90deg, transparent 49.8%, #d5d9d4 50%, transparent 50.2%),
+    linear-gradient(transparent 49.8%, #d5d9d4 50%, transparent 50.2%);
+  background-size: 12.5% 100%, 100% 16.67%;
+  pointer-events: none;
+}
+
+.a3-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4.5%;
+  border-bottom: 1px solid rgb(45 56 50 / 13%);
+}
+
+.a3-header > div {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.a3-section-index {
+  color: var(--a3-accent);
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: clamp(6px, 0.75vw, 9px);
+  font-weight: 800;
+}
+
+.a3-section-title,
+.a3-project-name {
+  font-size: clamp(5px, 0.65vw, 8px);
+  font-weight: 750;
+  letter-spacing: 0.08em;
+}
+
+.a3-project-name {
+  max-width: 45%;
+  overflow: hidden;
+  color: #6d756f;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.a3-main {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 33% minmax(0, 1fr);
+  gap: 3.8%;
+  padding: 4.2% 4.5% 3.4%;
+}
+
+.a3-copy-column {
+  min-width: 0;
+}
+
+.a3-kicker {
+  margin-bottom: 7%;
+  color: #727b75;
+  font-size: clamp(5px, 0.62vw, 7px);
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+
+.a3-copy-column h3 {
+  max-width: 15em;
+  margin: 0;
+  font-family: "Songti SC", "STSong", serif;
+  font-size: clamp(13px, 2vw, 24px);
+  font-weight: 750;
+  line-height: 1.22;
+  letter-spacing: -0.04em;
+}
+
+.a3-copy-column h4 {
+  margin: 4% 0 0;
+  color: #6a726d;
+  font-size: clamp(5px, 0.72vw, 8px);
+  font-weight: 650;
+  line-height: 1.35;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.a3-accent-rule {
+  width: 24px;
+  height: 2px;
+  margin: 7% 0;
+  background: var(--a3-accent);
+}
+
+.a3-core-message {
+  margin: 0;
+  font-size: clamp(6px, 0.86vw, 10px);
+  font-weight: 680;
+  line-height: 1.55;
+}
+
+.a3-body-copy {
+  display: -webkit-box;
+  overflow: hidden;
+  margin: 6% 0 0;
+  color: #5c655f;
+  font-size: clamp(5px, 0.65vw, 8px);
+  line-height: 1.65;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 5;
+}
+
+.a3-copy-placeholder {
+  margin-top: 7%;
+  padding: 6% 7%;
+  border: 1px dashed #c7ccc7;
+  color: #929994;
+  font-size: clamp(5px, 0.62vw, 7px);
+  line-height: 1.45;
+}
+
+.a3-visual-column {
+  min-width: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 6%;
+}
+
+.a3-visual-stage {
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: 2px;
+  background:
+    linear-gradient(140deg, rgb(26 46 36 / 4%), transparent 50%),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0,
+      transparent 24px,
+      rgb(52 77 63 / 6%) 25px
+    ),
+    #e8ece7;
+}
+
+.a3-visual-stage::before,
+.a3-visual-stage::after {
+  content: "";
+  position: absolute;
+  border: 1px solid rgb(52 89 71 / 24%);
+  transform: rotate(-14deg);
+}
+
+.a3-visual-stage::before {
+  width: 46%;
+  height: 52%;
+  right: 13%;
+  top: 19%;
+  background: rgb(255 255 255 / 58%);
+  box-shadow: 15px 11px 0 rgb(54 89 71 / 10%);
+}
+
+.a3-visual-stage::after {
+  width: 29%;
+  height: 35%;
+  left: 14%;
+  bottom: 13%;
+  border-color: rgb(221 96 58 / 45%);
+  background: rgb(221 96 58 / 8%);
+}
+
+.a3-visual-orbit {
+  position: absolute;
+  z-index: 2;
+  right: 13%;
+  top: 14%;
+  width: 53%;
+  height: 65%;
+  border: 1px solid rgb(54 89 71 / 30%);
+  border-radius: 50%;
+  transform: rotate(-14deg);
+}
+
+.a3-visual-orbit span {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--a3-accent);
+}
+
+.a3-visual-orbit span:nth-child(1) {
+  left: 5%;
+  top: 54%;
+}
+
+.a3-visual-orbit span:nth-child(2) {
+  right: 13%;
+  top: 3%;
+}
+
+.a3-visual-orbit span:nth-child(3) {
+  right: 3%;
+  bottom: 17%;
+}
+
+.a3-visual-axis {
+  position: absolute;
+  z-index: 2;
+  left: 8%;
+  right: 8%;
+  top: 51%;
+  border-top: 1px dashed rgb(54 89 71 / 42%);
+  transform: rotate(-14deg);
+}
+
+.a3-visual-labels {
+  position: absolute;
+  z-index: 3;
+  left: 5%;
+  top: 7%;
+  display: grid;
+  gap: 4px;
+}
+
+.a3-visual-labels span {
+  width: fit-content;
+  max-width: 24em;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 5px;
+  background: rgb(248 247 242 / 88%);
+  color: #465149;
+  font-size: clamp(4px, 0.56vw, 6px);
+  line-height: 1.35;
+}
+
+.a3-visual-labels i {
+  color: var(--a3-accent);
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 0.92em;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.a3-empty-visual {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: rgb(54 89 71 / 42%);
+  font-size: clamp(6px, 0.8vw, 9px);
+  font-weight: 800;
+  letter-spacing: 0.15em;
+}
+
+.a3-callout-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 3px;
+}
+
+.a3-callout-grid article {
+  min-width: 0;
+  min-height: 39px;
+  padding: 6px;
+  border-top: 2px solid var(--a3-accent);
+  background: white;
+}
+
+.a3-callout-grid article > span {
+  display: block;
+  margin-bottom: 3px;
+  color: #9ba19d;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: clamp(4px, 0.5vw, 6px);
+}
+
+.a3-callout-grid strong,
+.a3-callout-grid small,
+.a3-callout-grid em {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.a3-callout-grid strong {
+  font-size: clamp(5px, 0.66vw, 8px);
+}
+
+.a3-callout-grid small,
+.a3-callout-grid em {
+  margin-top: 2px;
+  color: #7d8580;
+  font-size: clamp(3px, 0.44vw, 5px);
+  font-style: normal;
+}
+
+.a3-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4.5%;
+  border-top: 1px solid rgb(45 56 50 / 13%);
+  color: #6f7772;
+  font-size: clamp(4px, 0.5vw, 6px);
+  font-weight: 750;
+  letter-spacing: 0.12em;
+}
+
+.a3-footer > div {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.a3-footer strong {
+  color: var(--a3-accent);
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: clamp(8px, 1.1vw, 13px);
+}
+
+.a3-preview-caption {
+  display: flex;
+  justify-content: space-between;
+  padding: 9px 2px 0;
+  color: #747b76;
+  font-size: 9px;
+}
+
+.a3-hero-sheet {
+  --a3-accent: #f07a53;
+  background: #1c2420;
+  color: white;
+}
+
+.a3-hero-sheet .a3-grid-lines {
+  opacity: 0.08;
+}
+
+.a3-hero-sheet .a3-header,
+.a3-hero-sheet .a3-footer {
+  border-color: rgb(255 255 255 / 13%);
+}
+
+.a3-hero-sheet .a3-project-name,
+.a3-hero-sheet .a3-copy-column h4,
+.a3-hero-sheet .a3-kicker,
+.a3-hero-sheet .a3-body-copy,
+.a3-hero-sheet .a3-footer {
+  color: #aeb9b2;
+}
+
+.a3-hero-sheet .a3-visual-stage {
+  background:
+    radial-gradient(circle at 68% 36%, rgb(240 122 83 / 24%), transparent 34%),
+    linear-gradient(145deg, #354b40, #17201b 68%);
+}
+
+.a3-hero-sheet .a3-visual-stage::before {
+  border-color: rgb(255 255 255 / 28%);
+  background: rgb(255 255 255 / 6%);
+  box-shadow: 15px 11px 0 rgb(255 255 255 / 4%);
+}
+
+.a3-hero-sheet .a3-visual-labels span {
+  background: rgb(24 33 28 / 82%);
+  color: #dce4df;
+}
+
+.a3-hero-sheet .a3-callout-grid article {
+  background: rgb(255 255 255 / 8%);
+}
+
+.a3-hero-sheet .a3-callout-grid small,
+.a3-hero-sheet .a3-callout-grid em {
+  color: #aeb9b2;
+}
+
+.a3-type-data .a3-visual-stage {
+  background:
+    linear-gradient(120deg, rgb(221 96 58 / 7%), transparent 45%),
+    repeating-linear-gradient(
+      0deg,
+      transparent 0,
+      transparent 22px,
+      rgb(52 77 63 / 6%) 23px
+    ),
+    #eef1ec;
+}
+
+.a3-type-data .a3-visual-stage::before {
+  width: 62%;
+  height: 52%;
+  right: 8%;
+  top: 19%;
+  transform: none;
+  background:
+    linear-gradient(90deg, rgb(54 89 71 / 12%) 33%, transparent 33% 66%, rgb(221 96 58 / 10%) 66%);
+  box-shadow: none;
+}
+
+.a3-type-data .a3-visual-stage::after {
+  width: 44%;
+  height: 24%;
+  left: 12%;
+  bottom: 16%;
+  transform: none;
+}
+
+.preview-notice {
+  max-width: 760px;
+  display: flex;
+  gap: 9px;
+  margin: 12px auto 0;
+  padding: 11px 12px;
+  border: 1px solid #d8dcd7;
+  border-radius: 8px;
+  background: rgb(255 255 255 / 80%);
+  color: var(--muted);
+}
+
+.preview-notice > svg {
+  flex: 0 0 auto;
+  margin-top: 1px;
+  color: var(--forest);
+}
+
+.preview-notice strong {
+  display: block;
+  color: var(--ink);
+  font-size: 10px;
+}
+
+.preview-notice p {
+  margin: 3px 0 0;
+  font-size: 9px;
+  line-height: 1.55;
+}
+
 .detail-scroll {
   padding: 2px 18px 22px;
 }

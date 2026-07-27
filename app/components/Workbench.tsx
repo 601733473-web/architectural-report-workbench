@@ -15,6 +15,7 @@ import {
   LoaderCircle,
   Play,
   Plus,
+  Presentation,
   Quote,
   RefreshCw,
   ShieldCheck,
@@ -31,12 +32,12 @@ import { fileToInputDocument } from "@/app/lib/pdf-client";
 import { isDefaultReference } from "@/app/lib/default-reference";
 import type {
   InputDocument,
-  NodeOutput,
   PipelineResult,
   SourceRole,
 } from "@/app/lib/pipeline";
 
 type LeftTab = "documents" | "facts" | "issues";
+type DetailTab = "preview" | "content";
 
 interface WorkbenchProps {
   initialDocuments: InputDocument[];
@@ -144,6 +145,145 @@ function documentTextLength(document: InputDocument) {
     .trim().length;
 }
 
+function A3PagePreview({
+  page,
+  section,
+  facts,
+  projectName,
+}: {
+  page: DesignReportPagePlan["pages"][number];
+  section?: DesignReportPagePlan["sections"][number];
+  facts: DesignReportProjectFacts["facts"];
+  projectName: string;
+}) {
+  const callouts =
+    page.callouts?.length
+      ? page.callouts.map((callout) => {
+          const fact = callout.fact_ref
+            ? facts.find((item) => item.fact_id === callout.fact_ref)
+            : undefined;
+          return {
+            label: callout.label_zh,
+            labelEn: callout.label_en,
+            source: fact?.source,
+          };
+        })
+      : facts.slice(0, 4).map((fact) => ({
+          label: String(fact.value_raw),
+          labelEn: fact.source.location_note,
+          source: fact.source,
+        }));
+  const visualItems = (page.visual_brief?.length
+    ? page.visual_brief
+    : page.visual_requirements
+  ).slice(0, 3);
+  const isHeroPage = [
+    "cover",
+    "section_divider",
+    "concept",
+    "rendering",
+    "summary",
+  ].includes(page.page_type);
+  const pageNumber =
+    page.display_page_number == null
+      ? "—"
+      : String(page.display_page_number).padStart(2, "0");
+
+  return (
+    <div className="a3-preview-frame">
+      <div
+        className={`a3-sheet a3-type-${page.page_type} ${
+          isHeroPage ? "a3-hero-sheet" : ""
+        }`}
+        aria-label={`${page.headline_zh} A3 页面预览`}
+      >
+        <div className="a3-grid-lines" aria-hidden="true" />
+        <header className="a3-header">
+          <div>
+            <span className="a3-section-index">{section?.section_id ?? page.section_id}</span>
+            <span className="a3-section-title">
+              {section?.title_zh ?? pageTypeLabels[page.page_type]}
+            </span>
+          </div>
+          <span className="a3-project-name">{projectName}</span>
+        </header>
+
+        <div className="a3-main">
+          <section className="a3-copy-column">
+            <div className="a3-kicker">
+              {pageTypeLabels[page.page_type]} / {page.page_id}
+            </div>
+            <h3>{page.headline_zh}</h3>
+            {page.headline_en ? <h4>{page.headline_en}</h4> : null}
+            <div className="a3-accent-rule" />
+            <p className="a3-core-message">{page.core_message}</p>
+            {page.body_copy ? (
+              <p className="a3-body-copy">{page.body_copy}</p>
+            ) : (
+              <div className="a3-copy-placeholder">
+                {page.generation_status === "blocked"
+                  ? "当前页证据不足，暂不生成正文"
+                  : "当前页正文待生成"}
+              </div>
+            )}
+          </section>
+
+          <section className="a3-visual-column">
+            <div className="a3-visual-stage" aria-label="图面区域占位预览">
+              <div className="a3-visual-orbit" aria-hidden="true">
+                <span />
+                <span />
+                <span />
+              </div>
+              <div className="a3-visual-axis" aria-hidden="true" />
+              <div className="a3-visual-labels">
+                {visualItems.map((item, index) => (
+                  <span key={`${item}-${index}`}>
+                    <i>{String(index + 1).padStart(2, "0")}</i>
+                    {item.replace(/^历史参考页型：/, "")}
+                  </span>
+                ))}
+              </div>
+              {!visualItems.length ? (
+                <div className="a3-empty-visual">VISUAL AREA</div>
+              ) : null}
+            </div>
+
+            {callouts.length ? (
+              <div className="a3-callout-grid">
+                {callouts.map((callout, index) => (
+                  <article key={`${callout.label}-${index}`}>
+                    <span>{String(index + 1).padStart(2, "0")}</span>
+                    <strong>{callout.label}</strong>
+                    {callout.labelEn ? <small>{callout.labelEn}</small> : null}
+                    {callout.source ? (
+                      <em>
+                        {callout.source.document_id} · P{callout.source.page}
+                      </em>
+                    ) : null}
+                  </article>
+                ))}
+              </div>
+            ) : null}
+          </section>
+        </div>
+
+        <footer className="a3-footer">
+          <span>ARCHITECTURAL DESIGN REPORT</span>
+          <div>
+            <span>{page.generation_status === "generated" ? "DRAFT" : "PREVIEW"}</span>
+            <strong>{pageNumber}</strong>
+          </div>
+        </footer>
+      </div>
+      <div className="a3-preview-caption">
+        <span>A3 横版 · 420 × 297 mm</span>
+        <span>按面板宽度缩放</span>
+      </div>
+    </div>
+  );
+}
+
 function DocumentCard({
   document,
   locked,
@@ -226,6 +366,7 @@ export function Workbench({
     useState<InputDocument[]>(initialDocuments);
   const [result, setResult] = useState<PipelineResult>(initialResult);
   const [leftTab, setLeftTab] = useState<LeftTab>("documents");
+  const [detailTab, setDetailTab] = useState<DetailTab>("preview");
   const [selectedPageId, setSelectedPageId] = useState(
     initialResult.projectFacts.facts.length
       ? initialResult.pagePlan.pages[0]?.page_id
@@ -260,6 +401,9 @@ export function Workbench({
         .map((factId) => facts.facts.find((fact) => fact.fact_id === factId))
         .filter(Boolean) as DesignReportProjectFacts["facts"],
     [facts.facts, selectedPage],
+  );
+  const selectedSection = plan.sections.find(
+    (section) => section.section_id === selectedPage?.section_id,
   );
 
   const processDocuments = async (nextDocuments: InputDocument[]) => {
@@ -848,6 +992,46 @@ export function Workbench({
                 </button>
               </div>
 
+              <div className="detail-view-tabs" role="tablist" aria-label="单页查看方式">
+                <button
+                  className={detailTab === "preview" ? "active" : ""}
+                  onClick={() => setDetailTab("preview")}
+                  role="tab"
+                  aria-selected={detailTab === "preview"}
+                >
+                  <Presentation size={14} />
+                  A3 页面预览
+                </button>
+                <button
+                  className={detailTab === "content" ? "active" : ""}
+                  onClick={() => setDetailTab("content")}
+                  role="tab"
+                  aria-selected={detailTab === "content"}
+                >
+                  <BookOpenText size={14} />
+                  内容与证据
+                </button>
+              </div>
+
+              {detailTab === "preview" ? (
+                <div className="scroll-area preview-scroll">
+                  <A3PagePreview
+                    page={selectedPage}
+                    section={selectedSection}
+                    facts={selectedFacts}
+                    projectName={facts.project_name_anonymized ?? "当前项目"}
+                  />
+                  <div className="preview-notice">
+                    <Presentation size={15} />
+                    <div>
+                      <strong>当前为排版预览</strong>
+                      <p>
+                        图面区域依据本页视觉要求生成占位结构；正文、指标及来源均取自当前页面数据。
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ) : (
               <div className="scroll-area detail-scroll">
                 <section className="detail-section core-message">
                   <FieldLabel icon={<CircleDot size={14} />}>
@@ -993,6 +1177,7 @@ export function Workbench({
                   ) : null}
                 </section>
               </div>
+              )}
             </>
           ) : (
             <div className="empty-detail">请选择一页。</div>
