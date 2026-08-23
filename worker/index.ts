@@ -15,6 +15,7 @@ interface Env {
   };
   OPENAI_API_KEY?: string;
   OPENAI_MODEL?: string;
+  OPENAI_BASE_URL?: string;
   OPENAI_API?: {
     fetch(request: Request): Promise<Response>;
   };
@@ -32,28 +33,46 @@ interface ExecutionContext {
 // const imageConfig: ImageConfig = { dangerouslyAllowSVG: true };
 
 const worker = {
-  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+  async fetch(
+    request: Request,
+    env?: Env,
+    ctx?: ExecutionContext,
+  ): Promise<Response> {
+    const runtimeEnv = env ?? ({} as Env);
+    const runtimeContext =
+      ctx ??
+      ({
+        waitUntil() {},
+        passThroughOnException() {},
+      } satisfies ExecutionContext);
     globalThis.__ARCH_REPORT_MODEL_RUNTIME__ = {
-      apiKey: env.OPENAI_API_KEY,
-      model: env.OPENAI_MODEL,
-      apiFetch: env.OPENAI_API
-        ? (modelRequest: Request) => env.OPENAI_API!.fetch(modelRequest)
+      apiKey: runtimeEnv.OPENAI_API_KEY,
+      model: runtimeEnv.OPENAI_MODEL,
+      baseUrl: runtimeEnv.OPENAI_BASE_URL,
+      apiFetch: runtimeEnv.OPENAI_API
+        ? (modelRequest: Request) => runtimeEnv.OPENAI_API!.fetch(modelRequest)
         : undefined,
     };
     const url = new URL(request.url);
 
     if (url.pathname === "/_vinext/image") {
+      if (!runtimeEnv.ASSETS || !runtimeEnv.IMAGES) {
+        return new Response("Image optimization is unavailable locally.", {
+          status: 404,
+        });
+      }
       const allowedWidths = [...DEFAULT_DEVICE_SIZES, ...DEFAULT_IMAGE_SIZES];
       return handleImageOptimization(request, {
-        fetchAsset: (path) => env.ASSETS.fetch(new Request(new URL(path, request.url))),
+        fetchAsset: (path) =>
+          runtimeEnv.ASSETS.fetch(new Request(new URL(path, request.url))),
         transformImage: async (body, { width, format, quality }) => {
-          const result = await env.IMAGES.input(body).transform(width > 0 ? { width } : {}).output({ format, quality });
+          const result = await runtimeEnv.IMAGES.input(body).transform(width > 0 ? { width } : {}).output({ format, quality });
           return result.response();
         },
       }, allowedWidths);
     }
 
-    return handler.fetch(request, env, ctx);
+    return handler.fetch(request, runtimeEnv, runtimeContext);
   },
 };
 

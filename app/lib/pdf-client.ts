@@ -1,5 +1,6 @@
 import type { InputDocument } from "@/app/lib/pipeline";
 import { inferRole } from "@/app/lib/pipeline";
+import { scoreSiteResearchPageText } from "@/app/lib/site-source-pages";
 
 interface PdfTextItem {
   str: string;
@@ -63,15 +64,56 @@ async function readPdf(file: File) {
   const data = new Uint8Array(await file.arrayBuffer());
   const pdf = await pdfjs.getDocument({ data }).promise;
   const pages: string[] = [];
+  const pageTexts: string[] = [];
 
   for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
     const page = await pdf.getPage(pageNumber);
     const content = await page.getTextContent();
     const text = pageItemsToLines(content.items);
+    pageTexts.push(text);
     pages.push(`===== PAGE ${pageNumber} =====\n${text}`);
   }
 
-  return { text: pages.join("\n"), pageCount: pdf.numPages };
+  const scoredPages = pageTexts
+    .map((text, index) => {
+      return {
+        pageNumber: index + 1,
+        text,
+        score: scoreSiteResearchPageText(text),
+      };
+    })
+    .filter((candidate) => candidate.score > 0)
+    .sort((left, right) => right.score - left.score || left.pageNumber - right.pageNumber)
+    .slice(0, 3);
+
+  const visualPages: NonNullable<InputDocument["visual_pages"]> = [];
+  for (const candidate of scoredPages) {
+    const page = await pdf.getPage(candidate.pageNumber);
+    const baseViewport = page.getViewport({ scale: 1 });
+    const scale = Math.min(2, 1500 / Math.max(baseViewport.width, 1));
+    const viewport = page.getViewport({ scale });
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(viewport.width));
+    canvas.height = Math.max(1, Math.round(viewport.height));
+    const context = canvas.getContext("2d", { alpha: false });
+    if (!context) continue;
+    context.fillStyle = "#ffffff";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    await page.render({ canvas, canvasContext: context, viewport }).promise;
+    visualPages.push({
+      page_number: candidate.pageNumber,
+      data_url: canvas.toDataURL("image/jpeg", 0.82),
+      reason: "任务书中的区位、场地、交通或周边资源相关页面",
+      text_excerpt: candidate.text.replace(/\s+/g, " ").trim().slice(0, 1800),
+    });
+    page.cleanup();
+  }
+
+  return {
+    text: pages.join("\n"),
+    pageCount: pdf.numPages,
+    visualPages,
+  };
 }
 
 function fileToDataUrl(file: File) {
@@ -83,13 +125,32 @@ function fileToDataUrl(file: File) {
   });
 }
 
+function countMarkedTextPages(text: string) {
+  const pageNumbers = [...text.matchAll(/={3,}\s*PAGE\s+(\d+)\s*={3,}/gi)]
+    .map((match) => Number.parseInt(match[1] ?? "", 10))
+    .filter((pageNumber) => Number.isFinite(pageNumber) && pageNumber > 0);
+
+  return pageNumbers.length > 0 ? Math.max(...pageNumbers) : 1;
+}
+
 export async function fileToInputDocument(file: File): Promise<InputDocument> {
   const isPdf =
     file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
   const parsed = isPdf
     ? await readPdf(file)
-    : { text: await file.text(), pageCount: 1 };
-  const fileData = isPdf ? await fileToDataUrl(file) : undefined;
+    : await file.text().then((text) => ({
+        text,
+        pageCount: countMarkedTextPages(text),
+        visualPages: [],
+      }));
+  const extractedTextLength = parsed.text
+    .replace(/={3,}\s*PAGE\s+\d+\s*={3,}/gi, "")
+    .replace(/\s+/g, "")
+    .length;
+  const needsVisualPdfFallback = isPdf && extractedTextLength < 200;
+  const fileData = needsVisualPdfFallback
+    ? await fileToDataUrl(file)
+    : undefined;
   const id = `DOC_UPLOAD_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
 
   return {
@@ -104,5 +165,6 @@ export async function fileToInputDocument(file: File): Promise<InputDocument> {
     text: parsed.text,
     file_data: fileData,
     mime_type: file.type || (isPdf ? "application/pdf" : "text/plain"),
+    visual_pages: parsed.visualPages,
   };
 }

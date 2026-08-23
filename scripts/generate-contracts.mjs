@@ -7,35 +7,53 @@ import { compile } from "json-schema-to-typescript";
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const projectRoot = resolve(scriptDir, "..");
-const contractRoot = resolve(
-  projectRoot,
-  "..",
-  "output",
-  "design_report_agent_v0_1",
-  "schemas",
-);
+const contractRoot = resolve(projectRoot, "schemas");
 const generatedRoot = resolve(projectRoot, "app", "generated");
 
 const factsPath = resolve(contractRoot, "project_facts.schema.json");
 const planPath = resolve(contractRoot, "page_plan.schema.json");
-const [factsText, planText] = await Promise.all([
+const narrativePath = resolve(
+  contractRoot,
+  "design_narrative.schema.json",
+);
+const visualLibraryPath = resolve(
+  contractRoot,
+  "visual_reference_library.schema.json",
+);
+const [factsText, planText, narrativeText, visualLibraryText] =
+  await Promise.all([
   readFile(factsPath, "utf8"),
   readFile(planPath, "utf8"),
+  readFile(narrativePath, "utf8"),
+  readFile(visualLibraryPath, "utf8"),
 ]);
 const factsSchema = JSON.parse(factsText);
 const planSchema = JSON.parse(planText);
+const narrativeSchema = JSON.parse(narrativeText);
+const visualLibrarySchema = JSON.parse(visualLibraryText);
 
 await mkdir(generatedRoot, { recursive: true });
 
 const banner =
   "/* Generated from the canonical JSON Schemas. Do not edit by hand. */\n\n";
-const [factsTypes, planTypes] = await Promise.all([
+const [factsTypes, planTypes, narrativeTypes, visualLibraryTypes] =
+  await Promise.all([
   compile(factsSchema, "DesignReportProjectFacts", {
     bannerComment: "",
     additionalProperties: false,
     style: { singleQuote: false, semi: true },
   }),
   compile(planSchema, "DesignReportPagePlan", {
+    bannerComment: "",
+    additionalProperties: false,
+    style: { singleQuote: false, semi: true },
+  }),
+  compile(narrativeSchema, "DesignReportNarrative", {
+    bannerComment: "",
+    additionalProperties: false,
+    style: { singleQuote: false, semi: true },
+  }),
+  compile(visualLibrarySchema, "DesignReportVisualReferenceLibrary", {
     bannerComment: "",
     additionalProperties: false,
     style: { singleQuote: false, semi: true },
@@ -48,9 +66,13 @@ const ajv = new Ajv2020({
 });
 ajv.addSchema(factsSchema, "projectFacts");
 ajv.addSchema(planSchema, "pagePlan");
+ajv.addSchema(narrativeSchema, "designNarrative");
+ajv.addSchema(visualLibrarySchema, "visualLibrary");
 const validatorsCode = standaloneCode(ajv, {
   validateFacts: "projectFacts",
   validatePlan: "pagePlan",
+  validateDesignNarrative: "designNarrative",
+  validateVisualLibrary: "visualLibrary",
 });
 const esmValidatorsCode = validatorsCode.replace(
   /require\("ajv\/dist\/runtime\/ucs2length"\)\.default/g,
@@ -60,12 +82,12 @@ const esmValidatorsCode = validatorsCode.replace(
 await Promise.all([
   writeFile(
     resolve(generatedRoot, "contracts.ts"),
-    `${banner}${factsTypes}\n${planTypes}`,
+    `${banner}${factsTypes}\n${planTypes}\n${narrativeTypes}\n${visualLibraryTypes}`,
     "utf8",
   ),
   writeFile(
     resolve(generatedRoot, "schema-data.ts"),
-    `${banner}export const projectFactsSchema = ${JSON.stringify(factsSchema, null, 2)} as const;\n\nexport const pagePlanSchema = ${JSON.stringify(planSchema, null, 2)} as const;\n`,
+    `${banner}export const projectFactsSchema = ${JSON.stringify(factsSchema, null, 2)} as const;\n\nexport const pagePlanSchema = ${JSON.stringify(planSchema, null, 2)} as const;\n\nexport const designNarrativeSchema = ${JSON.stringify(narrativeSchema, null, 2)} as const;\n\nexport const visualReferenceLibrarySchema = ${JSON.stringify(visualLibrarySchema, null, 2)} as const;\n`,
     "utf8",
   ),
   writeFile(

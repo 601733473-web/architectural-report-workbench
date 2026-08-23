@@ -1,6 +1,7 @@
 import type { InputDocument } from "@/app/lib/pipeline";
+import { DEFAULT_REFERENCE_ID } from "@/app/lib/reference-style-examples";
 
-export const DEFAULT_REFERENCE_ID = "SYS_REFERENCE_DK05_PRESENTATION";
+export { DEFAULT_REFERENCE_ID };
 
 /**
  * Isolated style profile derived from the user's 109-page A3 presentation.
@@ -9,7 +10,7 @@ export const DEFAULT_REFERENCE_ID = "SYS_REFERENCE_DK05_PRESENTATION";
  */
 export const defaultReferenceDocument: InputDocument = {
   document_id: DEFAULT_REFERENCE_ID,
-  file_name: "26_0610 PRESENTATION_LR.pdf",
+  file_name: "Guangzhou Yuexiu",
   role: "reference_style",
   version_or_date: "2026-06-10",
   authority_rank: 6,

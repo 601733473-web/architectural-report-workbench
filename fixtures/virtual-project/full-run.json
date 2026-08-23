@@ -3,7 +3,7 @@
     "project_id": "VIRTUAL_RIVERFRONT_CULTURE",
     "project_name_anonymized": "滨水文化中心概念方案竞赛",
     "default_page_format": "A3_landscape_420x297mm",
-    "language_mode": "zh",
+    "language_mode": "zh_en",
     "ignore_company_info": true,
     "documents": [
       {
@@ -332,14 +332,14 @@
         "fact_id": "F_017",
         "category": "proposal_design",
         "field_path": "proposal.masterplan",
-        "value_raw": "展览与图书阅览分置南北两翼，共享中央公共大厅；首层架空通廊连接城市公园和滨水步道。",
-        "value_normalized": "展览与图书阅览分置南北两翼，共享中央公共大厅；首层架空通廊连接城市公园和滨水步道",
+        "value_raw": "展览与图书阅览分置南北两翼，共享中央公共大厅",
+        "value_normalized": "展览与图书阅览分置南北两翼，共享中央公共大厅",
         "unit": null,
         "source": {
           "document_id": "DOC_PROPOSAL_V01",
           "page": 2,
           "location_note": "总体布局",
-          "quote": "总体布局：展览与图书阅览分置南北两翼，共享中央公共大厅；首层架空通廊连接城市公园和滨水步道。"
+          "quote": "总体布局：展览与图书阅览分置南北两翼，共享中央公共大厅"
         },
         "source_role": "proposal_fact",
         "confidence": 1,
@@ -459,6 +459,7 @@
         }
       }
     ],
+    "reference_style_examples": [],
     "conflicts": [
       {
         "conflict_id": "C_001",
@@ -481,71 +482,73 @@
           "page_generation"
         ],
         "suggested_source": "已确认的方案说明、图纸或视觉素材清单"
-      },
-      {
-        "item_id": "M_B_002",
-        "description": "Gate B 缺少：结构方案",
-        "severity": "important",
-        "blocks": [
-          "page_generation"
-        ],
-        "suggested_source": "已确认的方案说明、图纸或视觉素材清单"
-      },
-      {
-        "item_id": "M_B_003",
-        "description": "Gate B 缺少：效果图或视觉清单",
-        "severity": "important",
-        "blocks": [
-          "page_generation"
-        ],
-        "suggested_source": "已确认的方案说明、图纸或视觉素材清单"
       }
     ],
+    "task_mode": "large_public_building",
     "gate_report": {
       "planner_readiness": "ready",
       "generation_readiness": "partial",
       "gate_a_missing": [],
       "gate_b_missing": [
-        "立面方案",
-        "结构方案",
-        "效果图或视觉清单"
+        "立面方案"
       ],
-      "summary": "Gate A 已通过；Gate B 仍缺少 3 类方案证据。"
-    }
+      "summary": "Gate A 已通过；Gate B 仍缺少 1 类方案证据。"
+    },
+    "gate_b_proposals": []
   },
   "pagePlan": {
+    "task_mode": "large_public_building",
     "narrative_claim": "围绕“建立城市与滨水之间连续开放的公共文化界面。”组织全篇，并以可追溯的空间、图纸与技术证据逐页验证。",
     "page_format": "A3_landscape_420x297mm",
-    "language_mode": "zh",
-    "target_page_count": 10,
+    "language_mode": "zh_en",
+    "target_page_count": 34,
     "sections": [
       {
         "section_id": "S00",
         "title_zh": "开篇",
+        "title_en": "OPENING",
         "purpose": "建立项目身份与汇报路径。",
         "answers_question": "我们在解决什么项目？"
       },
       {
         "section_id": "S01",
         "title_zh": "项目理解",
+        "title_en": "PROJECT UNDERSTANDING",
         "purpose": "用权威事实说明场地机会与设计边界。",
         "answers_question": "项目的核心条件和矛盾是什么？"
       },
       {
         "section_id": "S02",
-        "title_zh": "规划策略",
-        "purpose": "把任务要求转译为可验证的策略框架。",
-        "answers_question": "哪些策略能够回应项目的关键条件？"
+        "title_zh": "核心议题与规划策略",
+        "title_en": "KEY ISSUES & PLANNING STRATEGIES",
+        "purpose": "把任务要求转译为可验证的议题与策略框架。",
+        "answers_question": "哪些策略能够回应项目的关键条件和评审重点？"
       },
       {
         "section_id": "S03",
-        "title_zh": "设计概念与空间落实",
-        "purpose": "说明概念、布局、交通、功能、重点空间与技术证据。",
-        "answers_question": "策略如何落实为可以被图纸证明的空间？"
+        "title_zh": "设计概念",
+        "title_en": "DESIGN CONCEPT",
+        "purpose": "通过概念、生成逻辑与方案比选建立空间方法。",
+        "answers_question": "核心策略如何转译为空间概念？"
       },
       {
         "section_id": "S04",
+        "title_zh": "空间与功能落实",
+        "title_en": "SPATIAL & FUNCTIONAL DEVELOPMENT",
+        "purpose": "用总图、功能、交通、平面、剖面和重点空间落实概念。",
+        "answers_question": "概念如何落实为可以被图纸证明的空间？"
+      },
+      {
+        "section_id": "S05",
+        "title_zh": "技术与实施",
+        "title_en": "TECHNICAL DEVELOPMENT & DELIVERY",
+        "purpose": "用立面、材料、系统剖切渲染与环境性能说明方案的实施路径。",
+        "answers_question": "方案如何获得技术支撑？"
+      },
+      {
+        "section_id": "S06",
         "title_zh": "方案总结",
+        "title_en": "DESIGN SUMMARY",
         "purpose": "回收前文已经被证明的项目价值。",
         "answers_question": "方案最终回答了哪些评审问题？"
       }
@@ -556,11 +559,15 @@
         "display_page_number": 1,
         "section_id": "S00",
         "page_type": "cover",
-        "core_message": "以匿名项目名称和方案阶段建立汇报起点。",
+        "core_message": "建筑概念方案设计 / ARCHITECTURAL CONCEPT DESIGN",
+        "core_message_en": "A fact-grounded architectural design report.",
         "headline_zh": "滨水文化中心概念方案竞赛",
+        "headline_en": "DESIGN REPORT",
         "body_zh": "",
+        "body_en": "",
         "body_copy": "",
         "diagram_labels": [],
+        "diagram_labels_en": [],
         "speaker_notes": "",
         "visual_requirements": [
           "项目主视觉或场地区位底图",
@@ -573,92 +580,165 @@
           "横版 A3 封面",
           "历史参考页型：以全幅主视觉和短篇幅双语标题建立单页结论"
         ],
+        "style_example_refs": [],
+        "experience_recipe_refs": [],
         "fact_refs": [
           "F_001",
           "F_002"
         ],
         "unresolved_items": [],
         "missing_information": [],
-        "generation_status": "ready"
+        "generation_status": "ready",
+        "proposal_refs": [],
+        "proposal_context_hash": ""
       },
       {
         "page_id": "P002",
         "display_page_number": 2,
-        "section_id": "S01",
-        "page_type": "position",
-        "core_message": "项目区位与周边联系构成后续策略必须回应的空间背景。",
-        "headline_zh": "从城市关系识别场地机会",
+        "section_id": "S00",
+        "page_type": "toc",
+        "core_message": "项目理解 · 规划策略 · 设计概念 · 空间与功能 · 技术实施 · 方案总结",
+        "core_message_en": "The report is organized by chapters and page sequence.",
+        "headline_zh": "目录",
+        "headline_en": "CONTENTS",
         "body_zh": "",
+        "body_en": "",
         "body_copy": "",
         "diagram_labels": [],
+        "diagram_labels_en": [],
         "speaker_notes": "",
         "visual_requirements": [
-          "城市区位图",
-          "周边关系与到达分析",
+          "六章目录结构",
+          "章节编号与起始页码",
+          "全篇叙事路径",
           "历史参考页型：分析白底、图解主导，并保持左上章节定位"
         ],
         "callouts": [],
         "visual_brief": [
-          "城市区位图",
-          "周边关系与到达分析",
+          "六章目录结构",
+          "章节编号与起始页码",
+          "全篇叙事路径",
           "历史参考页型：分析白底、图解主导，并保持左上章节定位"
         ],
+        "style_example_refs": [],
+        "experience_recipe_refs": [],
         "fact_refs": [
-          "F_003"
+          "F_001"
         ],
         "unresolved_items": [],
         "missing_information": [],
-        "generation_status": "ready"
+        "generation_status": "ready",
+        "proposal_refs": [],
+        "proposal_context_hash": ""
       },
       {
         "page_id": "P003",
         "display_page_number": 3,
         "section_id": "S01",
-        "page_type": "data",
-        "core_message": "用地、强度、高度和规模共同构成不可越过的方案边界。",
-        "headline_zh": "以明确指标建立设计边界",
-        "body_zh": "任务书明确：用地面积18,600㎡，容积率2.50，建筑限高48m，总建筑面积62,000㎡。这些指标共同界定体量、功能与空间组织的基本边界。",
-        "body_copy": "任务书明确：用地面积18,600㎡，容积率2.50，建筑限高48m，总建筑面积62,000㎡。这些指标共同界定体量、功能与空间组织的基本边界。",
+        "page_type": "section_divider",
+        "core_message": "从任务书的权威事实出发，建立场地机会、建设边界与评审目标的共同认识。",
+        "core_message_en": "This section establishes the next stage of the design argument.",
+        "headline_zh": "项目理解",
+        "headline_en": "PROJECT UNDERSTANDING",
+        "body_zh": "",
+        "body_en": "This section establishes the next stage of the design argument.",
+        "body_copy": "",
         "diagram_labels": [
-          "用地面积：18,600㎡",
-          "容积率：2.50",
-          "建筑限高：48m",
-          "总建筑面积：62,000㎡",
-          "总建筑面积：61,800㎡"
+          "关键信息",
+          "证据关系",
+          "本页结论",
+          "项目名称：滨水文化中心概念方案竞赛"
         ],
-        "speaker_notes": "本页结论仅引用 5 条事实。讲述时先说结论，再说明设计动作，最后指出需要由图纸验证的部分。",
+        "diagram_labels_en": [
+          "SECTION 01",
+          "SECTION 02",
+          "SECTION 03",
+          "SECTION 04"
+        ],
+        "speaker_notes": "先说明本页结论，再解释当前项目事实与设计动作，最后归纳空间价值。",
         "visual_requirements": [
-          "四项核心指标卡",
-          "地上地下规模对照",
+          "章节编号与标题",
+          "场地区位或任务书关键图像",
           "历史参考页型：分析白底、图解主导，并保持左上章节定位"
         ],
         "callouts": [
           {
-            "label_zh": "用地面积：18,600㎡",
-            "fact_ref": "F_004"
+            "label_zh": "关键信息",
+            "label_en": "SECTION 01",
+            "fact_ref": "F_001"
           },
           {
-            "label_zh": "容积率：2.50",
-            "fact_ref": "F_005"
+            "label_zh": "证据关系",
+            "label_en": "SECTION 02"
           },
           {
-            "label_zh": "建筑限高：48m",
-            "fact_ref": "F_006"
+            "label_zh": "本页结论",
+            "label_en": "SECTION 03"
           },
           {
-            "label_zh": "总建筑面积：62,000㎡",
-            "fact_ref": "F_007"
-          },
-          {
-            "label_zh": "总建筑面积：61,800㎡",
-            "fact_ref": "F_019"
+            "label_zh": "项目名称：滨水文化中心概念方案竞赛",
+            "label_en": "SECTION 04"
           }
         ],
         "visual_brief": [
-          "四项核心指标卡",
-          "地上地下规模对照",
+          "章节编号与标题",
+          "场地区位或任务书关键图像",
           "历史参考页型：分析白底、图解主导，并保持左上章节定位"
         ],
+        "style_example_refs": [],
+        "experience_recipe_refs": [],
+        "fact_refs": [
+          "F_001"
+        ],
+        "unresolved_items": [],
+        "missing_information": [],
+        "generation_status": "reviewed",
+        "proposal_refs": [],
+        "proposal_context_hash": "",
+        "content_depth_check": {
+          "status": "pass",
+          "applicable": false,
+          "evaluated_at": "2026-08-23T15:18:25.806Z",
+          "conclusion_present": true,
+          "body_point_count": 0,
+          "evidence_count": 0,
+          "image_caption_count": 0,
+          "required_image_caption_count": 0,
+          "confirmed_proposal_count": 0,
+          "unsupported_numbers": [],
+          "issues": []
+        }
+      },
+      {
+        "page_id": "P004",
+        "display_page_number": 4,
+        "section_id": "S01",
+        "page_type": "data",
+        "core_message": "用地、强度、高度和规模共同构成不可越过的方案边界。",
+        "core_message_en": "Verified project metrics define the design boundary.",
+        "headline_zh": "明确指标建立设计边界",
+        "headline_en": "DEFINING DESIGN BOUNDARIES WITH KEY METRICS",
+        "body_zh": "",
+        "body_en": "",
+        "body_copy": "",
+        "diagram_labels": [],
+        "diagram_labels_en": [],
+        "speaker_notes": "",
+        "visual_requirements": [
+          "四项核心指标卡",
+          "灰白场地模型上的彩色抽象功能体块 diagram",
+          "在对应体块上标注用地面积、容积率、建筑限高、总建筑面积与分项规模",
+          "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+        ],
+        "callouts": [],
+        "visual_brief": [
+          "四项核心指标卡",
+          "灰白场地模型上的彩色抽象功能体块 diagram",
+          "在对应体块上标注用地面积、容积率、建筑限高、总建筑面积与分项规模",
+          "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+        ],
+        "style_example_refs": [],
+        "experience_recipe_refs": [],
         "fact_refs": [
           "F_004",
           "F_005",
@@ -668,61 +748,378 @@
         ],
         "unresolved_items": [],
         "missing_information": [],
-        "generation_status": "reviewed"
+        "generation_status": "ready",
+        "proposal_refs": [],
+        "proposal_context_hash": ""
       },
       {
-        "page_id": "P004",
-        "display_page_number": 4,
+        "page_id": "P005",
+        "display_page_number": 5,
         "section_id": "S01",
-        "page_type": "analysis",
-        "core_message": "评审重点、功能要求与场地条件共同建立本项目的设计命题。",
-        "headline_zh": "把任务要求转译为可回答的问题",
+        "page_type": "position",
+        "core_message": "项目区位与周边联系构成后续策略必须回应的空间背景。",
+        "core_message_en": "Urban context and site connections define the design opportunity.",
+        "headline_zh": "从城市关系识别场地机会",
+        "headline_en": "IDENTIFYING SITE OPPORTUNITIES IN THE URBAN CONTEXT",
         "body_zh": "",
+        "body_en": "",
         "body_copy": "",
         "diagram_labels": [],
+        "diagram_labels_en": [],
         "speaker_notes": "",
         "visual_requirements": [
-          "任务目标—设计响应矩阵",
-          "3—5 个核心问题图解",
+          "城市区位图",
+          "周边关系与到达分析",
           "历史参考页型：分析白底、图解主导，并保持左上章节定位"
         ],
         "callouts": [],
         "visual_brief": [
-          "任务目标—设计响应矩阵",
-          "3—5 个核心问题图解",
+          "城市区位图",
+          "周边关系与到达分析",
           "历史参考页型：分析白底、图解主导，并保持左上章节定位"
         ],
+        "style_example_refs": [],
+        "experience_recipe_refs": [],
+        "fact_refs": [
+          "F_003"
+        ],
+        "unresolved_items": [],
+        "missing_information": [],
+        "generation_status": "ready",
+        "proposal_refs": [],
+        "proposal_context_hash": ""
+      },
+      {
+        "page_id": "P006",
+        "display_page_number": 6,
+        "section_id": "S01",
+        "page_type": "analysis",
+        "core_message": "周边公共空间、城市道路和到达方向共同决定场地的主要开放关系。",
+        "core_message_en": "Current project evidence establishes the conditions and relationships shown on this page.",
+        "headline_zh": "从场地周边识别开放界面",
+        "headline_en": "IDENTIFYING OPEN INTERFACES AROUND THE SITE",
+        "body_zh": "",
+        "body_en": "",
+        "body_copy": "",
+        "diagram_labels": [],
+        "diagram_labels_en": [],
+        "speaker_notes": "",
+        "visual_requirements": [
+          "场地周边关系图",
+          "城市界面与开放方向图解",
+          "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+        ],
+        "callouts": [],
+        "visual_brief": [
+          "场地周边关系图",
+          "城市界面与开放方向图解",
+          "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+        ],
+        "style_example_refs": [],
+        "experience_recipe_refs": [],
+        "fact_refs": [
+          "F_003"
+        ],
+        "unresolved_items": [],
+        "missing_information": [],
+        "generation_status": "ready",
+        "proposal_refs": [],
+        "proposal_context_hash": ""
+      },
+      {
+        "page_id": "P007",
+        "display_page_number": 7,
+        "section_id": "S01",
+        "page_type": "analysis",
+        "core_message": "用地边界、开发强度与高度条件共同限定可实施的空间范围。",
+        "core_message_en": "Current project evidence establishes the conditions and relationships shown on this page.",
+        "headline_zh": "识别场地限制与建设条件",
+        "headline_en": "IDENTIFYING SITE CONSTRAINTS AND DEVELOPMENT CONDITIONS",
+        "body_zh": "",
+        "body_en": "",
+        "body_copy": "",
+        "diagram_labels": [],
+        "diagram_labels_en": [],
+        "speaker_notes": "",
+        "visual_requirements": [
+          "建设条件叠合图",
+          "边界、强度与高度限制图解",
+          "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+        ],
+        "callouts": [],
+        "visual_brief": [
+          "建设条件叠合图",
+          "边界、强度与高度限制图解",
+          "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+        ],
+        "style_example_refs": [],
+        "experience_recipe_refs": [],
+        "fact_refs": [
+          "F_004",
+          "F_005",
+          "F_006"
+        ],
+        "unresolved_items": [],
+        "missing_information": [],
+        "generation_status": "ready",
+        "proposal_refs": [],
+        "proposal_context_hash": ""
+      },
+      {
+        "page_id": "P008",
+        "display_page_number": 8,
+        "section_id": "S01",
+        "page_type": "analysis",
+        "core_message": "任务书中的人行、车行与后勤要求构成交通组织的基础边界。",
+        "core_message_en": "Current project evidence establishes the conditions and relationships shown on this page.",
+        "headline_zh": "交通要求梳理到达秩序",
+        "headline_en": "ORGANIZING ARRIVAL THROUGH TRAFFIC REQUIREMENTS",
+        "body_zh": "",
+        "body_en": "",
+        "body_copy": "",
+        "diagram_labels": [],
+        "diagram_labels_en": [],
+        "speaker_notes": "",
+        "visual_requirements": [
+          "现状到达条件",
+          "人车与后勤要求图解",
+          "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+        ],
+        "callouts": [],
+        "visual_brief": [
+          "现状到达条件",
+          "人车与后勤要求图解",
+          "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+        ],
+        "style_example_refs": [],
+        "experience_recipe_refs": [],
+        "fact_refs": [
+          "F_012"
+        ],
+        "unresolved_items": [],
+        "missing_information": [],
+        "generation_status": "ready",
+        "proposal_refs": [],
+        "proposal_context_hash": ""
+      },
+      {
+        "page_id": "P009",
+        "display_page_number": 9,
+        "section_id": "S01",
+        "page_type": "analysis",
+        "core_message": "任务书明确的主要功能决定空间体系必须容纳的核心活动。",
+        "core_message_en": "Current project evidence establishes the conditions and relationships shown on this page.",
+        "headline_zh": "从功能要求理解空间构成",
+        "headline_en": "TRANSLATING PROGRAM REQUIREMENTS INTO SPATIAL STRUCTURE",
+        "body_zh": "",
+        "body_en": "",
+        "body_copy": "",
+        "diagram_labels": [],
+        "diagram_labels_en": [],
+        "speaker_notes": "",
+        "visual_requirements": [
+          "功能构成树",
+          "核心功能与配套功能关系",
+          "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+        ],
+        "callouts": [],
+        "visual_brief": [
+          "功能构成树",
+          "核心功能与配套功能关系",
+          "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+        ],
+        "style_example_refs": [],
+        "experience_recipe_refs": [],
+        "fact_refs": [
+          "F_010"
+        ],
+        "unresolved_items": [],
+        "missing_information": [],
+        "generation_status": "ready",
+        "proposal_refs": [],
+        "proposal_context_hash": ""
+      },
+      {
+        "page_id": "P010",
+        "display_page_number": 10,
+        "section_id": "S01",
+        "page_type": "analysis",
+        "core_message": "评审重点决定后续策略、图纸和价值表达的证据优先级。",
+        "core_message_en": "Current project evidence establishes the conditions and relationships shown on this page.",
+        "headline_zh": "评审重点校准汇报方向",
+        "headline_en": "ALIGNING THE REPORT WITH EVALUATION PRIORITIES",
+        "body_zh": "",
+        "body_en": "",
+        "body_copy": "",
+        "diagram_labels": [],
+        "diagram_labels_en": [],
+        "speaker_notes": "",
+        "visual_requirements": [
+          "评审重点权重图",
+          "重点—证据页面对应关系",
+          "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+        ],
+        "callouts": [],
+        "visual_brief": [
+          "评审重点权重图",
+          "重点—证据页面对应关系",
+          "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+        ],
+        "style_example_refs": [],
+        "experience_recipe_refs": [],
+        "fact_refs": [
+          "F_014"
+        ],
+        "unresolved_items": [],
+        "missing_information": [],
+        "generation_status": "ready",
+        "proposal_refs": [],
+        "proposal_context_hash": ""
+      },
+      {
+        "page_id": "P011",
+        "display_page_number": 11,
+        "section_id": "S01",
+        "page_type": "analysis",
+        "core_message": "功能、交通、指标和成果要求需要在后续页面中逐项获得回应。",
+        "core_message_en": "Current project evidence establishes the conditions and relationships shown on this page.",
+        "headline_zh": "建立任务要求响应矩阵",
+        "headline_en": "BUILDING A TASK-RESPONSE MATRIX",
+        "body_zh": "",
+        "body_en": "",
+        "body_copy": "",
+        "diagram_labels": [],
+        "diagram_labels_en": [],
+        "speaker_notes": "",
+        "visual_requirements": [
+          "任务要求响应矩阵",
+          "待验证事项清单",
+          "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+        ],
+        "callouts": [],
+        "visual_brief": [
+          "任务要求响应矩阵",
+          "待验证事项清单",
+          "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+        ],
+        "style_example_refs": [],
+        "experience_recipe_refs": [],
         "fact_refs": [
           "F_010",
+          "F_012",
+          "F_013"
+        ],
+        "unresolved_items": [],
+        "missing_information": [],
+        "generation_status": "ready",
+        "proposal_refs": [],
+        "proposal_context_hash": ""
+      },
+      {
+        "page_id": "P012",
+        "display_page_number": 12,
+        "section_id": "S02",
+        "page_type": "section_divider",
+        "core_message": "把场地条件、任务要求和评审重点转译为可由空间与图纸验证的策略体系。",
+        "core_message_en": "This section establishes the next stage of the design argument.",
+        "headline_zh": "核心议题与规划策略",
+        "headline_en": "KEY ISSUES & PLANNING STRATEGIES",
+        "body_zh": "",
+        "body_en": "",
+        "body_copy": "",
+        "diagram_labels": [],
+        "diagram_labels_en": [],
+        "speaker_notes": "",
+        "visual_requirements": [
+          "章节标题",
+          "问题—策略—证据关系主图",
+          "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+        ],
+        "callouts": [],
+        "visual_brief": [
+          "章节标题",
+          "问题—策略—证据关系主图",
+          "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+        ],
+        "style_example_refs": [],
+        "experience_recipe_refs": [],
+        "fact_refs": [
           "F_011",
           "F_014"
         ],
         "unresolved_items": [],
         "missing_information": [],
-        "generation_status": "ready"
+        "generation_status": "ready",
+        "proposal_refs": [],
+        "proposal_context_hash": ""
       },
       {
-        "page_id": "P005",
-        "display_page_number": 5,
+        "page_id": "P013",
+        "display_page_number": 13,
+        "section_id": "S02",
+        "page_type": "analysis",
+        "core_message": "场地条件、设计目标与评审重点共同界定本项目必须回答的核心议题。",
+        "core_message_en": "Current project evidence establishes the conditions and relationships shown on this page.",
+        "headline_zh": "聚焦必须回答的核心议题",
+        "headline_en": "FOCUSING ON THE KEY QUESTIONS",
+        "body_zh": "",
+        "body_en": "",
+        "body_copy": "",
+        "diagram_labels": [],
+        "diagram_labels_en": [],
+        "speaker_notes": "",
+        "visual_requirements": [
+          "核心议题图解",
+          "条件—矛盾—目标关系",
+          "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+        ],
+        "callouts": [],
+        "visual_brief": [
+          "核心议题图解",
+          "条件—矛盾—目标关系",
+          "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+        ],
+        "style_example_refs": [],
+        "experience_recipe_refs": [],
+        "fact_refs": [
+          "F_003",
+          "F_011",
+          "F_014"
+        ],
+        "unresolved_items": [],
+        "missing_information": [],
+        "generation_status": "ready",
+        "proposal_refs": [],
+        "proposal_context_hash": ""
+      },
+      {
+        "page_id": "P014",
+        "display_page_number": 14,
         "section_id": "S02",
         "page_type": "strategy",
         "core_message": "先依据任务书建立策略框架，再由总图、交通与空间图纸逐项验证。",
-        "headline_zh": "以策略链回应项目核心条件",
+        "core_message_en": "The strategy translates project requirements into spatial actions that can be verified by drawings.",
+        "headline_zh": "策略链统领设计响应",
+        "headline_en": "COORDINATING DESIGN RESPONSES THROUGH A STRATEGY CHAIN",
         "body_zh": "",
+        "body_en": "",
         "body_copy": "",
         "diagram_labels": [],
+        "diagram_labels_en": [],
         "speaker_notes": "",
         "visual_requirements": [
-          "四项连续策略卡",
+          "策略总览图",
           "任务—策略—证据对应关系",
           "历史参考页型：分析白底、图解主导，并保持左上章节定位"
         ],
         "callouts": [],
         "visual_brief": [
-          "四项连续策略卡",
+          "策略总览图",
           "任务—策略—证据对应关系",
           "历史参考页型：分析白底、图解主导，并保持左上章节定位"
         ],
+        "style_example_refs": [],
+        "experience_recipe_refs": [],
         "fact_refs": [
           "F_010",
           "F_011",
@@ -731,60 +1128,430 @@
         ],
         "unresolved_items": [],
         "missing_information": [],
-        "generation_status": "ready"
+        "generation_status": "ready",
+        "proposal_refs": [],
+        "proposal_context_hash": ""
       },
       {
-        "page_id": "P006",
-        "display_page_number": 6,
-        "section_id": "S03",
-        "page_type": "concept",
-        "core_message": "设计概念必须由明确的空间组织方式支撑。",
-        "headline_zh": "以核心概念统领空间动作",
+        "page_id": "P015",
+        "display_page_number": 15,
+        "section_id": "S02",
+        "page_type": "strategy",
+        "core_message": "公共性要求需要被转译为连续、开放且可达的空间骨架。",
+        "core_message_en": "The strategy translates project requirements into spatial actions that can be verified by drawings.",
+        "headline_zh": "公共性组织空间骨架",
+        "headline_en": "ORGANIZING THE SPATIAL FRAMEWORK AROUND PUBLIC VALUE",
         "body_zh": "",
+        "body_en": "",
         "body_copy": "",
         "diagram_labels": [],
+        "diagram_labels_en": [],
         "speaker_notes": "",
         "visual_requirements": [
-          "概念主图",
-          "概念—空间动作拆解",
-          "历史参考页型：以全幅主视觉和短篇幅双语标题建立单页结论"
+          "公共空间策略图",
+          "开放节点与连续路径",
+          "历史参考页型：分析白底、图解主导，并保持左上章节定位"
         ],
         "callouts": [],
         "visual_brief": [
-          "概念主图",
-          "概念—空间动作拆解",
-          "历史参考页型：以全幅主视觉和短篇幅双语标题建立单页结论"
+          "公共空间策略图",
+          "开放节点与连续路径",
+          "历史参考页型：分析白底、图解主导，并保持左上章节定位"
         ],
+        "style_example_refs": [],
+        "experience_recipe_refs": [],
+        "fact_refs": [
+          "F_011",
+          "F_014"
+        ],
+        "unresolved_items": [],
+        "missing_information": [],
+        "generation_status": "ready",
+        "proposal_refs": [],
+        "proposal_context_hash": ""
+      },
+      {
+        "page_id": "P016",
+        "display_page_number": 16,
+        "section_id": "S02",
+        "page_type": "strategy",
+        "core_message": "主要城市联系和场地开放方向应转化为总体布局的优先关系。",
+        "core_message_en": "The strategy translates project requirements into spatial actions that can be verified by drawings.",
+        "headline_zh": "城市关系回应场地条件",
+        "headline_en": "RESPONDING TO SITE CONDITIONS THROUGH URBAN CONNECTIONS",
+        "body_zh": "",
+        "body_en": "",
+        "body_copy": "",
+        "diagram_labels": [],
+        "diagram_labels_en": [],
+        "speaker_notes": "",
+        "visual_requirements": [
+          "城市—场地联系策略",
+          "主要界面与视线方向",
+          "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+        ],
+        "callouts": [],
+        "visual_brief": [
+          "城市—场地联系策略",
+          "主要界面与视线方向",
+          "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+        ],
+        "style_example_refs": [],
+        "experience_recipe_refs": [],
+        "fact_refs": [
+          "F_003",
+          "F_011",
+          "F_014"
+        ],
+        "unresolved_items": [],
+        "missing_information": [],
+        "generation_status": "ready",
+        "proposal_refs": [],
+        "proposal_context_hash": ""
+      },
+      {
+        "page_id": "P017",
+        "display_page_number": 17,
+        "section_id": "S02",
+        "page_type": "strategy",
+        "core_message": "人行、车行与后勤系统应在明确分流的基础上形成高效到达。",
+        "core_message_en": "The strategy translates project requirements into spatial actions that can be verified by drawings.",
+        "headline_zh": "分流原则保障交通效率",
+        "headline_en": "ENSURING TRAFFIC EFFICIENCY THROUGH SEPARATED FLOWS",
+        "body_zh": "",
+        "body_en": "",
+        "body_copy": "",
+        "diagram_labels": [],
+        "diagram_labels_en": [],
+        "speaker_notes": "",
+        "visual_requirements": [
+          "交通策略图",
+          "人车与后勤分流原则",
+          "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+        ],
+        "callouts": [],
+        "visual_brief": [
+          "交通策略图",
+          "人车与后勤分流原则",
+          "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+        ],
+        "style_example_refs": [],
+        "experience_recipe_refs": [],
+        "fact_refs": [
+          "F_012",
+          "F_018"
+        ],
+        "unresolved_items": [],
+        "missing_information": [],
+        "generation_status": "ready",
+        "proposal_refs": [],
+        "proposal_context_hash": ""
+      },
+      {
+        "page_id": "P018",
+        "display_page_number": 18,
+        "section_id": "S03",
+        "page_type": "section_divider",
+        "core_message": "将已经确认的策略转译为统一的空间概念、生成逻辑与形态语言。",
+        "core_message_en": "This section establishes the next stage of the design argument.",
+        "headline_zh": "设计概念",
+        "headline_en": "DESIGN CONCEPT",
+        "body_zh": "",
+        "body_en": "",
+        "body_copy": "",
+        "diagram_labels": [],
+        "diagram_labels_en": [],
+        "speaker_notes": "",
+        "visual_requirements": [
+          "章节标题",
+          "概念主视觉或生成序列封面",
+          "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+        ],
+        "callouts": [],
+        "visual_brief": [
+          "章节标题",
+          "概念主视觉或生成序列封面",
+          "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+        ],
+        "style_example_refs": [],
+        "experience_recipe_refs": [],
         "fact_refs": [
           "F_015",
           "F_016"
         ],
         "unresolved_items": [],
         "missing_information": [],
-        "generation_status": "ready"
+        "generation_status": "ready",
+        "proposal_refs": [],
+        "proposal_context_hash": ""
       },
       {
-        "page_id": "P007",
-        "display_page_number": 7,
+        "page_id": "P019",
+        "display_page_number": 19,
         "section_id": "S03",
-        "page_type": "masterplan",
-        "core_message": "功能、公共空间与交通系统在总图层面相互校验。",
-        "headline_zh": "功能布局与交通系统协同落位",
+        "page_type": "concept",
+        "core_message": "设计概念必须由明确的空间组织方式支撑。",
+        "core_message_en": "The design concept is developed through explicit and verifiable spatial moves.",
+        "headline_zh": "核心概念统领空间动作",
+        "headline_en": "GUIDING SPATIAL MOVES WITH A CORE CONCEPT",
         "body_zh": "",
+        "body_en": "",
         "body_copy": "",
         "diagram_labels": [],
+        "diagram_labels_en": [],
+        "speaker_notes": "",
+        "visual_requirements": [
+          "概念主图",
+          "概念—空间动作拆解",
+          "历史参考页型：以全幅主视觉和短篇幅双语标题建立单页结论"
+        ],
+        "callouts": [],
+        "visual_brief": [
+          "概念主图",
+          "概念—空间动作拆解",
+          "历史参考页型：以全幅主视觉和短篇幅双语标题建立单页结论"
+        ],
+        "style_example_refs": [],
+        "experience_recipe_refs": [],
+        "fact_refs": [
+          "F_015",
+          "F_016"
+        ],
+        "unresolved_items": [],
+        "missing_information": [],
+        "generation_status": "ready",
+        "proposal_refs": [],
+        "proposal_context_hash": ""
+      },
+      {
+        "page_id": "P020",
+        "display_page_number": 20,
+        "section_id": "S03",
+        "page_type": "concept",
+        "core_message": "高密度复合功能、运营独立、公共空间连续性和热湿气候四项条件，分别转化为连续基座连接地铁与绿地、三塔错位形成高低梯度、空中庭院与连桥延伸公共界面、立体绿化回应热湿气候，逐步形成统一的空间组织。",
+        "core_message_en": "The design concept is developed through explicit and verifiable spatial moves.",
+        "headline_zh": "从四项条件推导概念生成逻辑",
+        "headline_en": "DESIGN CONCEPT",
+        "body_zh": "",
+        "body_en": "",
+        "body_copy": "",
+        "diagram_labels": [],
+        "diagram_labels_en": [],
+        "speaker_notes": "",
+        "visual_requirements": [
+          "连续基座连接地铁与绿地",
+          "三塔错位形成高低梯度",
+          "空中庭院与连桥延伸公共界面",
+          "立体绿化回应热湿气候",
+          "历史参考页型：以全幅主视觉和短篇幅双语标题建立单页结论"
+        ],
+        "callouts": [],
+        "visual_brief": [
+          "连续基座连接地铁与绿地",
+          "三塔错位形成高低梯度",
+          "空中庭院与连桥延伸公共界面",
+          "立体绿化回应热湿气候",
+          "历史参考页型：以全幅主视觉和短篇幅双语标题建立单页结论"
+        ],
+        "style_example_refs": [],
+        "experience_recipe_refs": [],
+        "fact_refs": [
+          "F_015",
+          "F_016"
+        ],
+        "unresolved_items": [],
+        "missing_information": [],
+        "generation_status": "ready",
+        "proposal_refs": [],
+        "proposal_context_hash": ""
+      },
+      {
+        "page_id": "P021",
+        "display_page_number": 21,
+        "section_id": "S03",
+        "page_type": "rendering",
+        "core_message": "围绕 P19 提出的核心概念，选择三个重点精彩空间效果图，分别呈现公共到达、核心共享空间与重点室内体验。",
+        "core_message_en": "The key view communicates the intended spatial experience.",
+        "headline_zh": "重点空间呈现核心概念",
+        "headline_en": "SPATIAL EXPERIENCE",
+        "body_zh": "",
+        "body_en": "",
+        "body_copy": "",
+        "diagram_labels": [],
+        "diagram_labels_en": [],
+        "speaker_notes": "",
+        "visual_requirements": [
+          "三个重点精彩空间效果图",
+          "公共到达与开放界面",
+          "核心共享空间与概念体验",
+          "重点室内空间与材料氛围",
+          "三张图均需回应 P19 核心概念",
+          "历史参考页型：以全幅主视觉和短篇幅双语标题建立单页结论"
+        ],
+        "callouts": [],
+        "visual_brief": [
+          "三个重点精彩空间效果图",
+          "公共到达与开放界面",
+          "核心共享空间与概念体验",
+          "重点室内空间与材料氛围",
+          "三张图均需回应 P19 核心概念",
+          "历史参考页型：以全幅主视觉和短篇幅双语标题建立单页结论"
+        ],
+        "style_example_refs": [],
+        "experience_recipe_refs": [],
+        "fact_refs": [
+          "F_015",
+          "F_016",
+          "F_017",
+          "F_020"
+        ],
+        "unresolved_items": [],
+        "missing_information": [],
+        "generation_status": "ready",
+        "proposal_refs": [],
+        "proposal_context_hash": ""
+      },
+      {
+        "page_id": "P022",
+        "display_page_number": 22,
+        "section_id": "S04",
+        "page_type": "section_divider",
+        "core_message": "通过总图、功能、交通、平面、剖面和重点空间逐项证明概念可以落地。",
+        "core_message_en": "This section establishes the next stage of the design argument.",
+        "headline_zh": "空间与功能落实",
+        "headline_en": "SPATIAL & FUNCTIONAL DEVELOPMENT",
+        "body_zh": "",
+        "body_en": "",
+        "body_copy": "",
+        "diagram_labels": [],
+        "diagram_labels_en": [],
+        "speaker_notes": "",
+        "visual_requirements": [
+          "章节标题",
+          "总图或重点空间主视觉",
+          "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+        ],
+        "callouts": [],
+        "visual_brief": [
+          "章节标题",
+          "总图或重点空间主视觉",
+          "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+        ],
+        "style_example_refs": [],
+        "experience_recipe_refs": [],
+        "fact_refs": [
+          "F_017",
+          "F_020"
+        ],
+        "unresolved_items": [],
+        "missing_information": [],
+        "generation_status": "ready",
+        "proposal_refs": [],
+        "proposal_context_hash": ""
+      },
+      {
+        "page_id": "P023",
+        "display_page_number": 23,
+        "section_id": "S04",
+        "page_type": "masterplan",
+        "core_message": "建筑、开放空间与城市界面需要在总图层面形成完整关系。",
+        "core_message_en": "The masterplan coordinates buildings, open space, access and urban interfaces.",
+        "headline_zh": "总体布局统筹场地关系",
+        "headline_en": "COORDINATING SITE RELATIONSHIPS THROUGH THE MASTERPLAN",
+        "body_zh": "",
+        "body_en": "",
+        "body_copy": "",
+        "diagram_labels": [],
+        "diagram_labels_en": [],
         "speaker_notes": "",
         "visual_requirements": [
           "总平面图",
-          "分层交通组织图",
+          "总体布局关系图",
           "历史参考页型：图纸占据主要版面，以统一色彩和短标签组织证据"
         ],
         "callouts": [],
         "visual_brief": [
           "总平面图",
-          "分层交通组织图",
+          "总体布局关系图",
           "历史参考页型：图纸占据主要版面，以统一色彩和短标签组织证据"
         ],
+        "style_example_refs": [],
+        "experience_recipe_refs": [],
+        "fact_refs": [
+          "F_017"
+        ],
+        "unresolved_items": [],
+        "missing_information": [],
+        "generation_status": "ready",
+        "proposal_refs": [],
+        "proposal_context_hash": ""
+      },
+      {
+        "page_id": "P024",
+        "display_page_number": 24,
+        "section_id": "S04",
+        "page_type": "data",
+        "core_message": "功能分区需要同时回应任务构成、共享关系与运营边界。",
+        "core_message_en": "Verified project metrics define the design boundary.",
+        "headline_zh": "功能分区落实复合关系",
+        "headline_en": "KEY METRICS",
+        "body_zh": "",
+        "body_en": "",
+        "body_copy": "",
+        "diagram_labels": [],
+        "diagram_labels_en": [],
+        "speaker_notes": "",
+        "visual_requirements": [
+          "功能分区图",
+          "功能面积与共享关系",
+          "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+        ],
+        "callouts": [],
+        "visual_brief": [
+          "功能分区图",
+          "功能面积与共享关系",
+          "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+        ],
+        "style_example_refs": [],
+        "experience_recipe_refs": [],
+        "fact_refs": [
+          "F_010",
+          "F_017"
+        ],
+        "unresolved_items": [],
+        "missing_information": [],
+        "generation_status": "ready",
+        "proposal_refs": [],
+        "proposal_context_hash": ""
+      },
+      {
+        "page_id": "P025",
+        "display_page_number": 25,
+        "section_id": "S04",
+        "page_type": "masterplan",
+        "core_message": "交通系统需要在总图层面验证人行、车行和后勤分流。",
+        "core_message_en": "The masterplan coordinates buildings, open space, access and urban interfaces.",
+        "headline_zh": "交通组织校验总体布局",
+        "headline_en": "MASTERPLAN",
+        "body_zh": "",
+        "body_en": "",
+        "body_copy": "",
+        "diagram_labels": [],
+        "diagram_labels_en": [],
+        "speaker_notes": "",
+        "visual_requirements": [
+          "交通组织总图",
+          "到达、落客与后勤流线",
+          "历史参考页型：图纸占据主要版面，以统一色彩和短标签组织证据"
+        ],
+        "callouts": [],
+        "visual_brief": [
+          "交通组织总图",
+          "到达、落客与后勤流线",
+          "历史参考页型：图纸占据主要版面，以统一色彩和短标签组织证据"
+        ],
+        "style_example_refs": [],
+        "experience_recipe_refs": [],
         "fact_refs": [
           "F_012",
           "F_017",
@@ -792,129 +1559,386 @@
         ],
         "unresolved_items": [],
         "missing_information": [],
-        "generation_status": "ready"
+        "generation_status": "ready",
+        "proposal_refs": [],
+        "proposal_context_hash": ""
       },
       {
-        "page_id": "P008",
-        "display_page_number": 8,
-        "section_id": "S03",
+        "page_id": "P026",
+        "display_page_number": 26,
+        "section_id": "S04",
         "page_type": "plan",
-        "core_message": "重点空间应形成连续、可识别且有层次的公共序列。",
-        "headline_zh": "重点空间串联完整公共体验",
+        "core_message": "首层空间需要协调入口、公共功能、开放界面与后勤边界。",
+        "core_message_en": "The plan verifies functional organization, circulation and spatial efficiency.",
+        "headline_zh": "首层平面承接公共活动",
+        "headline_en": "ACCOMMODATING PUBLIC LIFE ON THE GROUND FLOOR",
         "body_zh": "",
+        "body_en": "",
         "body_copy": "",
         "diagram_labels": [],
+        "diagram_labels_en": [],
         "speaker_notes": "",
         "visual_requirements": [
-          "首层平面与重点空间索引",
-          "空间序列剖面",
+          "首层平面图",
+          "公共功能与入口索引",
           "历史参考页型：图纸占据主要版面，以统一色彩和短标签组织证据"
         ],
         "callouts": [],
         "visual_brief": [
-          "首层平面与重点空间索引",
-          "空间序列剖面",
+          "首层平面图",
+          "公共功能与入口索引",
           "历史参考页型：图纸占据主要版面，以统一色彩和短标签组织证据"
         ],
+        "style_example_refs": [],
+        "experience_recipe_refs": [],
+        "fact_refs": [
+          "F_017",
+          "F_020"
+        ],
+        "unresolved_items": [],
+        "missing_information": [],
+        "generation_status": "ready",
+        "proposal_refs": [],
+        "proposal_context_hash": ""
+      },
+      {
+        "page_id": "P027",
+        "display_page_number": 27,
+        "section_id": "S04",
+        "page_type": "plan",
+        "core_message": "典型层应通过清晰的功能分区、交通核心和空间尺度验证日常使用效率。",
+        "core_message_en": "The plan verifies functional organization, circulation and spatial efficiency.",
+        "headline_zh": "典型层平面验证使用效率",
+        "headline_en": "TESTING OPERATIONAL EFFICIENCY WITH TYPICAL FLOOR PLANS",
+        "body_zh": "",
+        "body_en": "",
+        "body_copy": "",
+        "diagram_labels": [],
+        "diagram_labels_en": [],
+        "speaker_notes": "",
+        "visual_requirements": [
+          "典型层平面图",
+          "功能、交通核与主要尺度标注",
+          "历史参考页型：图纸占据主要版面，以统一色彩和短标签组织证据"
+        ],
+        "callouts": [],
+        "visual_brief": [
+          "典型层平面图",
+          "功能、交通核与主要尺度标注",
+          "历史参考页型：图纸占据主要版面，以统一色彩和短标签组织证据"
+        ],
+        "style_example_refs": [],
+        "experience_recipe_refs": [],
+        "fact_refs": [
+          "F_010",
+          "F_020"
+        ],
+        "unresolved_items": [],
+        "missing_information": [],
+        "generation_status": "ready",
+        "proposal_refs": [],
+        "proposal_context_hash": ""
+      },
+      {
+        "page_id": "P028",
+        "display_page_number": 28,
+        "section_id": "S04",
+        "page_type": "rendering",
+        "core_message": "重点空间应将公共性、功能组织和场所特征落实为可感知体验。",
+        "core_message_en": "The key view communicates the intended spatial experience.",
+        "headline_zh": "重点空间呈现完整体验",
+        "headline_en": "PRESENTING THE COMPLETE EXPERIENCE THROUGH KEY SPACES",
+        "body_zh": "",
+        "body_en": "",
+        "body_copy": "",
+        "diagram_labels": [],
+        "diagram_labels_en": [],
+        "speaker_notes": "",
+        "visual_requirements": [
+          "重点空间效果图",
+          "空间价值短标注",
+          "历史参考页型：以全幅主视觉和短篇幅双语标题建立单页结论"
+        ],
+        "callouts": [],
+        "visual_brief": [
+          "重点空间效果图",
+          "空间价值短标注",
+          "历史参考页型：以全幅主视觉和短篇幅双语标题建立单页结论"
+        ],
+        "style_example_refs": [],
+        "experience_recipe_refs": [],
         "fact_refs": [
           "F_020"
         ],
         "unresolved_items": [],
         "missing_information": [],
-        "generation_status": "ready"
+        "generation_status": "ready",
+        "proposal_refs": [],
+        "proposal_context_hash": ""
       },
       {
-        "page_id": "P009",
-        "display_page_number": 9,
-        "section_id": "S03",
-        "page_type": "technical",
-        "core_message": "结构与立面结论必须等待专项资料确认后生成。",
-        "headline_zh": "技术策略为设计结论提供落地证据",
+        "page_id": "P029",
+        "display_page_number": 29,
+        "section_id": "S04",
+        "page_type": "section",
+        "core_message": "垂直交通、层高与重点空间需要通过剖面形成可验证的空间关系。",
+        "core_message_en": "The section verifies vertical circulation, spatial hierarchy and key relationships.",
+        "headline_zh": "剖面关系建立空间层次",
+        "headline_en": "BUILDING SPATIAL HIERARCHY THROUGH SECTIONAL RELATIONSHIPS",
         "body_zh": "",
+        "body_en": "",
         "body_copy": "",
         "diagram_labels": [],
+        "diagram_labels_en": [],
         "speaker_notes": "",
         "visual_requirements": [
-          "结构体系图",
-          "立面材料与构造节点",
+          "关键剖面图",
+          "垂直交通与空间层次",
+          "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+        ],
+        "callouts": [],
+        "visual_brief": [
+          "关键剖面图",
+          "垂直交通与空间层次",
+          "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+        ],
+        "style_example_refs": [],
+        "experience_recipe_refs": [],
+        "fact_refs": [
+          "F_020"
+        ],
+        "unresolved_items": [],
+        "missing_information": [],
+        "generation_status": "ready",
+        "proposal_refs": [],
+        "proposal_context_hash": ""
+      },
+      {
+        "page_id": "P030",
+        "display_page_number": 30,
+        "section_id": "S05",
+        "page_type": "section_divider",
+        "core_message": "以立面、材料、系统剖切渲染和环境性能说明空间方案的技术支撑与实施路径。",
+        "core_message_en": "This section establishes the next stage of the design argument.",
+        "headline_zh": "技术与实施",
+        "headline_en": "TECHNICAL DEVELOPMENT & DELIVERY",
+        "body_zh": "",
+        "body_en": "",
+        "body_copy": "",
+        "diagram_labels": [],
+        "diagram_labels_en": [],
+        "speaker_notes": "",
+        "visual_requirements": [
+          "章节标题",
+          "立面或系统剖切渲染主视觉",
+          "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+        ],
+        "callouts": [],
+        "visual_brief": [
+          "章节标题",
+          "立面或系统剖切渲染主视觉",
+          "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+        ],
+        "style_example_refs": [],
+        "experience_recipe_refs": [],
+        "fact_refs": [
+          "F_015",
+          "F_016",
+          "F_021"
+        ],
+        "unresolved_items": [],
+        "missing_information": [],
+        "generation_status": "ready",
+        "proposal_refs": [],
+        "proposal_context_hash": ""
+      },
+      {
+        "page_id": "P031",
+        "display_page_number": 31,
+        "section_id": "S05",
+        "page_type": "technical",
+        "core_message": "立面材料、开口和构造逻辑必须由已确认的专项方案支撑。",
+        "core_message_en": "Technical systems support the spatial concept and its implementation.",
+        "headline_zh": "立面策略回应空间与环境",
+        "headline_en": "RESPONDING TO SPACE AND CLIMATE THROUGH FACADE STRATEGY",
+        "body_zh": "",
+        "body_en": "",
+        "body_copy": "",
+        "diagram_labels": [],
+        "diagram_labels_en": [],
+        "speaker_notes": "",
+        "visual_requirements": [
+          "立面策略图",
+          "材料与构造节点",
           "历史参考页型：图纸占据主要版面，以统一色彩和短标签组织证据"
         ],
         "callouts": [],
         "visual_brief": [
-          "结构体系图",
-          "立面材料与构造节点",
+          "立面策略图",
+          "材料与构造节点",
           "历史参考页型：图纸占据主要版面，以统一色彩和短标签组织证据"
         ],
+        "style_example_refs": [],
+        "experience_recipe_refs": [],
         "fact_refs": [
-          "F_021",
-          "F_022"
+          "F_021"
         ],
         "unresolved_items": [
-          "立面方案",
-          "结构方案"
+          "立面方案"
         ],
         "missing_information": [
-          "立面方案",
-          "结构方案"
+          "立面方案"
         ],
-        "generation_status": "placeholder"
+        "generation_status": "placeholder",
+        "proposal_refs": [],
+        "proposal_context_hash": ""
       },
       {
-        "page_id": "P010",
-        "display_page_number": 10,
-        "section_id": "S04",
-        "page_type": "summary",
-        "core_message": "总结页只收束已经被前文事实和图纸证明的价值。",
-        "headline_zh": "以可追溯证据收束方案价值",
+        "page_id": "P032",
+        "display_page_number": 32,
+        "section_id": "S05",
+        "page_type": "rendering",
+        "core_message": "通过局部切开连续三至五层典型楼层与立面系统，呈现室内空间、楼板、幕墙、水平遮阳与自然通风路径之间的协同关系。",
+        "core_message_en": "The key view communicates the intended spatial experience.",
+        "headline_zh": "系统剖切渲染整合建筑关系",
+        "headline_en": "INTEGRATING FACADE AND ENVIRONMENTAL SYSTEMS THROUGH A SECTIONAL RENDERING",
         "body_zh": "",
+        "body_en": "",
         "body_copy": "",
         "diagram_labels": [],
+        "diagram_labels_en": [],
         "speaker_notes": "",
         "visual_requirements": [
-          "方案主视觉",
-          "三项已验证价值",
+          "局部立面系统剖切渲染",
+          "近距离切开连续三至五层典型楼层与一至两个立面开间，展示室内、楼板、幕墙、遮阳、通风构件与环境路径",
+          "采用局部系统剖切的标准尺度：左侧短文案，右侧局部立面系统剖切主视觉；不得采用 P50 的整栋 section perspective 或其他远距离剖透视表达",
           "历史参考页型：以全幅主视觉和短篇幅双语标题建立单页结论"
         ],
         "callouts": [],
         "visual_brief": [
-          "方案主视觉",
-          "三项已验证价值",
+          "局部立面系统剖切渲染",
+          "近距离切开连续三至五层典型楼层与一至两个立面开间，展示室内、楼板、幕墙、遮阳、通风构件与环境路径",
+          "采用局部系统剖切的标准尺度：左侧短文案，右侧局部立面系统剖切主视觉；不得采用 P50 的整栋 section perspective 或其他远距离剖透视表达",
           "历史参考页型：以全幅主视觉和短篇幅双语标题建立单页结论"
         ],
+        "style_example_refs": [],
+        "experience_recipe_refs": [],
+        "fact_refs": [
+          "F_015",
+          "F_016",
+          "F_017",
+          "F_020"
+        ],
+        "unresolved_items": [],
+        "missing_information": [],
+        "generation_status": "ready",
+        "proposal_refs": [],
+        "proposal_context_hash": ""
+      },
+      {
+        "page_id": "P033",
+        "display_page_number": 33,
+        "section_id": "S06",
+        "page_type": "section_divider",
+        "core_message": "回到项目最初的条件与问题，集中呈现已经得到空间和技术证据支持的方案价值。",
+        "core_message_en": "This section establishes the next stage of the design argument.",
+        "headline_zh": "方案总结",
+        "headline_en": "DESIGN SUMMARY",
+        "body_zh": "",
+        "body_en": "",
+        "body_copy": "",
+        "diagram_labels": [],
+        "diagram_labels_en": [],
+        "speaker_notes": "",
+        "visual_requirements": [
+          "章节标题",
+          "方案主视觉",
+          "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+        ],
+        "callouts": [],
+        "visual_brief": [
+          "章节标题",
+          "方案主视觉",
+          "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+        ],
+        "style_example_refs": [],
+        "experience_recipe_refs": [],
         "fact_refs": [
           "F_015",
           "F_017",
+          "F_020"
+        ],
+        "unresolved_items": [],
+        "missing_information": [],
+        "generation_status": "ready",
+        "proposal_refs": [],
+        "proposal_context_hash": ""
+      },
+      {
+        "page_id": "P034",
+        "display_page_number": 34,
+        "section_id": "S06",
+        "page_type": "summary",
+        "core_message": "综合城市与场地回应、空间与功能组织、公共体验和环境策略，总结方案如何落实任务书目标与已确认设计方向。",
+        "core_message_en": "The conclusion consolidates design value supported by facts and drawings.",
+        "headline_zh": "方案设计总结",
+        "headline_en": "DESIGN SUMMARY",
+        "body_zh": "",
+        "body_en": "",
+        "body_copy": "",
+        "diagram_labels": [],
+        "diagram_labels_en": [],
+        "speaker_notes": "",
+        "visual_requirements": [
+          "总体鸟瞰或建筑整体效果图",
+          "公共空间或入口效果图",
+          "重点空间或室内效果图",
+          "历史参考页型：以全幅主视觉和短篇幅双语标题建立单页结论"
+        ],
+        "callouts": [],
+        "visual_brief": [
+          "总体鸟瞰或建筑整体效果图",
+          "公共空间或入口效果图",
+          "重点空间或室内效果图",
+          "历史参考页型：以全幅主视觉和短篇幅双语标题建立单页结论"
+        ],
+        "style_example_refs": [],
+        "experience_recipe_refs": [],
+        "fact_refs": [
+          "F_001",
+          "F_002",
+          "F_003",
+          "F_004",
+          "F_005",
+          "F_006",
+          "F_008",
+          "F_009",
+          "F_010",
+          "F_011",
+          "F_012",
+          "F_013",
+          "F_014",
+          "F_015",
+          "F_016",
+          "F_017",
+          "F_018",
+          "F_020",
+          "F_021",
           "F_022"
         ],
-        "unresolved_items": [
-          "结构方案"
-        ],
-        "missing_information": [
-          "结构方案"
-        ],
-        "generation_status": "placeholder"
+        "unresolved_items": [],
+        "missing_information": [],
+        "generation_status": "ready",
+        "proposal_refs": [],
+        "proposal_context_hash": ""
       }
     ],
     "audit_report": {
       "reviewed_page_ids": [
         "P003"
       ],
-      "issues": [
-        {
-          "severity": "major",
-          "pages": [
-            "P003"
-          ],
-          "issue": "页面引用的字段存在未解决冲突。",
-          "evidence": "总建筑面积：62,000㎡；总建筑面积：61,800㎡",
-          "fact_refs": [
-            "F_007",
-            "F_019"
-          ],
-          "recommended_fix": "确认采用值并在事实库记录冲突处理结果。"
-        }
-      ],
-      "summary": "已审核 1 页，发现 1 项问题。"
+      "issues": [],
+      "summary": "已审核 1 页，发现 0 项问题。"
     }
   },
   "nodeOutputs": [
@@ -1006,7 +2030,7 @@
         "project_id": "VIRTUAL_RIVERFRONT_CULTURE",
         "project_name_anonymized": "滨水文化中心概念方案竞赛",
         "default_page_format": "A3_landscape_420x297mm",
-        "language_mode": "zh",
+        "language_mode": "zh_en",
         "ignore_company_info": true,
         "documents": [
           {
@@ -1335,14 +2359,14 @@
             "fact_id": "F_017",
             "category": "proposal_design",
             "field_path": "proposal.masterplan",
-            "value_raw": "展览与图书阅览分置南北两翼，共享中央公共大厅；首层架空通廊连接城市公园和滨水步道。",
-            "value_normalized": "展览与图书阅览分置南北两翼，共享中央公共大厅；首层架空通廊连接城市公园和滨水步道",
+            "value_raw": "展览与图书阅览分置南北两翼，共享中央公共大厅",
+            "value_normalized": "展览与图书阅览分置南北两翼，共享中央公共大厅",
             "unit": null,
             "source": {
               "document_id": "DOC_PROPOSAL_V01",
               "page": 2,
               "location_note": "总体布局",
-              "quote": "总体布局：展览与图书阅览分置南北两翼，共享中央公共大厅；首层架空通廊连接城市公园和滨水步道。"
+              "quote": "总体布局：展览与图书阅览分置南北两翼，共享中央公共大厅"
             },
             "source_role": "proposal_fact",
             "confidence": 1,
@@ -1462,6 +2486,7 @@
             }
           }
         ],
+        "reference_style_examples": [],
         "conflicts": [
           {
             "conflict_id": "C_001",
@@ -1475,7 +2500,8 @@
             "resolution_note": "保留所有来源值，目录与文案优先引用 authoritative 来源。"
           }
         ],
-        "missing_items": []
+        "missing_items": [],
+        "task_mode": "large_public_building"
       }
     },
     {
@@ -1487,11 +2513,9 @@
         "generation_readiness": "partial",
         "gate_a_missing": [],
         "gate_b_missing": [
-          "立面方案",
-          "结构方案",
-          "效果图或视觉清单"
+          "立面方案"
         ],
-        "summary": "Gate A 已通过；Gate B 仍缺少 3 类方案证据。"
+        "summary": "Gate A 已通过；Gate B 仍缺少 1 类方案证据。"
       }
     },
     {
@@ -1499,38 +2523,58 @@
       "execution": "local_rule",
       "model_calls": 0,
       "output": {
+        "task_mode": "large_public_building",
         "narrative_claim": "围绕“建立城市与滨水之间连续开放的公共文化界面。”组织全篇，并以可追溯的空间、图纸与技术证据逐页验证。",
         "page_format": "A3_landscape_420x297mm",
-        "language_mode": "zh",
-        "target_page_count": 10,
+        "language_mode": "zh_en",
+        "target_page_count": 34,
         "sections": [
           {
             "section_id": "S00",
             "title_zh": "开篇",
+            "title_en": "OPENING",
             "purpose": "建立项目身份与汇报路径。",
             "answers_question": "我们在解决什么项目？"
           },
           {
             "section_id": "S01",
             "title_zh": "项目理解",
+            "title_en": "PROJECT UNDERSTANDING",
             "purpose": "用权威事实说明场地机会与设计边界。",
             "answers_question": "项目的核心条件和矛盾是什么？"
           },
           {
             "section_id": "S02",
-            "title_zh": "规划策略",
-            "purpose": "把任务要求转译为可验证的策略框架。",
-            "answers_question": "哪些策略能够回应项目的关键条件？"
+            "title_zh": "核心议题与规划策略",
+            "title_en": "KEY ISSUES & PLANNING STRATEGIES",
+            "purpose": "把任务要求转译为可验证的议题与策略框架。",
+            "answers_question": "哪些策略能够回应项目的关键条件和评审重点？"
           },
           {
             "section_id": "S03",
-            "title_zh": "设计概念与空间落实",
-            "purpose": "说明概念、布局、交通、功能、重点空间与技术证据。",
-            "answers_question": "策略如何落实为可以被图纸证明的空间？"
+            "title_zh": "设计概念",
+            "title_en": "DESIGN CONCEPT",
+            "purpose": "通过概念、生成逻辑与方案比选建立空间方法。",
+            "answers_question": "核心策略如何转译为空间概念？"
           },
           {
             "section_id": "S04",
+            "title_zh": "空间与功能落实",
+            "title_en": "SPATIAL & FUNCTIONAL DEVELOPMENT",
+            "purpose": "用总图、功能、交通、平面、剖面和重点空间落实概念。",
+            "answers_question": "概念如何落实为可以被图纸证明的空间？"
+          },
+          {
+            "section_id": "S05",
+            "title_zh": "技术与实施",
+            "title_en": "TECHNICAL DEVELOPMENT & DELIVERY",
+            "purpose": "用立面、材料、系统剖切渲染与环境性能说明方案的实施路径。",
+            "answers_question": "方案如何获得技术支撑？"
+          },
+          {
+            "section_id": "S06",
             "title_zh": "方案总结",
+            "title_en": "DESIGN SUMMARY",
             "purpose": "回收前文已经被证明的项目价值。",
             "answers_question": "方案最终回答了哪些评审问题？"
           }
@@ -1541,11 +2585,15 @@
             "display_page_number": 1,
             "section_id": "S00",
             "page_type": "cover",
-            "core_message": "以匿名项目名称和方案阶段建立汇报起点。",
+            "core_message": "建筑概念方案设计 / ARCHITECTURAL CONCEPT DESIGN",
+            "core_message_en": "A fact-grounded architectural design report.",
             "headline_zh": "滨水文化中心概念方案竞赛",
+            "headline_en": "DESIGN REPORT",
             "body_zh": "",
+            "body_en": "",
             "body_copy": "",
             "diagram_labels": [],
+            "diagram_labels_en": [],
             "speaker_notes": "",
             "visual_requirements": [
               "项目主视觉或场地区位底图",
@@ -1558,6 +2606,8 @@
               "横版 A3 封面",
               "历史参考页型：以全幅主视觉和短篇幅双语标题建立单页结论"
             ],
+            "style_example_refs": [],
+            "experience_recipe_refs": [],
             "fact_refs": [
               "F_001",
               "F_002"
@@ -1569,27 +2619,35 @@
           {
             "page_id": "P002",
             "display_page_number": 2,
-            "section_id": "S01",
-            "page_type": "position",
-            "core_message": "项目区位与周边联系构成后续策略必须回应的空间背景。",
-            "headline_zh": "从城市关系识别场地机会",
+            "section_id": "S00",
+            "page_type": "toc",
+            "core_message": "项目理解 · 规划策略 · 设计概念 · 空间与功能 · 技术实施 · 方案总结",
+            "core_message_en": "The report is organized by chapters and page sequence.",
+            "headline_zh": "目录",
+            "headline_en": "CONTENTS",
             "body_zh": "",
+            "body_en": "",
             "body_copy": "",
             "diagram_labels": [],
+            "diagram_labels_en": [],
             "speaker_notes": "",
             "visual_requirements": [
-              "城市区位图",
-              "周边关系与到达分析",
+              "六章目录结构",
+              "章节编号与起始页码",
+              "全篇叙事路径",
               "历史参考页型：分析白底、图解主导，并保持左上章节定位"
             ],
             "callouts": [],
             "visual_brief": [
-              "城市区位图",
-              "周边关系与到达分析",
+              "六章目录结构",
+              "章节编号与起始页码",
+              "全篇叙事路径",
               "历史参考页型：分析白底、图解主导，并保持左上章节定位"
             ],
+            "style_example_refs": [],
+            "experience_recipe_refs": [],
             "fact_refs": [
-              "F_003"
+              "F_001"
             ],
             "unresolved_items": [],
             "missing_information": [],
@@ -1599,24 +2657,67 @@
             "page_id": "P003",
             "display_page_number": 3,
             "section_id": "S01",
-            "page_type": "data",
-            "core_message": "用地、强度、高度和规模共同构成不可越过的方案边界。",
-            "headline_zh": "以明确指标建立设计边界",
+            "page_type": "section_divider",
+            "core_message": "从任务书的权威事实出发，建立场地机会、建设边界与评审目标的共同认识。",
+            "core_message_en": "This section establishes the next stage of the design argument.",
+            "headline_zh": "项目理解",
+            "headline_en": "PROJECT UNDERSTANDING",
             "body_zh": "",
+            "body_en": "",
             "body_copy": "",
             "diagram_labels": [],
+            "diagram_labels_en": [],
+            "speaker_notes": "",
+            "visual_requirements": [
+              "章节编号与标题",
+              "场地区位或任务书关键图像",
+              "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+            ],
+            "callouts": [],
+            "visual_brief": [
+              "章节编号与标题",
+              "场地区位或任务书关键图像",
+              "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+            ],
+            "style_example_refs": [],
+            "experience_recipe_refs": [],
+            "fact_refs": [
+              "F_001"
+            ],
+            "unresolved_items": [],
+            "missing_information": [],
+            "generation_status": "ready"
+          },
+          {
+            "page_id": "P004",
+            "display_page_number": 4,
+            "section_id": "S01",
+            "page_type": "data",
+            "core_message": "用地、强度、高度和规模共同构成不可越过的方案边界。",
+            "core_message_en": "Verified project metrics define the design boundary.",
+            "headline_zh": "明确指标建立设计边界",
+            "headline_en": "DEFINING DESIGN BOUNDARIES WITH KEY METRICS",
+            "body_zh": "",
+            "body_en": "",
+            "body_copy": "",
+            "diagram_labels": [],
+            "diagram_labels_en": [],
             "speaker_notes": "",
             "visual_requirements": [
               "四项核心指标卡",
-              "地上地下规模对照",
+              "灰白场地模型上的彩色抽象功能体块 diagram",
+              "在对应体块上标注用地面积、容积率、建筑限高、总建筑面积与分项规模",
               "历史参考页型：分析白底、图解主导，并保持左上章节定位"
             ],
             "callouts": [],
             "visual_brief": [
               "四项核心指标卡",
-              "地上地下规模对照",
+              "灰白场地模型上的彩色抽象功能体块 diagram",
+              "在对应体块上标注用地面积、容积率、建筑限高、总建筑面积与分项规模",
               "历史参考页型：分析白底、图解主导，并保持左上章节定位"
             ],
+            "style_example_refs": [],
+            "experience_recipe_refs": [],
             "fact_refs": [
               "F_004",
               "F_005",
@@ -1629,29 +2730,283 @@
             "generation_status": "ready"
           },
           {
-            "page_id": "P004",
-            "display_page_number": 4,
+            "page_id": "P005",
+            "display_page_number": 5,
             "section_id": "S01",
-            "page_type": "analysis",
-            "core_message": "评审重点、功能要求与场地条件共同建立本项目的设计命题。",
-            "headline_zh": "把任务要求转译为可回答的问题",
+            "page_type": "position",
+            "core_message": "项目区位与周边联系构成后续策略必须回应的空间背景。",
+            "core_message_en": "Urban context and site connections define the design opportunity.",
+            "headline_zh": "从城市关系识别场地机会",
+            "headline_en": "IDENTIFYING SITE OPPORTUNITIES IN THE URBAN CONTEXT",
             "body_zh": "",
+            "body_en": "",
             "body_copy": "",
             "diagram_labels": [],
+            "diagram_labels_en": [],
             "speaker_notes": "",
             "visual_requirements": [
-              "任务目标—设计响应矩阵",
-              "3—5 个核心问题图解",
+              "城市区位图",
+              "周边关系与到达分析",
               "历史参考页型：分析白底、图解主导，并保持左上章节定位"
             ],
             "callouts": [],
             "visual_brief": [
-              "任务目标—设计响应矩阵",
-              "3—5 个核心问题图解",
+              "城市区位图",
+              "周边关系与到达分析",
               "历史参考页型：分析白底、图解主导，并保持左上章节定位"
             ],
+            "style_example_refs": [],
+            "experience_recipe_refs": [],
+            "fact_refs": [
+              "F_003"
+            ],
+            "unresolved_items": [],
+            "missing_information": [],
+            "generation_status": "ready"
+          },
+          {
+            "page_id": "P006",
+            "display_page_number": 6,
+            "section_id": "S01",
+            "page_type": "analysis",
+            "core_message": "周边公共空间、城市道路和到达方向共同决定场地的主要开放关系。",
+            "core_message_en": "Current project evidence establishes the conditions and relationships shown on this page.",
+            "headline_zh": "从场地周边识别开放界面",
+            "headline_en": "IDENTIFYING OPEN INTERFACES AROUND THE SITE",
+            "body_zh": "",
+            "body_en": "",
+            "body_copy": "",
+            "diagram_labels": [],
+            "diagram_labels_en": [],
+            "speaker_notes": "",
+            "visual_requirements": [
+              "场地周边关系图",
+              "城市界面与开放方向图解",
+              "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+            ],
+            "callouts": [],
+            "visual_brief": [
+              "场地周边关系图",
+              "城市界面与开放方向图解",
+              "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+            ],
+            "style_example_refs": [],
+            "experience_recipe_refs": [],
+            "fact_refs": [
+              "F_003"
+            ],
+            "unresolved_items": [],
+            "missing_information": [],
+            "generation_status": "ready"
+          },
+          {
+            "page_id": "P007",
+            "display_page_number": 7,
+            "section_id": "S01",
+            "page_type": "analysis",
+            "core_message": "用地边界、开发强度与高度条件共同限定可实施的空间范围。",
+            "core_message_en": "Current project evidence establishes the conditions and relationships shown on this page.",
+            "headline_zh": "识别场地限制与建设条件",
+            "headline_en": "IDENTIFYING SITE CONSTRAINTS AND DEVELOPMENT CONDITIONS",
+            "body_zh": "",
+            "body_en": "",
+            "body_copy": "",
+            "diagram_labels": [],
+            "diagram_labels_en": [],
+            "speaker_notes": "",
+            "visual_requirements": [
+              "建设条件叠合图",
+              "边界、强度与高度限制图解",
+              "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+            ],
+            "callouts": [],
+            "visual_brief": [
+              "建设条件叠合图",
+              "边界、强度与高度限制图解",
+              "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+            ],
+            "style_example_refs": [],
+            "experience_recipe_refs": [],
+            "fact_refs": [
+              "F_004",
+              "F_005",
+              "F_006"
+            ],
+            "unresolved_items": [],
+            "missing_information": [],
+            "generation_status": "ready"
+          },
+          {
+            "page_id": "P008",
+            "display_page_number": 8,
+            "section_id": "S01",
+            "page_type": "analysis",
+            "core_message": "任务书中的人行、车行与后勤要求构成交通组织的基础边界。",
+            "core_message_en": "Current project evidence establishes the conditions and relationships shown on this page.",
+            "headline_zh": "交通要求梳理到达秩序",
+            "headline_en": "ORGANIZING ARRIVAL THROUGH TRAFFIC REQUIREMENTS",
+            "body_zh": "",
+            "body_en": "",
+            "body_copy": "",
+            "diagram_labels": [],
+            "diagram_labels_en": [],
+            "speaker_notes": "",
+            "visual_requirements": [
+              "现状到达条件",
+              "人车与后勤要求图解",
+              "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+            ],
+            "callouts": [],
+            "visual_brief": [
+              "现状到达条件",
+              "人车与后勤要求图解",
+              "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+            ],
+            "style_example_refs": [],
+            "experience_recipe_refs": [],
+            "fact_refs": [
+              "F_012"
+            ],
+            "unresolved_items": [],
+            "missing_information": [],
+            "generation_status": "ready"
+          },
+          {
+            "page_id": "P009",
+            "display_page_number": 9,
+            "section_id": "S01",
+            "page_type": "analysis",
+            "core_message": "任务书明确的主要功能决定空间体系必须容纳的核心活动。",
+            "core_message_en": "Current project evidence establishes the conditions and relationships shown on this page.",
+            "headline_zh": "从功能要求理解空间构成",
+            "headline_en": "TRANSLATING PROGRAM REQUIREMENTS INTO SPATIAL STRUCTURE",
+            "body_zh": "",
+            "body_en": "",
+            "body_copy": "",
+            "diagram_labels": [],
+            "diagram_labels_en": [],
+            "speaker_notes": "",
+            "visual_requirements": [
+              "功能构成树",
+              "核心功能与配套功能关系",
+              "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+            ],
+            "callouts": [],
+            "visual_brief": [
+              "功能构成树",
+              "核心功能与配套功能关系",
+              "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+            ],
+            "style_example_refs": [],
+            "experience_recipe_refs": [],
+            "fact_refs": [
+              "F_010"
+            ],
+            "unresolved_items": [],
+            "missing_information": [],
+            "generation_status": "ready"
+          },
+          {
+            "page_id": "P010",
+            "display_page_number": 10,
+            "section_id": "S01",
+            "page_type": "analysis",
+            "core_message": "评审重点决定后续策略、图纸和价值表达的证据优先级。",
+            "core_message_en": "Current project evidence establishes the conditions and relationships shown on this page.",
+            "headline_zh": "评审重点校准汇报方向",
+            "headline_en": "ALIGNING THE REPORT WITH EVALUATION PRIORITIES",
+            "body_zh": "",
+            "body_en": "",
+            "body_copy": "",
+            "diagram_labels": [],
+            "diagram_labels_en": [],
+            "speaker_notes": "",
+            "visual_requirements": [
+              "评审重点权重图",
+              "重点—证据页面对应关系",
+              "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+            ],
+            "callouts": [],
+            "visual_brief": [
+              "评审重点权重图",
+              "重点—证据页面对应关系",
+              "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+            ],
+            "style_example_refs": [],
+            "experience_recipe_refs": [],
+            "fact_refs": [
+              "F_014"
+            ],
+            "unresolved_items": [],
+            "missing_information": [],
+            "generation_status": "ready"
+          },
+          {
+            "page_id": "P011",
+            "display_page_number": 11,
+            "section_id": "S01",
+            "page_type": "analysis",
+            "core_message": "功能、交通、指标和成果要求需要在后续页面中逐项获得回应。",
+            "core_message_en": "Current project evidence establishes the conditions and relationships shown on this page.",
+            "headline_zh": "建立任务要求响应矩阵",
+            "headline_en": "BUILDING A TASK-RESPONSE MATRIX",
+            "body_zh": "",
+            "body_en": "",
+            "body_copy": "",
+            "diagram_labels": [],
+            "diagram_labels_en": [],
+            "speaker_notes": "",
+            "visual_requirements": [
+              "任务要求响应矩阵",
+              "待验证事项清单",
+              "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+            ],
+            "callouts": [],
+            "visual_brief": [
+              "任务要求响应矩阵",
+              "待验证事项清单",
+              "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+            ],
+            "style_example_refs": [],
+            "experience_recipe_refs": [],
             "fact_refs": [
               "F_010",
+              "F_012",
+              "F_013"
+            ],
+            "unresolved_items": [],
+            "missing_information": [],
+            "generation_status": "ready"
+          },
+          {
+            "page_id": "P012",
+            "display_page_number": 12,
+            "section_id": "S02",
+            "page_type": "section_divider",
+            "core_message": "把场地条件、任务要求和评审重点转译为可由空间与图纸验证的策略体系。",
+            "core_message_en": "This section establishes the next stage of the design argument.",
+            "headline_zh": "核心议题与规划策略",
+            "headline_en": "KEY ISSUES & PLANNING STRATEGIES",
+            "body_zh": "",
+            "body_en": "",
+            "body_copy": "",
+            "diagram_labels": [],
+            "diagram_labels_en": [],
+            "speaker_notes": "",
+            "visual_requirements": [
+              "章节标题",
+              "问题—策略—证据关系主图",
+              "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+            ],
+            "callouts": [],
+            "visual_brief": [
+              "章节标题",
+              "问题—策略—证据关系主图",
+              "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+            ],
+            "style_example_refs": [],
+            "experience_recipe_refs": [],
+            "fact_refs": [
               "F_011",
               "F_014"
             ],
@@ -1660,27 +3015,70 @@
             "generation_status": "ready"
           },
           {
-            "page_id": "P005",
-            "display_page_number": 5,
+            "page_id": "P013",
+            "display_page_number": 13,
+            "section_id": "S02",
+            "page_type": "analysis",
+            "core_message": "场地条件、设计目标与评审重点共同界定本项目必须回答的核心议题。",
+            "core_message_en": "Current project evidence establishes the conditions and relationships shown on this page.",
+            "headline_zh": "聚焦必须回答的核心议题",
+            "headline_en": "FOCUSING ON THE KEY QUESTIONS",
+            "body_zh": "",
+            "body_en": "",
+            "body_copy": "",
+            "diagram_labels": [],
+            "diagram_labels_en": [],
+            "speaker_notes": "",
+            "visual_requirements": [
+              "核心议题图解",
+              "条件—矛盾—目标关系",
+              "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+            ],
+            "callouts": [],
+            "visual_brief": [
+              "核心议题图解",
+              "条件—矛盾—目标关系",
+              "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+            ],
+            "style_example_refs": [],
+            "experience_recipe_refs": [],
+            "fact_refs": [
+              "F_003",
+              "F_011",
+              "F_014"
+            ],
+            "unresolved_items": [],
+            "missing_information": [],
+            "generation_status": "ready"
+          },
+          {
+            "page_id": "P014",
+            "display_page_number": 14,
             "section_id": "S02",
             "page_type": "strategy",
             "core_message": "先依据任务书建立策略框架，再由总图、交通与空间图纸逐项验证。",
-            "headline_zh": "以策略链回应项目核心条件",
+            "core_message_en": "The strategy translates project requirements into spatial actions that can be verified by drawings.",
+            "headline_zh": "策略链统领设计响应",
+            "headline_en": "COORDINATING DESIGN RESPONSES THROUGH A STRATEGY CHAIN",
             "body_zh": "",
+            "body_en": "",
             "body_copy": "",
             "diagram_labels": [],
+            "diagram_labels_en": [],
             "speaker_notes": "",
             "visual_requirements": [
-              "四项连续策略卡",
+              "策略总览图",
               "任务—策略—证据对应关系",
               "历史参考页型：分析白底、图解主导，并保持左上章节定位"
             ],
             "callouts": [],
             "visual_brief": [
-              "四项连续策略卡",
+              "策略总览图",
               "任务—策略—证据对应关系",
               "历史参考页型：分析白底、图解主导，并保持左上章节定位"
             ],
+            "style_example_refs": [],
+            "experience_recipe_refs": [],
             "fact_refs": [
               "F_010",
               "F_011",
@@ -1692,27 +3090,142 @@
             "generation_status": "ready"
           },
           {
-            "page_id": "P006",
-            "display_page_number": 6,
-            "section_id": "S03",
-            "page_type": "concept",
-            "core_message": "设计概念必须由明确的空间组织方式支撑。",
-            "headline_zh": "以核心概念统领空间动作",
+            "page_id": "P015",
+            "display_page_number": 15,
+            "section_id": "S02",
+            "page_type": "strategy",
+            "core_message": "公共性要求需要被转译为连续、开放且可达的空间骨架。",
+            "core_message_en": "The strategy translates project requirements into spatial actions that can be verified by drawings.",
+            "headline_zh": "公共性组织空间骨架",
+            "headline_en": "ORGANIZING THE SPATIAL FRAMEWORK AROUND PUBLIC VALUE",
             "body_zh": "",
+            "body_en": "",
             "body_copy": "",
             "diagram_labels": [],
+            "diagram_labels_en": [],
             "speaker_notes": "",
             "visual_requirements": [
-              "概念主图",
-              "概念—空间动作拆解",
-              "历史参考页型：以全幅主视觉和短篇幅双语标题建立单页结论"
+              "公共空间策略图",
+              "开放节点与连续路径",
+              "历史参考页型：分析白底、图解主导，并保持左上章节定位"
             ],
             "callouts": [],
             "visual_brief": [
-              "概念主图",
-              "概念—空间动作拆解",
-              "历史参考页型：以全幅主视觉和短篇幅双语标题建立单页结论"
+              "公共空间策略图",
+              "开放节点与连续路径",
+              "历史参考页型：分析白底、图解主导，并保持左上章节定位"
             ],
+            "style_example_refs": [],
+            "experience_recipe_refs": [],
+            "fact_refs": [
+              "F_011",
+              "F_014"
+            ],
+            "unresolved_items": [],
+            "missing_information": [],
+            "generation_status": "ready"
+          },
+          {
+            "page_id": "P016",
+            "display_page_number": 16,
+            "section_id": "S02",
+            "page_type": "strategy",
+            "core_message": "主要城市联系和场地开放方向应转化为总体布局的优先关系。",
+            "core_message_en": "The strategy translates project requirements into spatial actions that can be verified by drawings.",
+            "headline_zh": "城市关系回应场地条件",
+            "headline_en": "RESPONDING TO SITE CONDITIONS THROUGH URBAN CONNECTIONS",
+            "body_zh": "",
+            "body_en": "",
+            "body_copy": "",
+            "diagram_labels": [],
+            "diagram_labels_en": [],
+            "speaker_notes": "",
+            "visual_requirements": [
+              "城市—场地联系策略",
+              "主要界面与视线方向",
+              "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+            ],
+            "callouts": [],
+            "visual_brief": [
+              "城市—场地联系策略",
+              "主要界面与视线方向",
+              "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+            ],
+            "style_example_refs": [],
+            "experience_recipe_refs": [],
+            "fact_refs": [
+              "F_003",
+              "F_011",
+              "F_014"
+            ],
+            "unresolved_items": [],
+            "missing_information": [],
+            "generation_status": "ready"
+          },
+          {
+            "page_id": "P017",
+            "display_page_number": 17,
+            "section_id": "S02",
+            "page_type": "strategy",
+            "core_message": "人行、车行与后勤系统应在明确分流的基础上形成高效到达。",
+            "core_message_en": "The strategy translates project requirements into spatial actions that can be verified by drawings.",
+            "headline_zh": "分流原则保障交通效率",
+            "headline_en": "ENSURING TRAFFIC EFFICIENCY THROUGH SEPARATED FLOWS",
+            "body_zh": "",
+            "body_en": "",
+            "body_copy": "",
+            "diagram_labels": [],
+            "diagram_labels_en": [],
+            "speaker_notes": "",
+            "visual_requirements": [
+              "交通策略图",
+              "人车与后勤分流原则",
+              "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+            ],
+            "callouts": [],
+            "visual_brief": [
+              "交通策略图",
+              "人车与后勤分流原则",
+              "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+            ],
+            "style_example_refs": [],
+            "experience_recipe_refs": [],
+            "fact_refs": [
+              "F_012",
+              "F_018"
+            ],
+            "unresolved_items": [],
+            "missing_information": [],
+            "generation_status": "ready"
+          },
+          {
+            "page_id": "P018",
+            "display_page_number": 18,
+            "section_id": "S03",
+            "page_type": "section_divider",
+            "core_message": "将已经确认的策略转译为统一的空间概念、生成逻辑与形态语言。",
+            "core_message_en": "This section establishes the next stage of the design argument.",
+            "headline_zh": "设计概念",
+            "headline_en": "DESIGN CONCEPT",
+            "body_zh": "",
+            "body_en": "",
+            "body_copy": "",
+            "diagram_labels": [],
+            "diagram_labels_en": [],
+            "speaker_notes": "",
+            "visual_requirements": [
+              "章节标题",
+              "概念主视觉或生成序列封面",
+              "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+            ],
+            "callouts": [],
+            "visual_brief": [
+              "章节标题",
+              "概念主视觉或生成序列封面",
+              "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+            ],
+            "style_example_refs": [],
+            "experience_recipe_refs": [],
             "fact_refs": [
               "F_015",
               "F_016"
@@ -1722,27 +3235,260 @@
             "generation_status": "ready"
           },
           {
-            "page_id": "P007",
-            "display_page_number": 7,
+            "page_id": "P019",
+            "display_page_number": 19,
             "section_id": "S03",
-            "page_type": "masterplan",
-            "core_message": "功能、公共空间与交通系统在总图层面相互校验。",
-            "headline_zh": "功能布局与交通系统协同落位",
+            "page_type": "concept",
+            "core_message": "设计概念必须由明确的空间组织方式支撑。",
+            "core_message_en": "The design concept is developed through explicit and verifiable spatial moves.",
+            "headline_zh": "核心概念统领空间动作",
+            "headline_en": "GUIDING SPATIAL MOVES WITH A CORE CONCEPT",
             "body_zh": "",
+            "body_en": "",
             "body_copy": "",
             "diagram_labels": [],
+            "diagram_labels_en": [],
+            "speaker_notes": "",
+            "visual_requirements": [
+              "概念主图",
+              "概念—空间动作拆解",
+              "历史参考页型：以全幅主视觉和短篇幅双语标题建立单页结论"
+            ],
+            "callouts": [],
+            "visual_brief": [
+              "概念主图",
+              "概念—空间动作拆解",
+              "历史参考页型：以全幅主视觉和短篇幅双语标题建立单页结论"
+            ],
+            "style_example_refs": [],
+            "experience_recipe_refs": [],
+            "fact_refs": [
+              "F_015",
+              "F_016"
+            ],
+            "unresolved_items": [],
+            "missing_information": [],
+            "generation_status": "ready"
+          },
+          {
+            "page_id": "P020",
+            "display_page_number": 20,
+            "section_id": "S03",
+            "page_type": "concept",
+            "core_message": "高密度复合功能、运营独立、公共空间连续性和热湿气候四项条件，分别转化为连续基座连接地铁与绿地、三塔错位形成高低梯度、空中庭院与连桥延伸公共界面、立体绿化回应热湿气候，逐步形成统一的空间组织。",
+            "core_message_en": "The design concept is developed through explicit and verifiable spatial moves.",
+            "headline_zh": "从四项条件推导概念生成逻辑",
+            "headline_en": "DESIGN CONCEPT",
+            "body_zh": "",
+            "body_en": "",
+            "body_copy": "",
+            "diagram_labels": [],
+            "diagram_labels_en": [],
+            "speaker_notes": "",
+            "visual_requirements": [
+              "连续基座连接地铁与绿地",
+              "三塔错位形成高低梯度",
+              "空中庭院与连桥延伸公共界面",
+              "立体绿化回应热湿气候",
+              "历史参考页型：以全幅主视觉和短篇幅双语标题建立单页结论"
+            ],
+            "callouts": [],
+            "visual_brief": [
+              "连续基座连接地铁与绿地",
+              "三塔错位形成高低梯度",
+              "空中庭院与连桥延伸公共界面",
+              "立体绿化回应热湿气候",
+              "历史参考页型：以全幅主视觉和短篇幅双语标题建立单页结论"
+            ],
+            "style_example_refs": [],
+            "experience_recipe_refs": [],
+            "fact_refs": [
+              "F_015",
+              "F_016"
+            ],
+            "unresolved_items": [],
+            "missing_information": [],
+            "generation_status": "ready"
+          },
+          {
+            "page_id": "P021",
+            "display_page_number": 21,
+            "section_id": "S03",
+            "page_type": "rendering",
+            "core_message": "围绕 P19 提出的核心概念，选择三个重点精彩空间效果图，分别呈现公共到达、核心共享空间与重点室内体验。",
+            "core_message_en": "The key view communicates the intended spatial experience.",
+            "headline_zh": "重点空间呈现核心概念",
+            "headline_en": "SPATIAL EXPERIENCE",
+            "body_zh": "",
+            "body_en": "",
+            "body_copy": "",
+            "diagram_labels": [],
+            "diagram_labels_en": [],
+            "speaker_notes": "",
+            "visual_requirements": [
+              "三个重点精彩空间效果图",
+              "公共到达与开放界面",
+              "核心共享空间与概念体验",
+              "重点室内空间与材料氛围",
+              "三张图均需回应 P19 核心概念",
+              "历史参考页型：以全幅主视觉和短篇幅双语标题建立单页结论"
+            ],
+            "callouts": [],
+            "visual_brief": [
+              "三个重点精彩空间效果图",
+              "公共到达与开放界面",
+              "核心共享空间与概念体验",
+              "重点室内空间与材料氛围",
+              "三张图均需回应 P19 核心概念",
+              "历史参考页型：以全幅主视觉和短篇幅双语标题建立单页结论"
+            ],
+            "style_example_refs": [],
+            "experience_recipe_refs": [],
+            "fact_refs": [
+              "F_015",
+              "F_016",
+              "F_017",
+              "F_020"
+            ],
+            "unresolved_items": [],
+            "missing_information": [],
+            "generation_status": "ready"
+          },
+          {
+            "page_id": "P022",
+            "display_page_number": 22,
+            "section_id": "S04",
+            "page_type": "section_divider",
+            "core_message": "通过总图、功能、交通、平面、剖面和重点空间逐项证明概念可以落地。",
+            "core_message_en": "This section establishes the next stage of the design argument.",
+            "headline_zh": "空间与功能落实",
+            "headline_en": "SPATIAL & FUNCTIONAL DEVELOPMENT",
+            "body_zh": "",
+            "body_en": "",
+            "body_copy": "",
+            "diagram_labels": [],
+            "diagram_labels_en": [],
+            "speaker_notes": "",
+            "visual_requirements": [
+              "章节标题",
+              "总图或重点空间主视觉",
+              "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+            ],
+            "callouts": [],
+            "visual_brief": [
+              "章节标题",
+              "总图或重点空间主视觉",
+              "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+            ],
+            "style_example_refs": [],
+            "experience_recipe_refs": [],
+            "fact_refs": [
+              "F_017",
+              "F_020"
+            ],
+            "unresolved_items": [],
+            "missing_information": [],
+            "generation_status": "ready"
+          },
+          {
+            "page_id": "P023",
+            "display_page_number": 23,
+            "section_id": "S04",
+            "page_type": "masterplan",
+            "core_message": "建筑、开放空间与城市界面需要在总图层面形成完整关系。",
+            "core_message_en": "The masterplan coordinates buildings, open space, access and urban interfaces.",
+            "headline_zh": "总体布局统筹场地关系",
+            "headline_en": "COORDINATING SITE RELATIONSHIPS THROUGH THE MASTERPLAN",
+            "body_zh": "",
+            "body_en": "",
+            "body_copy": "",
+            "diagram_labels": [],
+            "diagram_labels_en": [],
             "speaker_notes": "",
             "visual_requirements": [
               "总平面图",
-              "分层交通组织图",
+              "总体布局关系图",
               "历史参考页型：图纸占据主要版面，以统一色彩和短标签组织证据"
             ],
             "callouts": [],
             "visual_brief": [
               "总平面图",
-              "分层交通组织图",
+              "总体布局关系图",
               "历史参考页型：图纸占据主要版面，以统一色彩和短标签组织证据"
             ],
+            "style_example_refs": [],
+            "experience_recipe_refs": [],
+            "fact_refs": [
+              "F_017"
+            ],
+            "unresolved_items": [],
+            "missing_information": [],
+            "generation_status": "ready"
+          },
+          {
+            "page_id": "P024",
+            "display_page_number": 24,
+            "section_id": "S04",
+            "page_type": "data",
+            "core_message": "功能分区需要同时回应任务构成、共享关系与运营边界。",
+            "core_message_en": "Verified project metrics define the design boundary.",
+            "headline_zh": "功能分区落实复合关系",
+            "headline_en": "KEY METRICS",
+            "body_zh": "",
+            "body_en": "",
+            "body_copy": "",
+            "diagram_labels": [],
+            "diagram_labels_en": [],
+            "speaker_notes": "",
+            "visual_requirements": [
+              "功能分区图",
+              "功能面积与共享关系",
+              "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+            ],
+            "callouts": [],
+            "visual_brief": [
+              "功能分区图",
+              "功能面积与共享关系",
+              "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+            ],
+            "style_example_refs": [],
+            "experience_recipe_refs": [],
+            "fact_refs": [
+              "F_010",
+              "F_017"
+            ],
+            "unresolved_items": [],
+            "missing_information": [],
+            "generation_status": "ready"
+          },
+          {
+            "page_id": "P025",
+            "display_page_number": 25,
+            "section_id": "S04",
+            "page_type": "masterplan",
+            "core_message": "交通系统需要在总图层面验证人行、车行和后勤分流。",
+            "core_message_en": "The masterplan coordinates buildings, open space, access and urban interfaces.",
+            "headline_zh": "交通组织校验总体布局",
+            "headline_en": "MASTERPLAN",
+            "body_zh": "",
+            "body_en": "",
+            "body_copy": "",
+            "diagram_labels": [],
+            "diagram_labels_en": [],
+            "speaker_notes": "",
+            "visual_requirements": [
+              "交通组织总图",
+              "到达、落客与后勤流线",
+              "历史参考页型：图纸占据主要版面，以统一色彩和短标签组织证据"
+            ],
+            "callouts": [],
+            "visual_brief": [
+              "交通组织总图",
+              "到达、落客与后勤流线",
+              "历史参考页型：图纸占据主要版面，以统一色彩和短标签组织证据"
+            ],
+            "style_example_refs": [],
+            "experience_recipe_refs": [],
             "fact_refs": [
               "F_012",
               "F_017",
@@ -1753,27 +3499,105 @@
             "generation_status": "ready"
           },
           {
-            "page_id": "P008",
-            "display_page_number": 8,
-            "section_id": "S03",
+            "page_id": "P026",
+            "display_page_number": 26,
+            "section_id": "S04",
             "page_type": "plan",
-            "core_message": "重点空间应形成连续、可识别且有层次的公共序列。",
-            "headline_zh": "重点空间串联完整公共体验",
+            "core_message": "首层空间需要协调入口、公共功能、开放界面与后勤边界。",
+            "core_message_en": "The plan verifies functional organization, circulation and spatial efficiency.",
+            "headline_zh": "首层平面承接公共活动",
+            "headline_en": "ACCOMMODATING PUBLIC LIFE ON THE GROUND FLOOR",
             "body_zh": "",
+            "body_en": "",
             "body_copy": "",
             "diagram_labels": [],
+            "diagram_labels_en": [],
             "speaker_notes": "",
             "visual_requirements": [
-              "首层平面与重点空间索引",
-              "空间序列剖面",
+              "首层平面图",
+              "公共功能与入口索引",
               "历史参考页型：图纸占据主要版面，以统一色彩和短标签组织证据"
             ],
             "callouts": [],
             "visual_brief": [
-              "首层平面与重点空间索引",
-              "空间序列剖面",
+              "首层平面图",
+              "公共功能与入口索引",
               "历史参考页型：图纸占据主要版面，以统一色彩和短标签组织证据"
             ],
+            "style_example_refs": [],
+            "experience_recipe_refs": [],
+            "fact_refs": [
+              "F_017",
+              "F_020"
+            ],
+            "unresolved_items": [],
+            "missing_information": [],
+            "generation_status": "ready"
+          },
+          {
+            "page_id": "P027",
+            "display_page_number": 27,
+            "section_id": "S04",
+            "page_type": "plan",
+            "core_message": "典型层应通过清晰的功能分区、交通核心和空间尺度验证日常使用效率。",
+            "core_message_en": "The plan verifies functional organization, circulation and spatial efficiency.",
+            "headline_zh": "典型层平面验证使用效率",
+            "headline_en": "TESTING OPERATIONAL EFFICIENCY WITH TYPICAL FLOOR PLANS",
+            "body_zh": "",
+            "body_en": "",
+            "body_copy": "",
+            "diagram_labels": [],
+            "diagram_labels_en": [],
+            "speaker_notes": "",
+            "visual_requirements": [
+              "典型层平面图",
+              "功能、交通核与主要尺度标注",
+              "历史参考页型：图纸占据主要版面，以统一色彩和短标签组织证据"
+            ],
+            "callouts": [],
+            "visual_brief": [
+              "典型层平面图",
+              "功能、交通核与主要尺度标注",
+              "历史参考页型：图纸占据主要版面，以统一色彩和短标签组织证据"
+            ],
+            "style_example_refs": [],
+            "experience_recipe_refs": [],
+            "fact_refs": [
+              "F_010",
+              "F_020"
+            ],
+            "unresolved_items": [],
+            "missing_information": [],
+            "generation_status": "ready"
+          },
+          {
+            "page_id": "P028",
+            "display_page_number": 28,
+            "section_id": "S04",
+            "page_type": "rendering",
+            "core_message": "重点空间应将公共性、功能组织和场所特征落实为可感知体验。",
+            "core_message_en": "The key view communicates the intended spatial experience.",
+            "headline_zh": "重点空间呈现完整体验",
+            "headline_en": "PRESENTING THE COMPLETE EXPERIENCE THROUGH KEY SPACES",
+            "body_zh": "",
+            "body_en": "",
+            "body_copy": "",
+            "diagram_labels": [],
+            "diagram_labels_en": [],
+            "speaker_notes": "",
+            "visual_requirements": [
+              "重点空间效果图",
+              "空间价值短标注",
+              "历史参考页型：以全幅主视觉和短篇幅双语标题建立单页结论"
+            ],
+            "callouts": [],
+            "visual_brief": [
+              "重点空间效果图",
+              "空间价值短标注",
+              "历史参考页型：以全幅主视觉和短篇幅双语标题建立单页结论"
+            ],
+            "style_example_refs": [],
+            "experience_recipe_refs": [],
             "fact_refs": [
               "F_020"
             ],
@@ -1782,75 +3606,248 @@
             "generation_status": "ready"
           },
           {
-            "page_id": "P009",
-            "display_page_number": 9,
-            "section_id": "S03",
-            "page_type": "technical",
-            "core_message": "结构与立面结论必须等待专项资料确认后生成。",
-            "headline_zh": "技术策略为设计结论提供落地证据",
+            "page_id": "P029",
+            "display_page_number": 29,
+            "section_id": "S04",
+            "page_type": "section",
+            "core_message": "垂直交通、层高与重点空间需要通过剖面形成可验证的空间关系。",
+            "core_message_en": "The section verifies vertical circulation, spatial hierarchy and key relationships.",
+            "headline_zh": "剖面关系建立空间层次",
+            "headline_en": "BUILDING SPATIAL HIERARCHY THROUGH SECTIONAL RELATIONSHIPS",
             "body_zh": "",
+            "body_en": "",
             "body_copy": "",
             "diagram_labels": [],
+            "diagram_labels_en": [],
             "speaker_notes": "",
             "visual_requirements": [
-              "结构体系图",
-              "立面材料与构造节点",
+              "关键剖面图",
+              "垂直交通与空间层次",
+              "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+            ],
+            "callouts": [],
+            "visual_brief": [
+              "关键剖面图",
+              "垂直交通与空间层次",
+              "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+            ],
+            "style_example_refs": [],
+            "experience_recipe_refs": [],
+            "fact_refs": [
+              "F_020"
+            ],
+            "unresolved_items": [],
+            "missing_information": [],
+            "generation_status": "ready"
+          },
+          {
+            "page_id": "P030",
+            "display_page_number": 30,
+            "section_id": "S05",
+            "page_type": "section_divider",
+            "core_message": "以立面、材料、系统剖切渲染和环境性能说明空间方案的技术支撑与实施路径。",
+            "core_message_en": "This section establishes the next stage of the design argument.",
+            "headline_zh": "技术与实施",
+            "headline_en": "TECHNICAL DEVELOPMENT & DELIVERY",
+            "body_zh": "",
+            "body_en": "",
+            "body_copy": "",
+            "diagram_labels": [],
+            "diagram_labels_en": [],
+            "speaker_notes": "",
+            "visual_requirements": [
+              "章节标题",
+              "立面或系统剖切渲染主视觉",
+              "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+            ],
+            "callouts": [],
+            "visual_brief": [
+              "章节标题",
+              "立面或系统剖切渲染主视觉",
+              "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+            ],
+            "style_example_refs": [],
+            "experience_recipe_refs": [],
+            "fact_refs": [
+              "F_015",
+              "F_016",
+              "F_021"
+            ],
+            "unresolved_items": [],
+            "missing_information": [],
+            "generation_status": "ready"
+          },
+          {
+            "page_id": "P031",
+            "display_page_number": 31,
+            "section_id": "S05",
+            "page_type": "technical",
+            "core_message": "立面材料、开口和构造逻辑必须由已确认的专项方案支撑。",
+            "core_message_en": "Technical systems support the spatial concept and its implementation.",
+            "headline_zh": "立面策略回应空间与环境",
+            "headline_en": "RESPONDING TO SPACE AND CLIMATE THROUGH FACADE STRATEGY",
+            "body_zh": "",
+            "body_en": "",
+            "body_copy": "",
+            "diagram_labels": [],
+            "diagram_labels_en": [],
+            "speaker_notes": "",
+            "visual_requirements": [
+              "立面策略图",
+              "材料与构造节点",
               "历史参考页型：图纸占据主要版面，以统一色彩和短标签组织证据"
             ],
             "callouts": [],
             "visual_brief": [
-              "结构体系图",
-              "立面材料与构造节点",
+              "立面策略图",
+              "材料与构造节点",
               "历史参考页型：图纸占据主要版面，以统一色彩和短标签组织证据"
             ],
+            "style_example_refs": [],
+            "experience_recipe_refs": [],
             "fact_refs": [
-              "F_021",
-              "F_022"
+              "F_021"
             ],
             "unresolved_items": [
-              "立面方案",
-              "结构方案"
+              "立面方案"
             ],
             "missing_information": [
-              "立面方案",
-              "结构方案"
+              "立面方案"
             ],
             "generation_status": "placeholder"
           },
           {
-            "page_id": "P010",
-            "display_page_number": 10,
-            "section_id": "S04",
-            "page_type": "summary",
-            "core_message": "总结页只收束已经被前文事实和图纸证明的价值。",
-            "headline_zh": "以可追溯证据收束方案价值",
+            "page_id": "P032",
+            "display_page_number": 32,
+            "section_id": "S05",
+            "page_type": "rendering",
+            "core_message": "通过局部切开连续三至五层典型楼层与立面系统，呈现室内空间、楼板、幕墙、水平遮阳与自然通风路径之间的协同关系。",
+            "core_message_en": "The key view communicates the intended spatial experience.",
+            "headline_zh": "系统剖切渲染整合建筑关系",
+            "headline_en": "INTEGRATING FACADE AND ENVIRONMENTAL SYSTEMS THROUGH A SECTIONAL RENDERING",
             "body_zh": "",
+            "body_en": "",
             "body_copy": "",
             "diagram_labels": [],
+            "diagram_labels_en": [],
             "speaker_notes": "",
             "visual_requirements": [
-              "方案主视觉",
-              "三项已验证价值",
+              "局部立面系统剖切渲染",
+              "近距离切开连续三至五层典型楼层与一至两个立面开间，展示室内、楼板、幕墙、遮阳、通风构件与环境路径",
+              "采用局部系统剖切的标准尺度：左侧短文案，右侧局部立面系统剖切主视觉；不得采用 P50 的整栋 section perspective 或其他远距离剖透视表达",
               "历史参考页型：以全幅主视觉和短篇幅双语标题建立单页结论"
             ],
             "callouts": [],
             "visual_brief": [
-              "方案主视觉",
-              "三项已验证价值",
+              "局部立面系统剖切渲染",
+              "近距离切开连续三至五层典型楼层与一至两个立面开间，展示室内、楼板、幕墙、遮阳、通风构件与环境路径",
+              "采用局部系统剖切的标准尺度：左侧短文案，右侧局部立面系统剖切主视觉；不得采用 P50 的整栋 section perspective 或其他远距离剖透视表达",
               "历史参考页型：以全幅主视觉和短篇幅双语标题建立单页结论"
             ],
+            "style_example_refs": [],
+            "experience_recipe_refs": [],
+            "fact_refs": [
+              "F_015",
+              "F_016",
+              "F_017",
+              "F_020"
+            ],
+            "unresolved_items": [],
+            "missing_information": [],
+            "generation_status": "ready"
+          },
+          {
+            "page_id": "P033",
+            "display_page_number": 33,
+            "section_id": "S06",
+            "page_type": "section_divider",
+            "core_message": "回到项目最初的条件与问题，集中呈现已经得到空间和技术证据支持的方案价值。",
+            "core_message_en": "This section establishes the next stage of the design argument.",
+            "headline_zh": "方案总结",
+            "headline_en": "DESIGN SUMMARY",
+            "body_zh": "",
+            "body_en": "",
+            "body_copy": "",
+            "diagram_labels": [],
+            "diagram_labels_en": [],
+            "speaker_notes": "",
+            "visual_requirements": [
+              "章节标题",
+              "方案主视觉",
+              "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+            ],
+            "callouts": [],
+            "visual_brief": [
+              "章节标题",
+              "方案主视觉",
+              "历史参考页型：分析白底、图解主导，并保持左上章节定位"
+            ],
+            "style_example_refs": [],
+            "experience_recipe_refs": [],
             "fact_refs": [
               "F_015",
               "F_017",
+              "F_020"
+            ],
+            "unresolved_items": [],
+            "missing_information": [],
+            "generation_status": "ready"
+          },
+          {
+            "page_id": "P034",
+            "display_page_number": 34,
+            "section_id": "S06",
+            "page_type": "summary",
+            "core_message": "综合城市与场地回应、空间与功能组织、公共体验和环境策略，总结方案如何落实任务书目标与已确认设计方向。",
+            "core_message_en": "The conclusion consolidates design value supported by facts and drawings.",
+            "headline_zh": "方案设计总结",
+            "headline_en": "DESIGN SUMMARY",
+            "body_zh": "",
+            "body_en": "",
+            "body_copy": "",
+            "diagram_labels": [],
+            "diagram_labels_en": [],
+            "speaker_notes": "",
+            "visual_requirements": [
+              "总体鸟瞰或建筑整体效果图",
+              "公共空间或入口效果图",
+              "重点空间或室内效果图",
+              "历史参考页型：以全幅主视觉和短篇幅双语标题建立单页结论"
+            ],
+            "callouts": [],
+            "visual_brief": [
+              "总体鸟瞰或建筑整体效果图",
+              "公共空间或入口效果图",
+              "重点空间或室内效果图",
+              "历史参考页型：以全幅主视觉和短篇幅双语标题建立单页结论"
+            ],
+            "style_example_refs": [],
+            "experience_recipe_refs": [],
+            "fact_refs": [
+              "F_001",
+              "F_002",
+              "F_003",
+              "F_004",
+              "F_005",
+              "F_006",
+              "F_008",
+              "F_009",
+              "F_010",
+              "F_011",
+              "F_012",
+              "F_013",
+              "F_014",
+              "F_015",
+              "F_016",
+              "F_017",
+              "F_018",
+              "F_020",
+              "F_021",
               "F_022"
             ],
-            "unresolved_items": [
-              "结构方案"
-            ],
-            "missing_information": [
-              "结构方案"
-            ],
-            "generation_status": "placeholder"
+            "unresolved_items": [],
+            "missing_information": [],
+            "generation_status": "ready"
           }
         ]
       }
@@ -1863,61 +3860,66 @@
         "page_id": "P003",
         "display_page_number": 3,
         "section_id": "S01",
-        "page_type": "data",
-        "core_message": "用地、强度、高度和规模共同构成不可越过的方案边界。",
-        "headline_zh": "以明确指标建立设计边界",
-        "body_zh": "任务书明确：用地面积18,600㎡，容积率2.50，建筑限高48m，总建筑面积62,000㎡。这些指标共同界定体量、功能与空间组织的基本边界。",
-        "body_copy": "任务书明确：用地面积18,600㎡，容积率2.50，建筑限高48m，总建筑面积62,000㎡。这些指标共同界定体量、功能与空间组织的基本边界。",
+        "page_type": "section_divider",
+        "core_message": "从任务书的权威事实出发，建立场地机会、建设边界与评审目标的共同认识。",
+        "core_message_en": "This section establishes the next stage of the design argument.",
+        "headline_zh": "项目理解",
+        "headline_en": "PROJECT UNDERSTANDING",
+        "body_zh": "",
+        "body_en": "This section establishes the next stage of the design argument.",
+        "body_copy": "",
         "diagram_labels": [
-          "用地面积：18,600㎡",
-          "容积率：2.50",
-          "建筑限高：48m",
-          "总建筑面积：62,000㎡",
-          "总建筑面积：61,800㎡"
+          "关键信息",
+          "证据关系",
+          "本页结论",
+          "项目名称：滨水文化中心概念方案竞赛"
         ],
-        "speaker_notes": "本页结论仅引用 5 条事实。讲述时先说结论，再说明设计动作，最后指出需要由图纸验证的部分。",
+        "diagram_labels_en": [
+          "SECTION 01",
+          "SECTION 02",
+          "SECTION 03",
+          "SECTION 04"
+        ],
+        "speaker_notes": "先说明本页结论，再解释当前项目事实与设计动作，最后归纳空间价值。",
         "visual_requirements": [
-          "四项核心指标卡",
-          "地上地下规模对照",
+          "章节编号与标题",
+          "场地区位或任务书关键图像",
           "历史参考页型：分析白底、图解主导，并保持左上章节定位"
         ],
         "callouts": [
           {
-            "label_zh": "用地面积：18,600㎡",
-            "fact_ref": "F_004"
+            "label_zh": "关键信息",
+            "label_en": "SECTION 01",
+            "fact_ref": "F_001"
           },
           {
-            "label_zh": "容积率：2.50",
-            "fact_ref": "F_005"
+            "label_zh": "证据关系",
+            "label_en": "SECTION 02"
           },
           {
-            "label_zh": "建筑限高：48m",
-            "fact_ref": "F_006"
+            "label_zh": "本页结论",
+            "label_en": "SECTION 03"
           },
           {
-            "label_zh": "总建筑面积：62,000㎡",
-            "fact_ref": "F_007"
-          },
-          {
-            "label_zh": "总建筑面积：61,800㎡",
-            "fact_ref": "F_019"
+            "label_zh": "项目名称：滨水文化中心概念方案竞赛",
+            "label_en": "SECTION 04"
           }
         ],
         "visual_brief": [
-          "四项核心指标卡",
-          "地上地下规模对照",
+          "章节编号与标题",
+          "场地区位或任务书关键图像",
           "历史参考页型：分析白底、图解主导，并保持左上章节定位"
         ],
+        "style_example_refs": [],
+        "experience_recipe_refs": [],
         "fact_refs": [
-          "F_004",
-          "F_005",
-          "F_006",
-          "F_007",
-          "F_019"
+          "F_001"
         ],
         "unresolved_items": [],
         "missing_information": [],
-        "generation_status": "generated"
+        "generation_status": "generated",
+        "proposal_refs": [],
+        "proposal_context_hash": ""
       }
     },
     {
@@ -1928,22 +3930,8 @@
         "reviewed_page_ids": [
           "P003"
         ],
-        "issues": [
-          {
-            "severity": "major",
-            "pages": [
-              "P003"
-            ],
-            "issue": "页面引用的字段存在未解决冲突。",
-            "evidence": "总建筑面积：62,000㎡；总建筑面积：61,800㎡",
-            "fact_refs": [
-              "F_007",
-              "F_019"
-            ],
-            "recommended_fix": "确认采用值并在事实库记录冲突处理结果。"
-          }
-        ],
-        "summary": "已审核 1 页，发现 1 项问题。"
+        "issues": [],
+        "summary": "已审核 1 页，发现 0 项问题。"
       }
     }
   ],

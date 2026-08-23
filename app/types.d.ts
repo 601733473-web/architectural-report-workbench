@@ -9,6 +9,10 @@ declare var __ARCH_REPORT_MODEL_RUNTIME__:
   | {
       apiKey?: string;
       model?: string;
+      imageApiKey?: string;
+      imageModel?: string;
+      baseUrl?: string;
+      imageBaseUrl?: string;
       apiFetch?: (request: Request) => Promise<Response>;
     }
   | undefined;

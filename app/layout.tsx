@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import "./globals.css";
 
-const title = "单项目建筑汇报工作台";
+const title = "智能建筑汇报文本工作台";
 const description =
-  "从项目资料到事实、完整度、页级目录、单页中文文案和一致性审核的可追溯工作台。";
+  "DESIGN REPORT STUDIO：从任务书、项目事实与设计提案到页级文本、视觉草案和成果导出的智能建筑汇报工作台。";
 
 export async function generateMetadata(): Promise<Metadata> {
   const requestHeaders = await headers();
