@@ -1,0 +1,234 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DesignReportNarrative",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "document_title_zh",
+    "document_subtitle_zh",
+    "source_scope_note",
+    "executive_concept",
+    "chapters",
+    "value_summary",
+    "coverage"
+  ],
+  "properties": {
+    "document_title_zh": {
+      "type": "string",
+      "minLength": 1
+    },
+    "document_subtitle_zh": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_scope_note": {
+      "type": "string",
+      "minLength": 1
+    },
+    "executive_concept": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "statement_zh",
+        "keywords_zh",
+        "fact_refs",
+        "proposal_refs",
+        "page_refs"
+      ],
+      "properties": {
+        "statement_zh": {
+          "type": "string",
+          "minLength": 60
+        },
+        "keywords_zh": {
+          "type": "array",
+          "minItems": 3,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "fact_refs": {
+          "$ref": "#/$defs/idList"
+        },
+        "proposal_refs": {
+          "$ref": "#/$defs/idList"
+        },
+        "page_refs": {
+          "$ref": "#/$defs/idList"
+        }
+      }
+    },
+    "chapters": {
+      "type": "array",
+      "minItems": 8,
+      "maxItems": 10,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "chapter_id",
+          "order",
+          "title_zh",
+          "lead_zh",
+          "subsections",
+          "fact_refs",
+          "proposal_refs",
+          "page_refs"
+        ],
+        "properties": {
+          "chapter_id": {
+            "type": "string",
+            "pattern": "^N[0-9]{2}$"
+          },
+          "order": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 99
+          },
+          "title_zh": {
+            "type": "string",
+            "minLength": 1
+          },
+          "lead_zh": {
+            "type": "string",
+            "minLength": 30
+          },
+          "subsections": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 3,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "heading_zh",
+                "paragraphs_zh",
+                "bullet_points_zh",
+                "fact_refs",
+                "proposal_refs",
+                "page_refs"
+              ],
+              "properties": {
+                "heading_zh": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "paragraphs_zh": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 2,
+                  "items": {
+                    "type": "string",
+                    "minLength": 30
+                  }
+                },
+                "bullet_points_zh": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 4
+                  }
+                },
+                "fact_refs": {
+                  "$ref": "#/$defs/idList"
+                },
+                "proposal_refs": {
+                  "$ref": "#/$defs/idList"
+                },
+                "page_refs": {
+                  "$ref": "#/$defs/idList"
+                }
+              }
+            }
+          },
+          "fact_refs": {
+            "$ref": "#/$defs/idList"
+          },
+          "proposal_refs": {
+            "$ref": "#/$defs/idList"
+          },
+          "page_refs": {
+            "$ref": "#/$defs/idList"
+          }
+        }
+      }
+    },
+    "value_summary": {
+      "type": "array",
+      "minItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "label_zh",
+          "statement_zh",
+          "fact_refs",
+          "proposal_refs",
+          "page_refs"
+        ],
+        "properties": {
+          "label_zh": {
+            "type": "string",
+            "minLength": 1
+          },
+          "statement_zh": {
+            "type": "string",
+            "minLength": 20
+          },
+          "fact_refs": {
+            "$ref": "#/$defs/idList"
+          },
+          "proposal_refs": {
+            "$ref": "#/$defs/idList"
+          },
+          "page_refs": {
+            "$ref": "#/$defs/idList"
+          }
+        }
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_document_ids",
+        "fact_refs",
+        "proposal_refs",
+        "page_refs",
+        "known_gaps"
+      ],
+      "properties": {
+        "source_document_ids": {
+          "$ref": "#/$defs/idList"
+        },
+        "fact_refs": {
+          "$ref": "#/$defs/idList"
+        },
+        "proposal_refs": {
+          "$ref": "#/$defs/idList"
+        },
+        "page_refs": {
+          "$ref": "#/$defs/idList"
+        },
+        "known_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "idList": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}

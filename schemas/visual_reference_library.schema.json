@@ -1,0 +1,315 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DesignReportVisualReferenceLibrary",
+  "type": "object",
+  "required": [
+    "library_id",
+    "version",
+    "source_documents",
+    "selection_method",
+    "entries"
+  ],
+  "properties": {
+    "library_id": {
+      "type": "string"
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "source_documents": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "source_document_id",
+          "display_name",
+          "source_page_count",
+          "selected_page_count"
+        ],
+        "properties": {
+          "source_document_id": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "source_page_count": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "selected_page_count": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      }
+    },
+    "selection_method": {
+      "type": "object",
+      "required": [
+        "target_count",
+        "criteria"
+      ],
+      "properties": {
+        "target_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "criteria": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "entries": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "visual_id",
+          "source_document_id",
+          "source_page",
+          "image_path",
+          "graphic_crop_path",
+          "graphic_crop_width",
+          "graphic_crop_height",
+          "graphic_crop_box",
+          "graphic_crop_source",
+          "crop_quality",
+          "thumbnail_width",
+          "thumbnail_height",
+          "dominant_colors",
+          "brightness",
+          "edge_density",
+          "page_type",
+          "page_role",
+          "scheme_branch",
+          "topics",
+          "page_intents",
+          "visual_type",
+          "evidence_types",
+          "layout_family",
+          "required_current_assets",
+          "recipe_refs",
+          "quality",
+          "retrieval_text",
+          "safe_use_guidance"
+        ],
+        "properties": {
+          "visual_id": {
+            "type": "string"
+          },
+          "source_document_id": {
+            "type": "string"
+          },
+          "source_page": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "image_path": {
+            "type": "string",
+            "pattern": "^/reference-library/"
+          },
+          "graphic_crop_path": {
+            "type": "string",
+            "pattern": "^/reference-library/crops/"
+          },
+          "graphic_crop_width": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "graphic_crop_height": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "graphic_crop_box": {
+            "type": "array",
+            "minItems": 4,
+            "maxItems": 4,
+            "items": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "graphic_crop_source": {
+            "enum": [
+              "embedded_image",
+              "rendered_component"
+            ]
+          },
+          "crop_quality": {
+            "type": "object",
+            "description": "裁图后的自动质量检测。低质量素材不会进入运行时匹配候选。",
+            "required": [
+              "score",
+              "accepted",
+              "blank_ratio",
+              "text_ratio",
+              "effective_area_ratio",
+              "sharpness",
+              "rejection_reasons"
+            ],
+            "properties": {
+              "score": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "accepted": {
+                "type": "boolean"
+              },
+              "blank_ratio": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "text_ratio": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "effective_area_ratio": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "sharpness": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "rejection_reasons": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "thumbnail_width": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "thumbnail_height": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "dominant_colors": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 5,
+            "items": {
+              "type": "string",
+              "pattern": "^#[0-9A-Fa-f]{6}$"
+            }
+          },
+          "brightness": {
+            "enum": [
+              "light",
+              "balanced",
+              "dark"
+            ]
+          },
+          "edge_density": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "page_type": {
+            "enum": [
+              "cover",
+              "toc",
+              "section_divider",
+              "position",
+              "analysis",
+              "strategy",
+              "concept",
+              "comparison",
+              "masterplan",
+              "plan",
+              "section",
+              "rendering",
+              "technical",
+              "data",
+              "summary"
+            ]
+          },
+          "page_role": {
+            "enum": [
+              "section_divider",
+              "fact_evidence",
+              "problem_definition",
+              "strategy_statement",
+              "design_action",
+              "technical_proof",
+              "visual_showcase"
+            ]
+          },
+          "scheme_branch": {
+            "enum": [
+              "shared",
+              "one_tower",
+              "two_tower",
+              "comparison"
+            ]
+          },
+          "topics": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "page_intents": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "visual_type": {
+            "type": "string"
+          },
+          "evidence_types": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "layout_family": {
+            "type": "string"
+          },
+          "required_current_assets": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "recipe_refs": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            }
+          },
+          "quality": {
+            "enum": [
+              "featured",
+              "supporting"
+            ]
+          },
+          "retrieval_text": {
+            "type": "string"
+          },
+          "safe_use_guidance": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

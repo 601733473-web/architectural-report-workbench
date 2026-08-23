@@ -1,0 +1,1024 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DesignReportProjectFacts",
+  "type": "object",
+  "required": [
+    "project_id",
+    "documents",
+    "facts",
+    "conflicts",
+    "missing_items"
+  ],
+  "properties": {
+    "project_id": {
+      "type": "string"
+    },
+    "task_mode": {
+      "enum": [
+        "large_public_building",
+        "small_building_or_interior"
+      ],
+      "default": "large_public_building",
+      "description": "新建任务时由用户选择的生产模式。大型公共建筑沿用建筑汇报参考与 Gate B；小型建筑/装置只依据任务书事实和其中明确的设计方向组织页面。"
+    },
+    "project_name_anonymized": {
+      "type": "string"
+    },
+    "default_page_format": {
+      "const": "A3_landscape_420x297mm"
+    },
+    "language_mode": {
+      "enum": [
+        "zh",
+        "zh_en"
+      ],
+      "default": "zh_en"
+    },
+    "ignore_company_info": {
+      "const": true
+    },
+    "documents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "document_id",
+          "file_name",
+          "role",
+          "version_or_date"
+        ],
+        "properties": {
+          "document_id": {
+            "type": "string"
+          },
+          "file_name": {
+            "type": "string"
+          },
+          "role": {
+            "enum": [
+              "authoritative",
+              "proposal",
+              "reference_style",
+              "site_research",
+              "company_info",
+              "unknown"
+            ]
+          },
+          "version_or_date": {
+            "type": "string"
+          },
+          "authority_rank": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 6
+          },
+          "notes": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "facts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "fact_id",
+          "category",
+          "field_path",
+          "value_raw",
+          "source",
+          "status"
+        ],
+        "properties": {
+          "fact_id": {
+            "type": "string"
+          },
+          "category": {
+            "enum": [
+              "project",
+              "site",
+              "planning_control",
+              "program",
+              "area",
+              "circulation",
+              "space_requirement",
+              "technical_requirement",
+              "deliverable",
+              "schedule",
+              "evaluation_priority",
+              "proposal_design",
+              "other"
+            ]
+          },
+          "field_path": {
+            "type": "string"
+          },
+          "value_raw": {},
+          "value_normalized": {},
+          "original_value_raw": {},
+          "value_origin": {
+            "enum": [
+              "source_extracted",
+              "user_confirmed",
+              "external_research"
+            ],
+            "description": "当前采用值的来源。user_confirmed 表示用户在事实面板中明确确认；external_research 表示来自可追溯公开数据的场地研究，二者均不得伪装成任务书原文。"
+          },
+          "revision_history": {
+            "type": "array",
+            "description": "事实面板中的多轮用户确认记录。原始来源、页码与引文始终保留在 source 中。",
+            "items": {
+              "type": "object",
+              "required": [
+                "revision_id",
+                "round",
+                "previous_value",
+                "confirmed_value",
+                "user_message",
+                "assistant_message",
+                "created_at"
+              ],
+              "properties": {
+                "revision_id": {
+                  "type": "string"
+                },
+                "round": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "previous_value": {},
+                "confirmed_value": {},
+                "user_message": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "assistant_message": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "created_at": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "unit": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "source": {
+            "type": "object",
+            "required": [
+              "document_id",
+              "page",
+              "quote"
+            ],
+            "properties": {
+              "document_id": {
+                "type": "string"
+              },
+              "page": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "location_note": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "retrieved_at": {
+                "type": "string"
+              },
+              "quote": {
+                "type": "string",
+                "minLength": 1,
+                "description": "支持该事实的原文引用，不得改写。"
+              }
+            }
+          },
+          "source_role": {
+            "enum": [
+              "brief_fact",
+              "proposal_fact",
+              "research_fact"
+            ]
+          },
+          "confidence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "status": {
+            "enum": [
+              "confirmed",
+              "needs_confirmation",
+              "conflict",
+              "superseded"
+            ]
+          },
+          "notes": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "style_observations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "observation_id",
+          "description",
+          "source"
+        ],
+        "properties": {
+          "observation_id": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "source": {
+            "type": "object",
+            "required": [
+              "document_id",
+              "pages"
+            ],
+            "properties": {
+              "document_id": {
+                "type": "string"
+              },
+              "pages": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "reference_style_examples": {
+      "type": "array",
+      "description": "从历史汇报中精选、脱敏且可追溯的页级文风与版式样本。历史项目事实不得进入当前项目 facts。",
+      "items": {
+        "type": "object",
+        "required": [
+          "example_id",
+          "page_type",
+          "source",
+          "sanitized_template",
+          "rhetorical_pattern",
+          "headline_pattern",
+          "layout_recipe",
+          "style_tags",
+          "forbidden_terms"
+        ],
+        "properties": {
+          "example_id": {
+            "type": "string"
+          },
+          "page_type": {
+            "enum": [
+              "cover",
+              "toc",
+              "section_divider",
+              "position",
+              "analysis",
+              "strategy",
+              "concept",
+              "comparison",
+              "masterplan",
+              "plan",
+              "section",
+              "rendering",
+              "technical",
+              "data",
+              "summary"
+            ]
+          },
+          "source": {
+            "type": "object",
+            "required": [
+              "document_id",
+              "page",
+              "quote"
+            ],
+            "properties": {
+              "document_id": {
+                "type": "string"
+              },
+              "page": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "quote": {
+                "type": "string",
+                "minLength": 1,
+                "description": "用于人工追溯的历史原文短引；逐页生成时不得直接发送。"
+              }
+            }
+          },
+          "sanitized_template": {
+            "type": "string",
+            "description": "去除历史项目名称、数字、功能结论后的可迁移表达模板。"
+          },
+          "rhetorical_pattern": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            }
+          },
+          "headline_pattern": {
+            "type": "string"
+          },
+          "layout_recipe": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            }
+          },
+          "style_tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "forbidden_terms": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "reference_experience": {
+      "type": "object",
+      "description": "由历史汇报结构化标注生成的安全经验投影。只保存叙事角色、转场和页面配方，不保存历史项目事实、原文或标题候选。",
+      "required": [
+        "source_document_id",
+        "source_documents",
+        "source_schema_version",
+        "source_page_count",
+        "safe_projection_version",
+        "narrative_pages",
+        "transition_patterns",
+        "page_recipes",
+        "excluded_fields"
+      ],
+      "properties": {
+        "source_document_id": {
+          "type": "string"
+        },
+        "source_documents": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "source_document_id",
+              "display_name",
+              "source_page_count",
+              "narrative_page_count",
+              "recipe_count"
+            ],
+            "properties": {
+              "source_document_id": {
+                "type": "string"
+              },
+              "display_name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "source_page_count": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "narrative_page_count": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "recipe_count": {
+                "type": "integer",
+                "minimum": 1
+              }
+            }
+          }
+        },
+        "source_schema_version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "source_page_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "safe_projection_version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "narrative_pages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "order",
+              "source_document_id",
+              "page_number",
+              "chapter",
+              "page_family",
+              "page_type_label",
+              "page_role",
+              "scheme_branch",
+              "reuse_level",
+              "reference_quality",
+              "can_merge_with_next"
+            ],
+            "properties": {
+              "order": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "source_document_id": {
+                "type": "string"
+              },
+              "page_number": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "chapter": {
+                "type": "string"
+              },
+              "page_family": {
+                "type": "string"
+              },
+              "page_type_label": {
+                "type": "string"
+              },
+              "page_role": {
+                "enum": [
+                  "section_divider",
+                  "fact_evidence",
+                  "problem_definition",
+                  "strategy_statement",
+                  "design_action",
+                  "technical_proof",
+                  "visual_showcase"
+                ]
+              },
+              "reuse_level": {
+                "enum": [
+                  "representative",
+                  "supporting",
+                  "low"
+                ]
+              },
+              "reference_quality": {
+                "type": "string"
+              },
+              "can_merge_with_next": {
+                "type": "boolean"
+              },
+              "scheme_branch": {
+                "enum": [
+                  "shared",
+                  "one_tower",
+                  "two_tower",
+                  "comparison"
+                ]
+              },
+              "parallel_step_key": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "transition_patterns": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "from_role",
+              "to_role",
+              "source_document_id",
+              "count",
+              "example_pages"
+            ],
+            "properties": {
+              "from_role": {
+                "type": "string"
+              },
+              "to_role": {
+                "type": "string"
+              },
+              "source_document_id": {
+                "type": "string"
+              },
+              "count": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "example_pages": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[0-9]+→[0-9]+$"
+                }
+              }
+            }
+          }
+        },
+        "page_recipes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "recipe_id",
+              "source_document_id",
+              "page_type_label",
+              "canonical_page_type",
+              "page_role",
+              "scheme_branch",
+              "primary_visual",
+              "supporting_visuals",
+              "needs_drawings",
+              "asset_slots",
+              "text_weight",
+              "layout_hint",
+              "source_pages",
+              "reuse_level"
+            ],
+            "properties": {
+              "recipe_id": {
+                "type": "string"
+              },
+              "source_document_id": {
+                "type": "string"
+              },
+              "page_type_label": {
+                "type": "string"
+              },
+              "canonical_page_type": {
+                "enum": [
+                  "cover",
+                  "toc",
+                  "section_divider",
+                  "position",
+                  "analysis",
+                  "strategy",
+                  "concept",
+                  "comparison",
+                  "masterplan",
+                  "plan",
+                  "section",
+                  "rendering",
+                  "technical",
+                  "data",
+                  "summary"
+                ]
+              },
+              "page_role": {
+                "type": "string"
+              },
+              "primary_visual": {
+                "type": "string"
+              },
+              "supporting_visuals": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "needs_drawings": {
+                "type": "boolean"
+              },
+              "asset_slots": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "slot",
+                    "visual_type",
+                    "count",
+                    "label"
+                  ],
+                  "properties": {
+                    "slot": {
+                      "type": "string"
+                    },
+                    "visual_type": {
+                      "type": "string"
+                    },
+                    "count": {
+                      "type": "integer",
+                      "minimum": 1
+                    },
+                    "label": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "text_weight": {
+                "enum": [
+                  "low",
+                  "medium",
+                  "high"
+                ]
+              },
+              "layout_hint": {
+                "type": "string"
+              },
+              "topics": {
+                "type": "array",
+                "description": "脱敏后的页面主题标签，用于语义检索，不得包含历史项目专名。",
+                "items": {
+                  "enum": [
+                    "identity",
+                    "location",
+                    "site_context",
+                    "constraints",
+                    "circulation",
+                    "public_space",
+                    "program",
+                    "massing",
+                    "concept",
+                    "landscape",
+                    "sustainability",
+                    "masterplan",
+                    "plan",
+                    "section",
+                    "facade",
+                    "structure",
+                    "technical",
+                    "rendering",
+                    "system_rendering",
+                    "comparison",
+                    "data",
+                    "summary",
+                    "strategy_overview"
+                  ]
+                }
+              },
+              "page_intents": {
+                "type": "array",
+                "description": "页面承担的叙事任务。",
+                "items": {
+                  "enum": [
+                    "introduce",
+                    "orient",
+                    "analyze",
+                    "define_problem",
+                    "state_strategy",
+                    "explain_generation",
+                    "verify_design",
+                    "prove_technical",
+                    "showcase",
+                    "transition",
+                    "summarize"
+                  ]
+                }
+              },
+              "evidence_types": {
+                "type": "array",
+                "description": "页面依赖的证据与素材类型。",
+                "items": {
+                  "enum": [
+                    "text",
+                    "map",
+                    "analysis_diagram",
+                    "concept_diagram",
+                    "masterplan",
+                    "floor_plan",
+                    "section",
+                    "elevation",
+                    "rendering",
+                    "data_table",
+                    "photo"
+                  ]
+                }
+              },
+              "layout_family": {
+                "type": "string",
+                "description": "脱敏的布局家族标识，用于全篇避免连续同构。"
+              },
+              "scheme_branch": {
+                "enum": [
+                  "shared",
+                  "one_tower",
+                  "two_tower",
+                  "comparison"
+                ],
+                "description": "多方案样本中的叙事分支；普通样本使用shared。"
+              },
+              "parallel_step_key": {
+                "type": "string",
+                "description": "平行方案中承担相同步骤的页面键，用于建立跨方案对应关系。"
+              },
+              "source_pages": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              },
+              "reuse_level": {
+                "enum": [
+                  "representative",
+                  "supporting",
+                  "low"
+                ]
+              }
+            }
+          }
+        },
+        "excluded_fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "conflicts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "conflict_id",
+          "field_path",
+          "fact_ids",
+          "severity",
+          "resolution_status"
+        ],
+        "properties": {
+          "conflict_id": {
+            "type": "string"
+          },
+          "field_path": {
+            "type": "string"
+          },
+          "fact_ids": {
+            "type": "array",
+            "minItems": 2,
+            "items": {
+              "type": "string"
+            }
+          },
+          "severity": {
+            "enum": [
+              "blocking",
+              "important",
+              "minor"
+            ]
+          },
+          "resolution_status": {
+            "enum": [
+              "unresolved",
+              "resolved",
+              "accepted_difference"
+            ]
+          },
+          "resolution_note": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "missing_items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "item_id",
+          "description",
+          "severity",
+          "blocks"
+        ],
+        "properties": {
+          "item_id": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "severity": {
+            "enum": [
+              "blocking",
+              "important",
+              "optional"
+            ]
+          },
+          "blocks": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "planner",
+                "page_generation",
+                "consistency_review"
+              ]
+            }
+          },
+          "suggested_source": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "gate_b_proposals": {
+      "type": "array",
+      "description": "针对 Gate B 缺口生成并由用户确认的设计方向。它们是设计决策，不属于带原文出处的项目事实。",
+      "items": {
+        "type": "object",
+        "required": [
+          "missing_item_id",
+          "missing_label",
+          "status",
+          "question",
+          "task_brief_fact_refs",
+          "options",
+          "selected_option_id",
+          "user_input",
+          "confirmed_direction"
+        ],
+        "properties": {
+          "missing_item_id": {
+            "type": "string"
+          },
+          "missing_label": {
+            "type": "string"
+          },
+          "origin": {
+            "enum": [
+              "agent_missing",
+              "user_created"
+            ],
+            "description": "agent_missing 来自 Agent 的完整度检查；user_created 是用户主动定义的设计提案。"
+          },
+          "user_defined_title": {
+            "type": "string"
+          },
+          "target_page_types": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "cover",
+                "toc",
+                "section_divider",
+                "position",
+                "analysis",
+                "strategy",
+                "concept",
+                "comparison",
+                "masterplan",
+                "plan",
+                "section",
+                "rendering",
+                "technical",
+                "data",
+                "summary"
+              ]
+            }
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "awaiting_choice",
+              "selected",
+              "user_defined",
+              "confirmed"
+            ]
+          },
+          "question": {
+            "type": "string"
+          },
+          "task_brief_fact_refs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "options": {
+            "type": "array",
+            "maxItems": 3,
+            "items": {
+              "type": "object",
+              "required": [
+                "option_id",
+                "title",
+                "summary",
+                "design_moves",
+                "rationale",
+                "task_brief_fact_refs",
+                "assumptions",
+                "validation_needed"
+              ],
+              "properties": {
+                "option_id": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "summary": {
+                  "type": "string"
+                },
+                "design_moves": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "rationale": {
+                  "type": "string"
+                },
+                "task_brief_fact_refs": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "assumptions": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "validation_needed": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "selected_option_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "user_input": {
+            "type": "string"
+          },
+          "confirmed_direction": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "gate_report": {
+      "type": "object",
+      "required": [
+        "planner_readiness",
+        "generation_readiness",
+        "gate_a_missing",
+        "gate_b_missing"
+      ],
+      "properties": {
+        "planner_readiness": {
+          "enum": [
+            "ready",
+            "partial",
+            "blocked"
+          ]
+        },
+        "generation_readiness": {
+          "enum": [
+            "ready",
+            "partial",
+            "blocked"
+          ]
+        },
+        "gate_a_missing": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "gate_b_missing": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "summary": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
