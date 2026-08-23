@@ -1,0 +1,1 @@
+export const DEFAULT_TARGET_PAGE_COUNT = 34;

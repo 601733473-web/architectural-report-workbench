@@ -1,0 +1,173 @@
+import type {
+  DesignReportPagePlan,
+  DesignReportProjectFacts,
+} from "@/app/generated/contracts";
+
+export type SmallModeLocalReadiness = {
+  match: boolean;
+  issues: string[];
+  coveredRequirements: string[];
+};
+
+const chainPrefixes = [
+  "产品诉求",
+  "装置转译",
+  "空间形态",
+  "互动动作",
+  "材料灯光",
+  "传播/复用",
+] as const;
+
+function activeFactCorpus(projectFacts: DesignReportProjectFacts) {
+  return projectFacts.facts
+    .filter((fact) => fact.status !== "superseded" && fact.status !== "conflict")
+    .map((fact) => `${fact.field_path} ${String(fact.value_raw)} ${fact.source.quote}`)
+    .join("\n");
+}
+
+/**
+ * Deterministic fail-closed verification used only when the current small-mode
+ * deck already exists but the text-review provider is temporarily unavailable.
+ * It never generates or repairs content; it only decides whether image calls
+ * may start from the current 19-page plan.
+ */
+export function evaluateSmallModeImageReadiness(
+  projectFacts: DesignReportProjectFacts,
+  pagePlan: DesignReportPagePlan,
+): SmallModeLocalReadiness {
+  const issues: string[] = [];
+  const sourceCorpus = activeFactCorpus(projectFacts);
+  const visibleCorpus = pagePlan.pages
+    .flatMap((page) => [
+      page.headline_zh,
+      page.core_message,
+      page.body_zh || page.body_copy,
+      ...(page.callouts ?? []).map((callout) => callout.label_zh),
+      ...(page.diagram_labels ?? []),
+      ...(page.visual_requirements ?? []),
+      ...(page.visual_task?.image_slots ?? []).flatMap((slot) => [
+        slot.label,
+        slot.purpose,
+        slot.prompt_focus,
+      ]),
+    ])
+    .filter(Boolean)
+    .join("\n");
+
+  if (pagePlan.pages.length !== 19) {
+    issues.push(`当前小型建筑/装置汇报为 ${pagePlan.pages.length} 页，应为 19 页完整骨架`);
+  }
+  if (!projectFacts.facts.some((fact) => fact.source_role === "brief_fact")) {
+    issues.push("当前项目没有可核验的任务书事实");
+  }
+
+  const forbiddenPageTypes = pagePlan.pages.filter((page) =>
+    ["position", "analysis", "masterplan", "plan", "section"].includes(
+      page.page_type,
+    ),
+  );
+  if (forbiddenPageTypes.length) {
+    issues.push(
+      `小型建筑/装置管线仍包含禁止页面：${forbiddenPageTypes
+        .map((page) => page.headline_zh)
+        .join("、")}`,
+    );
+  }
+
+  const requirements = [
+    {
+      label: "活动背景与发布会任务",
+      matched: /斗器大会|活动背景|发布会|开幕式/u.test(visibleCorpus),
+    },
+    {
+      label: "三类产品主题与三件装置",
+      matched: ["1", "2", "3"].every((id) =>
+        new RegExp(`装置\\s*${id}`, "u").test(visibleCorpus),
+      ),
+    },
+    {
+      label: "轻国风少女 IP 与真人现场互动",
+      matched:
+        /轻国风少女/u.test(visibleCorpus) &&
+        /真人|现场角色|现场互动/u.test(visibleCorpus),
+    },
+    {
+      label: "观众共创与社交传播",
+      matched:
+        /共创/u.test(visibleCorpus) && /传播|分享|留影|拍照/u.test(visibleCorpus),
+    },
+    {
+      label: "今年使用、收起与明年复用",
+      matched: /收起|再次部署|年度复用|明年/u.test(visibleCorpus),
+    },
+  ];
+  for (const requirement of requirements) {
+    if (!requirement.matched) issues.push(`整套汇报未覆盖：${requirement.label}`);
+  }
+
+  for (const page of pagePlan.pages) {
+    if (page.page_type === "cover") continue;
+    if (!["generated", "reviewed"].includes(page.generation_status)) {
+      issues.push(`${page.page_id}“${page.headline_zh}”文案尚未完成`);
+    }
+    if (!(page.body_zh || page.body_copy).trim()) {
+      issues.push(`${page.page_id}“${page.headline_zh}”缺少正文`);
+    }
+    const visibleUnits =
+      (page.body_zh || page.body_copy ? 1 : 0) +
+      Math.min(6, page.callouts?.length ?? 0) +
+      Math.min(6, page.visual_task?.image_slots.length ?? 0);
+    if (visibleUnits < 4) {
+      issues.push(`${page.page_id}“${page.headline_zh}”只有 ${visibleUnits} 个可见信息单元`);
+    }
+    if (
+      page.page_type === "concept" &&
+      /装置\s*[123一二三]/u.test(page.headline_zh)
+    ) {
+      const callouts = (page.callouts ?? []).map((callout) => callout.label_zh);
+      const missing = chainPrefixes.filter(
+        (prefix) => !callouts.some((callout) => callout.startsWith(`${prefix}｜`)),
+      );
+      if (missing.length) {
+        issues.push(`${page.page_id}“${page.headline_zh}”六段设计链缺少：${missing.join("、")}`);
+      }
+      const designLine = (page.visual_brief ?? []).find((line) =>
+        /^对象[123一二三]｜/u.test(line),
+      );
+      if (
+        !designLine ||
+        !["轮廓=", "空间=", "互动=", "材料灯光=", "构造组件=", "传播复用="].every(
+          (field) => designLine.includes(field),
+        )
+      ) {
+        issues.push(`${page.page_id}“${page.headline_zh}”缺少完整的造型与建造性母题`);
+      }
+    }
+  }
+
+  const unsupportedTerms = [
+    "机械式压力触发",
+    "压力感应",
+    "机械呼吸花瓣",
+    "机械开合的“花瓣”",
+    "香氛机",
+    "自动售货机",
+    "可擦写釉水笔",
+    "素烧瓷片墙",
+    "永久复用",
+    "无需改动即可复用",
+  ];
+  for (const term of unsupportedTerms) {
+    if (visibleCorpus.includes(term) && !sourceCorpus.includes(term)) {
+      issues.push(`页面仍包含任务书未确认的配置：${term}`);
+    }
+  }
+
+  return {
+    match: issues.length === 0,
+    issues,
+    coveredRequirements: requirements
+      .filter((requirement) => requirement.matched)
+      .map((requirement) => requirement.label),
+  };
+}

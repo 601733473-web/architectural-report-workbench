@@ -1,0 +1,324 @@
+{
+  "project_id": "DK05_REFERENCE",
+  "project_name_anonymized": "DK05地块建筑概念方案设计",
+  "default_page_format": "A3_landscape_420x297mm",
+  "language_mode": "zh_en",
+  "ignore_company_info": true,
+  "documents": [
+    {
+      "document_id": "DOC_BRIEF_001",
+      "file_name": "brief.pdf",
+      "role": "authoritative",
+      "version_or_date": "2026-04",
+      "authority_rank": 2,
+      "notes": "设计任务书，作为项目事实来源。"
+    },
+    {
+      "document_id": "DOC_STYLE_001",
+      "file_name": "26_0610 PRESENTATION_LR.pdf",
+      "role": "reference_style",
+      "version_or_date": "2026-06-10",
+      "authority_rank": 6,
+      "notes": "只用于叙事与版式学习，不进入项目事实。"
+    }
+  ],
+  "facts": [
+    {
+      "fact_id": "F_PROJECT_STAGE_001",
+      "category": "project",
+      "field_path": "project.design_stage",
+      "value_raw": "方案设计阶段",
+      "value_normalized": "方案设计",
+      "unit": null,
+      "source": {
+        "document_id": "DOC_BRIEF_001",
+        "page": 1,
+        "location_note": "封面",
+        "quote": "（方案设计阶段）"
+      },
+      "source_role": "brief_fact",
+      "confidence": 1,
+      "status": "confirmed",
+      "notes": ""
+    },
+    {
+      "fact_id": "F_SITE_AREA_001",
+      "category": "planning_control",
+      "field_path": "planning.site_area",
+      "value_raw": "22,197㎡",
+      "value_normalized": 22197,
+      "unit": "m2",
+      "source": {
+        "document_id": "DOC_BRIEF_001",
+        "page": 4,
+        "location_note": "主要经济技术指标",
+        "quote": "用地面积 22,197㎡"
+      },
+      "source_role": "brief_fact",
+      "confidence": 1,
+      "status": "confirmed",
+      "notes": ""
+    },
+    {
+      "fact_id": "F_FAR_001",
+      "category": "planning_control",
+      "field_path": "planning.far",
+      "value_raw": "4.01",
+      "value_normalized": 4.01,
+      "unit": null,
+      "source": {
+        "document_id": "DOC_BRIEF_001",
+        "page": 4,
+        "location_note": "主要经济技术指标",
+        "quote": "容积率 4.01"
+      },
+      "source_role": "brief_fact",
+      "confidence": 1,
+      "status": "confirmed",
+      "notes": ""
+    },
+    {
+      "fact_id": "F_HEIGHT_001",
+      "category": "planning_control",
+      "field_path": "planning.height_limit",
+      "value_raw": "120m",
+      "value_normalized": 120,
+      "unit": "m",
+      "source": {
+        "document_id": "DOC_BRIEF_001",
+        "page": 4,
+        "location_note": "主要经济技术指标",
+        "quote": "建筑限高 120m"
+      },
+      "source_role": "brief_fact",
+      "confidence": 1,
+      "status": "confirmed",
+      "notes": ""
+    },
+    {
+      "fact_id": "F_GFA_TOTAL_001",
+      "category": "area",
+      "field_path": "area.total_gfa",
+      "value_raw": "114,250㎡",
+      "value_normalized": 114250,
+      "unit": "m2",
+      "source": {
+        "document_id": "DOC_BRIEF_001",
+        "page": 4,
+        "location_note": "主要经济技术指标",
+        "quote": "总建筑面积 114,250㎡"
+      },
+      "source_role": "brief_fact",
+      "confidence": 1,
+      "status": "confirmed",
+      "notes": ""
+    },
+    {
+      "fact_id": "F_GFA_ABOVE_001",
+      "category": "area",
+      "field_path": "area.above_ground_gfa",
+      "value_raw": "83,000㎡",
+      "value_normalized": 83000,
+      "unit": "m2",
+      "source": {
+        "document_id": "DOC_BRIEF_001",
+        "page": 4,
+        "location_note": "主要经济技术指标",
+        "quote": "地上建筑面积 83,000㎡"
+      },
+      "source_role": "brief_fact",
+      "confidence": 1,
+      "status": "confirmed",
+      "notes": ""
+    },
+    {
+      "fact_id": "F_GFA_BELOW_001",
+      "category": "area",
+      "field_path": "area.below_ground_gfa",
+      "value_raw": "31,250㎡",
+      "value_normalized": 31250,
+      "unit": "m2",
+      "source": {
+        "document_id": "DOC_BRIEF_001",
+        "page": 4,
+        "location_note": "主要经济技术指标",
+        "quote": "地下建筑面积 31,250㎡"
+      },
+      "source_role": "brief_fact",
+      "confidence": 1,
+      "status": "confirmed",
+      "notes": ""
+    },
+    {
+      "fact_id": "F_PROGRAM_HOTEL_001",
+      "category": "program",
+      "field_path": "program.above_ground.hotel",
+      "value_raw": "35,000㎡",
+      "value_normalized": 35000,
+      "unit": "m2",
+      "source": {
+        "document_id": "DOC_BRIEF_001",
+        "page": 4,
+        "location_note": "主要经济技术指标",
+        "quote": "酒店 35,000㎡"
+      },
+      "source_role": "brief_fact",
+      "confidence": 1,
+      "status": "confirmed",
+      "notes": ""
+    },
+    {
+      "fact_id": "F_PROGRAM_APT_001",
+      "category": "program",
+      "field_path": "program.above_ground.apartment",
+      "value_raw": "10,000㎡",
+      "value_normalized": 10000,
+      "unit": "m2",
+      "source": {
+        "document_id": "DOC_BRIEF_001",
+        "page": 4,
+        "location_note": "主要经济技术指标",
+        "quote": "公寓 10,000㎡"
+      },
+      "source_role": "brief_fact",
+      "confidence": 1,
+      "status": "confirmed",
+      "notes": ""
+    },
+    {
+      "fact_id": "F_PROGRAM_OFFICE_001",
+      "category": "program",
+      "field_path": "program.above_ground.office",
+      "value_raw": "30,000㎡",
+      "value_normalized": 30000,
+      "unit": "m2",
+      "source": {
+        "document_id": "DOC_BRIEF_001",
+        "page": 4,
+        "location_note": "主要经济技术指标",
+        "quote": "办公 30,000㎡"
+      },
+      "source_role": "brief_fact",
+      "confidence": 1,
+      "status": "confirmed",
+      "notes": ""
+    },
+    {
+      "fact_id": "F_PROGRAM_RETAIL_001",
+      "category": "program",
+      "field_path": "program.above_ground.retail",
+      "value_raw": "8,000㎡",
+      "value_normalized": 8000,
+      "unit": "m2",
+      "source": {
+        "document_id": "DOC_BRIEF_001",
+        "page": 4,
+        "location_note": "主要经济技术指标",
+        "quote": "商业 8,000㎡"
+      },
+      "source_role": "brief_fact",
+      "confidence": 1,
+      "status": "confirmed",
+      "notes": ""
+    },
+    {
+      "fact_id": "F_DELIVERABLE_A3_001",
+      "category": "deliverable",
+      "field_path": "deliverable.design_book.page_format",
+      "value_raw": "A3",
+      "value_normalized": "A3",
+      "unit": null,
+      "source": {
+        "document_id": "DOC_BRIEF_001",
+        "page": 16,
+        "location_note": "成果文件",
+        "quote": "尺寸：A3"
+      },
+      "source_role": "brief_fact",
+      "confidence": 1,
+      "status": "confirmed",
+      "notes": "本 Agent 按用户要求进一步固定为横版。"
+    },
+    {
+      "fact_id": "F_DELIVERABLE_BILINGUAL_001",
+      "category": "deliverable",
+      "field_path": "deliverable.language",
+      "value_raw": "中英文形式",
+      "value_normalized": "zh_en",
+      "unit": null,
+      "source": {
+        "document_id": "DOC_BRIEF_001",
+        "page": 16,
+        "location_note": "成果文件",
+        "quote": "设计成果内容一律采用中英文形式"
+      },
+      "source_role": "brief_fact",
+      "confidence": 1,
+      "status": "confirmed",
+      "notes": ""
+    }
+  ],
+  "style_observations": [
+    {
+      "observation_id": "S_NARRATIVE_001",
+      "description": "叙事由项目理解、规划策略、设计演绎、产品章节、技术表达和方案总结逐层推进。",
+      "source": {
+        "document_id": "DOC_STYLE_001",
+        "pages": [
+          2,
+          3,
+          8,
+          24,
+          38,
+          96
+        ]
+      }
+    },
+    {
+      "observation_id": "S_LAYOUT_001",
+      "description": "章节页深色全幅、分析页浅色图解主导、概念页大图配短文、图纸页正文克制。",
+      "source": {
+        "document_id": "DOC_STYLE_001",
+        "pages": [
+          3,
+          9,
+          26,
+          42,
+          45,
+          75
+        ]
+      }
+    }
+  ],
+  "conflicts": [],
+  "missing_items": [
+    {
+      "item_id": "M_CONCEPT_001",
+      "description": "缺少本项目经确认的设计概念与核心叙事。",
+      "severity": "blocking",
+      "blocks": [
+        "page_generation"
+      ],
+      "suggested_source": "设计概念说明或方案汇报纪要"
+    },
+    {
+      "item_id": "M_MASTERPLAN_001",
+      "description": "缺少最新总图、分层平面和功能落位。",
+      "severity": "blocking",
+      "blocks": [
+        "page_generation",
+        "consistency_review"
+      ],
+      "suggested_source": "最新方案 PDF、CAD 导出图或模型截图"
+    },
+    {
+      "item_id": "M_TECH_001",
+      "description": "缺少消防、日照、结构、幕墙、景观和泛光等技术方案。",
+      "severity": "important",
+      "blocks": [
+        "page_generation"
+      ],
+      "suggested_source": "专项图纸与说明"
+    }
+  ]
+}
