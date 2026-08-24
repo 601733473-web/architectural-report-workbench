@@ -864,6 +864,7 @@ function verifiedSmallModeImageNodeOutputs(
   projectFacts: DesignReportProjectFacts,
   pagePlan: DesignReportPagePlan,
   nodeOutputs: NodeOutput[],
+  pageId?: string,
 ) {
   const existing = nodeOutputs
     .filter(
@@ -879,7 +880,9 @@ function verifiedSmallModeImageNodeOutputs(
     )
     .slice(-1);
   if (existing.length) return existing;
-  const readiness = evaluateSmallModeImageReadiness(projectFacts, pagePlan);
+  const readiness = evaluateSmallModeImageReadiness(projectFacts, pagePlan, {
+    pageId,
+  });
   if (!readiness.match) {
     throw new Error(
       `小型建筑/装置本地终稿审查未通过，已停止 AI 生图：${readiness.issues.join("；")}`,
@@ -4659,6 +4662,7 @@ export function Workbench({
   const autosaveInFlightRef = useRef<Promise<void> | null>(null);
   const queuedAutosaveRef = useRef<(() => Promise<void>) | null>(null);
   const lastCloudPersistedVisualImageRef = useRef("");
+  const visualPersistQueueRef = useRef<Promise<void>>(Promise.resolve());
 
   useEffect(() => {
     latestResultRef.current = result;
@@ -5872,92 +5876,16 @@ export function Workbench({
       }));
     }
 
-    setResult((current) => {
-      const visualNode = [...next.nodeOutputs]
-        .reverse()
-        .find((nodeOutput) => nodeOutput.node === "visual_image_generation");
-      const visualNodeKey = visualNode
-        ? tokenResponseKey(visualNode)
-        : null;
-      const shouldAppendVisualNode = Boolean(
-        visualNode &&
-          (!visualNodeKey ||
-            !current.nodeOutputs.some(
-              (nodeOutput) =>
-                tokenResponseKey(nodeOutput) === visualNodeKey,
-            )),
-      );
-
-      const mergedResult = {
-        ...current,
-        pagePlan: {
-          ...current.pagePlan,
-          pages: current.pagePlan.pages.map((currentPage) => {
-            if (currentPage.page_id !== pageId) return currentPage;
-            const currentTask = currentPage.visual_task ?? responseTask;
-            const mergedImages = [
-              ...(currentTask.generated_images ?? []).filter(
-                (image) => image.slot_id !== slotId,
-              ),
-              responseImage,
-            ].sort(
-              (left, right) =>
-                currentTask.image_slots.findIndex(
-                  (slot) => slot.slot_id === left.slot_id,
-                ) -
-                currentTask.image_slots.findIndex(
-                  (slot) => slot.slot_id === right.slot_id,
-                ),
-            );
-            const responseConversationEntry =
-              responseTask.conversation.at(-1);
-            const conversation = responseConversationEntry
-              ? [
-                  ...currentTask.conversation.filter(
-                    (entry) =>
-                      !(
-                        entry.role === responseConversationEntry.role &&
-                        entry.round === responseConversationEntry.round &&
-                        entry.content === responseConversationEntry.content
-                      ),
-                  ),
-                  responseConversationEntry,
-                ]
-              : currentTask.conversation;
-
-            return {
-              ...currentPage,
-              visual_task: {
-                ...currentTask,
-                image_prompt: responseTask.image_prompt,
-                generated_images:
-                  mergedImages as typeof currentTask.generated_images,
-                generated_image: legacyGeneratedImageFromSlots(
-                  mergedImages as NonNullable<
-                    PageVisualTask["generated_images"]
-                  >,
-                  responseTask.generated_image,
-                ),
-                conversation,
-              },
-            };
-          }),
-        },
-        nodeOutputs:
-          shouldAppendVisualNode && visualNode
-            ? [...current.nodeOutputs, visualNode]
-            : current.nodeOutputs,
-        modelCallCount:
-          current.modelCallCount +
-          (shouldAppendVisualNode && visualNode
-            ? visualNode.model_calls
-            : 0),
-        executionMode: next.executionMode ?? current.executionMode,
-        modelName: next.modelName ?? current.modelName,
-      };
-      latestResultRef.current = mergedResult;
-      return mergedResult;
-    });
+    // Update the ref before scheduling React state so an immediate cloud save
+    // cannot capture the pre-generation result during a refresh or tab close.
+    const mergedResult = mergeVisualImagePipelineResult(
+      latestResultRef.current,
+      next,
+      pageId,
+      slotId,
+    );
+    latestResultRef.current = mergedResult;
+    setResult(mergedResult);
   };
 
   const addPageFromPrompt = async () => {
@@ -6428,6 +6356,7 @@ export function Workbench({
           facts,
           plan,
           latestResultRef.current.nodeOutputs,
+          selectedPage.page_id,
         );
       } catch (caught) {
         setError(
@@ -6586,6 +6515,18 @@ export function Workbench({
         selectedPage.page_id,
         slotId,
       );
+      try {
+        // Persist the completed image before marking the UI job finished. This
+        // makes a refresh safe even if the completed-job effect has not run.
+        await saveVisualProgressNow();
+      } catch (caught) {
+        setLocalDraftStatus("warning");
+        setLocalDraftError(
+          caught instanceof Error
+            ? `AI 图片已生成，但云端保存失败：${caught.message}`
+            : "AI 图片已生成，但云端保存失败。",
+        );
+      }
       setVisualImageJob({
         ...jobBase,
         stage: "completed",
@@ -6811,6 +6752,19 @@ export function Workbench({
           );
           latestResultRef.current = workingResult;
           setResult(workingResult);
+          try {
+            // Persist every completed slot while a long batch is running so
+            // a refresh cannot restore the stale result from batch start.
+            await saveVisualProgressNow();
+            workingResult = latestResultRef.current;
+          } catch (caught) {
+            setLocalDraftStatus("warning");
+            setLocalDraftError(
+              caught instanceof Error
+                ? `AI 图片已生成，但云端增量保存失败：${caught.message}`
+                : "AI 图片已生成，但云端增量保存失败。",
+            );
+          }
           completedCount += 1;
           return;
         } catch (caught) {
@@ -7475,20 +7429,42 @@ export function Workbench({
 
   const saveCurrentProjectNow = async () => {
     if (!hasProjectSource) return;
-    const draft = currentProjectDraft(latestResultRef.current);
-    if (cloudStoreStatus?.connected) {
+    const currentResult = latestResultRef.current;
+    const draft = currentProjectDraft(currentResult);
+    let currentCloudStatus = cloudStoreStatus;
+    if (currentCloudStatus?.configured && !currentCloudStatus.connected) {
+      currentCloudStatus = await getCloudStoreStatus().catch(
+        () => currentCloudStatus,
+      );
+      setCloudStoreStatus(currentCloudStatus);
+    }
+    if (currentCloudStatus?.connected) {
       const savedCloud = await saveCloudProject(
-        draft,
+        {
+          ...draft,
+          result: persistedProjectResult(currentResult, "memfire"),
+        },
         cloudRevisionRef.current,
       );
       cloudRevisionRef.current = savedCloud.updatedAt;
       if (latestProjectIdRef.current === projectId) {
-        setResult((current) =>
-          applyPersistedImageUrlUpdates(current, savedCloud.imageUrls),
+        const persistedResult = applyPersistedImageUrlUpdates(
+          latestResultRef.current,
+          savedCloud.imageUrls,
         );
+        latestResultRef.current = persistedResult;
+        setResult(persistedResult);
       }
     }
     else await saveLocalProjectDraft(draft);
+  };
+
+  const saveVisualProgressNow = async () => {
+    const queuedSave = visualPersistQueueRef.current.then(() =>
+      saveCurrentProjectNow(),
+    );
+    visualPersistQueueRef.current = queuedSave.catch(() => undefined);
+    await queuedSave;
   };
 
   useEffect(() => {

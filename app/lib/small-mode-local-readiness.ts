@@ -34,9 +34,16 @@ function activeFactCorpus(projectFacts: DesignReportProjectFacts) {
 export function evaluateSmallModeImageReadiness(
   projectFacts: DesignReportProjectFacts,
   pagePlan: DesignReportPagePlan,
+  options?: { pageId?: string },
 ): SmallModeLocalReadiness {
   const issues: string[] = [];
   const sourceCorpus = activeFactCorpus(projectFacts);
+  const pagesToCheck = options?.pageId
+    ? pagePlan.pages.filter((page) => page.page_id === options.pageId)
+    : pagePlan.pages;
+  if (options?.pageId && pagesToCheck.length === 0) {
+    issues.push(`找不到当前图片页：${options.pageId}`);
+  }
   const visibleCorpus = pagePlan.pages
     .flatMap((page) => [
       page.headline_zh,
@@ -105,7 +112,7 @@ export function evaluateSmallModeImageReadiness(
     if (!requirement.matched) issues.push(`整套汇报未覆盖：${requirement.label}`);
   }
 
-  for (const page of pagePlan.pages) {
+  for (const page of pagesToCheck) {
     if (page.page_type === "cover") continue;
     if (!["generated", "reviewed"].includes(page.generation_status)) {
       issues.push(`${page.page_id}“${page.headline_zh}”文案尚未完成`);

@@ -850,13 +850,10 @@ test("AI image completion updates only the selected visual slot and preserves th
   const mergeSource = workbenchSource.slice(mergeStart, mergeEnd);
 
   assert.ok(mergeStart >= 0 && mergeEnd > mergeStart);
-  assert.match(mergeSource, /setResult\(\(current\) =>/);
-  assert.match(mergeSource, /\.\.\.currentPage,[\s\S]*?visual_task:/);
-  assert.match(mergeSource, /\.\.\.currentTask,[\s\S]*?generated_images:/);
-  assert.match(
-    mergeSource,
-    /filter\([\s\S]*?image\.slot_id !== slotId[\s\S]*?responseImage/,
-  );
+  assert.match(mergeSource, /mergeVisualImagePipelineResult\(/);
+  assert.match(mergeSource, /latestResultRef\.current = mergedResult/);
+  assert.match(mergeSource, /setResult\(mergedResult\)/);
+  assert.match(workbenchSource, /await saveVisualProgressNow\(\);/);
   assert.doesNotMatch(mergeSource, /synchronizeProposalCoverage/);
   assert.doesNotMatch(mergeSource, /setResult\(next/);
   assert.match(
@@ -6170,6 +6167,7 @@ test("design projects save into one switchable catalog with rename and delete", 
   assert.match(apiSource, /return NextResponse\.json\(\{ ok: true, updatedAt, imageUrls \}\)/);
   assert.match(workbenchSource, /generated_images is canonical/);
   assert.match(workbenchSource, /lastCloudPersistedVisualImageRef/);
+  assert.match(workbenchSource, /currentCloudStatus = await getCloudStoreStatus/);
   assert.match(workbenchSource, /AI 图片云端保存失败/);
   assert.match(cloudStoreSource, /export async function renameMemFireProject/);
   assert.match(cloudStoreSource, /export async function deleteMemFireProject/);
