@@ -5757,6 +5757,7 @@ export function Workbench({
       ...synchronized,
       analysisMode: next.analysisMode ?? result.analysisMode,
     };
+    latestResultRef.current = nextWithMode;
     let addedInput = 0;
     let addedOutput = 0;
     let addedImageInput = 0;
@@ -5881,7 +5882,7 @@ export function Workbench({
             )),
       );
 
-      return {
+      const mergedResult = {
         ...current,
         pagePlan: {
           ...current.pagePlan,
@@ -5948,6 +5949,8 @@ export function Workbench({
         executionMode: next.executionMode ?? current.executionMode,
         modelName: next.modelName ?? current.modelName,
       };
+      latestResultRef.current = mergedResult;
+      return mergedResult;
     });
   };
 
@@ -7167,6 +7170,50 @@ export function Workbench({
       .map((sheet) => sheet.dataset.a3PageId)
       .filter((pageId): pageId is string => Boolean(pageId));
 
+  const waitForA3Layout = async () => {
+    // The preview's fit pass runs from a layout effect and then a
+    // requestAnimationFrame. Wait for two complete frames after each model
+    // response so the measurement reflects the newly rendered copy.
+    await new Promise<void>((resolve) =>
+      window.requestAnimationFrame(() =>
+        window.requestAnimationFrame(() => resolve()),
+      ),
+    );
+  };
+
+  const rewriteUntilA3Fits = async (
+    initial: PipelineResult,
+    statusLabel: string,
+  ) => {
+    let next = initial;
+    const maxRewriteRounds = 4;
+    for (let round = 0; round < maxRewriteRounds; round += 1) {
+      await waitForA3Layout();
+      const overflowPageIds = readPdfLayoutOverflowPageIds();
+      if (overflowPageIds.length === 0) {
+        return next;
+      }
+      setError(
+        `已检测到 ${overflowPageIds.join("、")} 页真实文本框溢出，Agent 正在按当前版面进行第 ${round + 1} 轮整体重写。`,
+      );
+      next = await prepareExportWithRecovery(
+        "pdf",
+        next.projectFacts,
+        next.pagePlan,
+        overflowPageIds,
+      );
+      acceptPipelineResult(
+        next,
+        `${statusLabel}（按 A3 实际溢出第 ${round + 1} 轮）`,
+      );
+    }
+    await waitForA3Layout();
+    // Keep the latest complete rewrite and let the user inspect it. A
+    // character-count result is not treated as an export-blocking failure;
+    // the real A3 measurement remains the source of truth.
+    return next;
+  };
+
   const prepareExportWithRecovery = async (
     format: "pdf" | "docx",
     exportProjectFacts = facts,
@@ -7211,29 +7258,7 @@ export function Workbench({
     try {
       let next = await prepareExportWithRecovery("pdf");
       acceptPipelineResult(next, "模型整理 PDF 导出终稿");
-      await new Promise<void>((resolve) =>
-        window.requestAnimationFrame(() =>
-          window.requestAnimationFrame(() => resolve()),
-        ),
-      );
-      const overflowPageIds = readPdfLayoutOverflowPageIds();
-      if (overflowPageIds.length > 0) {
-        setError(
-          `已检测到 ${overflowPageIds.join("、")} 页真实文本框溢出，Agent 正在按当前版面重写文案。`,
-        );
-        next = await prepareExportWithRecovery(
-          "pdf",
-          next.projectFacts,
-          next.pagePlan,
-          overflowPageIds,
-        );
-        acceptPipelineResult(next, "按 A3 实际溢出重写终稿");
-        await new Promise<void>((resolve) =>
-          window.requestAnimationFrame(() =>
-            window.requestAnimationFrame(() => resolve()),
-          ),
-        );
-      }
+      next = await rewriteUntilA3Fits(next, "按 A3 实际溢出重写终稿");
       await waitForPdfVisualAssets();
       restorePdfRasterAssets = await preparePdfRasterAssets(pdfExportPpi);
       replaceBrowserDocumentTitle(safePdfFileName(
@@ -7258,26 +7283,9 @@ export function Workbench({
     setBusy("generate-all");
     setError("");
     try {
-      let next = await prepareExportWithRecovery("pdf");
+      const next = await prepareExportWithRecovery("pdf");
       acceptPipelineResult(next, "生成整套终稿文案");
-      await new Promise<void>((resolve) =>
-        window.requestAnimationFrame(() =>
-          window.requestAnimationFrame(() => resolve()),
-        ),
-      );
-      const overflowPageIds = readPdfLayoutOverflowPageIds();
-      if (overflowPageIds.length > 0) {
-        setError(
-          `已检测到 ${overflowPageIds.join("、")} 页真实文本框溢出，Agent 正在按当前版面重写文案。`,
-        );
-        next = await prepareExportWithRecovery(
-          "pdf",
-          next.projectFacts,
-          next.pagePlan,
-          overflowPageIds,
-        );
-        acceptPipelineResult(next, "按 A3 实际溢出重写终稿");
-      }
+      await rewriteUntilA3Fits(next, "按 A3 实际溢出重写终稿");
     } catch (caught) {
       setError(
         caught instanceof Error
@@ -7426,7 +7434,9 @@ export function Workbench({
     }
   };
 
-  const currentProjectDraft = (): LocalProjectDraft => ({
+  const currentProjectDraft = (
+    resultOverride: PipelineResult = latestResultRef.current,
+  ): LocalProjectDraft => ({
     version: 1,
     projectId,
     title: projectTitle.trim() || facts.project_name_anonymized || "未命名设计",
@@ -7435,7 +7445,7 @@ export function Workbench({
     updatedAt: new Date().toISOString(),
     documents: persistedProjectDocuments(documents),
     result: persistedProjectResult(
-      result,
+      resultOverride,
       cloudStoreStatus?.connected ? "memfire" : "browser",
     ),
     selectedPageId,
@@ -7458,7 +7468,7 @@ export function Workbench({
 
   const saveCurrentProjectNow = async () => {
     if (!hasProjectSource) return;
-    const draft = currentProjectDraft();
+    const draft = currentProjectDraft(latestResultRef.current);
     if (cloudStoreStatus?.connected) {
       const savedCloud = await saveCloudProject(
         draft,

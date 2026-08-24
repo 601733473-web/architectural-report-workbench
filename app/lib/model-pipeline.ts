@@ -2802,16 +2802,18 @@ function normalizeSmallModePage(
   const previousVisualTask = normalized.visual_task;
   const refreshedVisualTask = createVisualTask(projectFacts, normalized);
   if (previousVisualTask) {
-    const previousSlotLabels = new Map(
-      previousVisualTask.image_slots.map((slot) => [slot.slot_id, slot.label]),
-    );
-    const compatibleSlotIds = new Set(
-      refreshedVisualTask.image_slots
-        .filter((slot) => previousSlotLabels.get(slot.slot_id) === slot.label)
-        .map((slot) => slot.slot_id),
+    // Slot ids are the stable identity of a persisted image. Labels are
+    // presentation copy and can be normalized after generation (for example
+    // when a generic 装置3 title becomes a confirmed proposal name). Requiring
+    // an exact label match here used to delete every generated small-mode
+    // image during the next cloud save/load cycle. Keep images whose slot id
+    // still exists; stale slots removed from the new recipe are still dropped.
+    // The former rule was `previousSlotLabels.get(slot.slot_id) === slot.label`.
+    const refreshedSlotIds = new Set(
+      refreshedVisualTask.image_slots.map((slot) => slot.slot_id),
     );
     const compatibleImages = previousVisualTask.generated_images?.filter(
-      (image) => compatibleSlotIds.has(image.slot_id),
+      (image) => refreshedSlotIds.has(image.slot_id),
     );
     if (compatibleImages?.length) {
       const preservedImages = compatibleImages as unknown as NonNullable<
