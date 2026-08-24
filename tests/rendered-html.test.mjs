@@ -5909,7 +5909,7 @@ test("visual image requests classify network failures, slim payloads and preserv
   assert.match(modelClientSource, /imageRetryDelayMs/);
   assert.match(
     modelClientSource,
-    /\["gpt-5\.5", "gpt-5\.6-luna", "gpt-image-2"\]/,
+    /"gpt-image-2"[\s\S]*"gpt-image-2-c"[\s\S]*"gpt-image-1\.5"[\s\S]*"gpt-image-1"/,
   );
   assert.match(modelClientSource, /"gpt-image-2"/);
   assert.match(modelClientSource, /extractImageFromUnknown/);
@@ -6000,11 +6000,11 @@ test("small mode waits for explicit final-copy and full-image actions", async ()
   assert.match(routeSource, /!incomingHasRequestedSlot/);
   assert.match(
     imageModelSource,
-    /imageModel: "gpt-5\.5"/,
+    /imageModel: "gpt-image-2"/,
   );
   assert.match(
     imageModelSource,
-    /fallbackImageModels: smallMode \? \[\] : undefined/,
+    /fallbackImageModels: smallMode\s*\?\s*\["gpt-image-2-c", "gpt-image-1\.5", "gpt-image-1"\]/,
   );
   assert.match(imageModelSource, /固定方案 DNA（最高优先级，跨页不得改变）/);
   assert.match(imageModelSource, /objectDna\.join/);
@@ -6021,7 +6021,7 @@ test("small mode waits for explicit final-copy and full-image actions", async ()
     imageModelSource,
     /\.slice\(0, smallModeMustShowAllObjects \? 6_000 : 2_400\)/,
   );
-  assert.match(imageModelSource, /maxAttempts: smallMode \? 1 : 2/);
+  assert.match(imageModelSource, /maxAttempts: smallMode \? 3 : 2/);
   assert.match(
     modelClientSource,
     /图像模型返回成功响应，但没有调用图像生成工具或返回可用图片/,
@@ -6032,7 +6032,7 @@ test("small mode waits for explicit final-copy and full-image actions", async ()
   );
   assert.match(imageModelSource, /const promptResponse = smallTaskMode/);
   assert.match(imageModelSource, /local-small-mode-visual-prompt/);
-  assert.match(workbenchSource, /SMALL_BUILDING_IMAGE_MODEL = "gpt-5\.5"/);
+  assert.match(workbenchSource, /SMALL_BUILDING_IMAGE_MODEL = "gpt-image-2"/);
   assert.equal(
     workbenchSource.match(/imageApiSettingsForTaskMode\(apiSettings, taskMode\)/g)
       ?.length,

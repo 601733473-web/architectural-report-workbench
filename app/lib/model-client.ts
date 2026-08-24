@@ -924,7 +924,7 @@ export async function createImageGeneration({
   /** Apply the single-image-asset guard independently of provider fallback. */
   singleImageAssetGuard?: boolean;
   previousAttemptCount?: number;
-  maxAttempts?: 1 | 2;
+  maxAttempts?: 1 | 2 | 3;
 }): Promise<ImageGenerationCallRecord> {
   const runtime = getModelRuntime(runtimeOverride);
   if (!runtime.imageApiKey) {
@@ -937,7 +937,16 @@ export async function createImageGeneration({
     : fallbackImageModels ??
     (/ruishiglobal\.com$/i.test(new URL(runtime.imageBaseUrl).hostname)
       ? (() => {
-          const priority = ["gpt-5.5", "gpt-5.6-luna", "gpt-image-2"];
+          // Keep fallback attempts inside the image-model family. A text
+          // model such as gpt-5.5 can return HTTP 200 metadata without an
+          // image, which is indistinguishable from a broken generation to
+          // the caller and cannot be persisted to cloud storage.
+          const priority = [
+            "gpt-image-2",
+            "gpt-image-2-c",
+            "gpt-image-1.5",
+            "gpt-image-1",
+          ];
           const currentIndex = priority.findIndex(
             (candidate) =>
               candidate.toLowerCase() === runtime.imageModel.toLowerCase(),

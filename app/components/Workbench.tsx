@@ -683,7 +683,10 @@ function safePdfFileName(value: string) {
   return sanitized || "建筑设计汇报";
 }
 
-const SMALL_BUILDING_IMAGE_MODEL = "gpt-5.5";
+// The small-building cloud route exposes a real image endpoint for gpt-image-2.
+// gpt-5.5 is a text/reasoning model on the same gateway; sending it the
+// Responses image tool returns a successful metadata envelope without pixels.
+const SMALL_BUILDING_IMAGE_MODEL = "gpt-image-2";
 
 function imageApiSettingsForTaskMode(
   settings: ApiSettings,

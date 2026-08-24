@@ -1438,13 +1438,14 @@ ${systemRenderingPromptGuard(page)}`;
       `P8 项目事实未完整传递到图像模型，已阻止提交：${trafficPromptTransferAudit.missingSignals.slice(0, 6).join("；")}`,
     );
   }
-  // Small mode stays on the configured image provider and model so the UI can
-  // truthfully report that every accepted visual came from that exact model.
+  // Small mode uses the provider's actual image-generation model. The gateway
+  // also lists gpt-5.5, but that model returns a text Responses envelope when
+  // asked for image_generation and therefore contains no pixels to persist.
   const smallMode = isSmallBuildingMode(
     projectFacts.task_mode ?? "large_public_building",
   );
   const imageRuntimeOverride = smallMode
-    ? { ...runtimeOverride, imageModel: "gpt-5.5" }
+    ? { ...runtimeOverride, imageModel: "gpt-image-2" }
     : runtimeOverride;
   // Small-scale work is intentionally text-to-image. The user explicitly does
   // not require image-to-image continuity, and forwarding a previous generated
@@ -1523,14 +1524,15 @@ ${systemRenderingPromptGuard(page)}`;
     runtimeOverride: imageRuntimeOverride,
     size: outputSpec.api_size,
     timeoutMs: smallModeTimeoutMs,
-    // Small mode is intentionally pinned to gpt-5.5 with no model fallback so
-    // a deck cannot silently mix visual languages from different generators.
-    // Large mode preserves the existing provider policy.
-    fallbackImageModels: smallMode ? [] : undefined,
+    // Keep the same provider and image family when the gateway is temporarily
+    // saturated; never fall back to a text model that can return no pixels.
+    fallbackImageModels: smallMode
+      ? ["gpt-image-2-c", "gpt-image-1.5", "gpt-image-1"]
+      : undefined,
     allowCrossProviderImageFallback: false,
     strictConfiguredImageModel: false,
     singleImageAssetGuard: smallMode,
-    maxAttempts: smallMode ? 1 : 2,
+    maxAttempts: smallMode ? 3 : 2,
   });
   imageCalls.push(imageCall);
 
