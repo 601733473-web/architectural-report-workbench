@@ -759,6 +759,11 @@ const imageValueKeys = [
   "b64_json",
   "image_base64",
   "base64",
+  // Several OpenAI-compatible image gateways wrap the completed image in
+  // `output_image` instead of the standard `result`/`image_url` fields.
+  "output_image",
+  "output_image_url",
+  "image_data",
   "image_url",
   "image",
   "url",
@@ -856,7 +861,11 @@ function imageResponseError(response: Record<string, unknown>) {
   return new ModelRequestError(
     detail
       ? `图像模型没有返回图片：${detail}`
-      : "图像模型返回成功响应，但内容中没有可识别的图片",
+      : `图像模型返回成功响应，但内容中没有可识别的图片（返回字段：${Object.keys(
+          response,
+        )
+          .slice(0, 12)
+          .join("、") || "未提供"}）`,
     502,
     true,
     "PROVIDER_RESPONSE",

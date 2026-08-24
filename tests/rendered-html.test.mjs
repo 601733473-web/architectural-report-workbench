@@ -5917,6 +5917,8 @@ test("visual image requests classify network failures, slim payloads and preserv
   assert.match(modelClientSource, /同一项目的连续性母版/);
   assert.match(modelClientSource, /resolvedReferenceImages/);
   assert.match(modelClientSource, /"b64_json"/);
+  assert.match(modelClientSource, /"output_image"/);
+  assert.match(modelClientSource, /"output_image_url"/);
   assert.match(modelClientSource, /"output_image"|image_url/);
   assert.match(routeSource, /class PipelineOperationError extends Error/);
   assert.match(routeSource, /runRecoverableVisualJob/);
