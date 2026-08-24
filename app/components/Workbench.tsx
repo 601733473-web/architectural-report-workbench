@@ -2055,9 +2055,15 @@ const a3TextConstraintSelector = [
 ].join(",");
 
 function textExceedsA3Frame(element: HTMLElement, sheet: HTMLElement) {
+  // Hidden/conditional content in the offscreen PDF deck has no measurable
+  // box. It must not turn a whole page into a false-positive overflow.
+  if (element.clientWidth === 0 && element.clientHeight === 0) {
+    return false;
+  }
+  const dimensionTolerance = 4;
   if (
-    element.scrollHeight > element.clientHeight + 1 ||
-    element.scrollWidth > element.clientWidth + 1
+    element.scrollHeight > element.clientHeight + dimensionTolerance ||
+    element.scrollWidth > element.clientWidth + dimensionTolerance
   ) {
     return true;
   }
@@ -7162,11 +7168,12 @@ export function Workbench({
     );
 
   const readPdfLayoutOverflowPageIds = () =>
-    Array.from(
-      document.querySelectorAll<HTMLElement>(
-        '.pdf-export-deck [data-a3-layout-overflow="true"]',
-      ),
-    )
+    Array.from(document.querySelectorAll<HTMLElement>(".pdf-export-deck [data-a3-page-id]"))
+      .filter((sheet) =>
+        Array.from(sheet.querySelectorAll<HTMLElement>("[data-a3-overflow=\"true\"]")).some(
+          (element) => element.clientWidth > 0 && element.clientHeight > 0,
+        ),
+      )
       .map((sheet) => sheet.dataset.a3PageId)
       .filter((pageId): pageId is string => Boolean(pageId));
 
