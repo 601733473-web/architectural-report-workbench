@@ -156,6 +156,78 @@ function visibleCharacterCount(value: string | undefined) {
   return Array.from(String(value ?? "").replace(/\s+/gu, "")).length;
 }
 
+function visibleBodyExceedsLimit(
+  body: string,
+  coreMessage: string,
+  smallMode: boolean,
+) {
+  if (visibleCharacterCount(body) > 150) return true;
+  return smallMode &&
+    visibleCharacterCount(`${coreMessage}${body}`) > 150;
+}
+
+function shortSmallModeHeadline(value: string) {
+  const suffix = value
+    .replace(/^装置\s*[0-9一二三四五六七八九十]+\s*[|｜:：]?\s*/u, "")
+    .replace(/^核心概念\s*[：:]\s*/u, "")
+    .trim();
+  return suffix || "当前装置";
+}
+
+function deterministicBoundedBody(
+  page: ReportPage,
+  smallMode: boolean,
+) {
+  const subject = shortSmallModeHeadline(page.headline_zh);
+  if (!smallMode) {
+    return {
+      coreMessage: page.core_message,
+      body: `围绕“${subject}”组织本页空间关系，并通过图示呈现关键设计动作。`,
+    };
+  }
+
+  const coreCandidates = [
+    `“${subject}”形成清晰的空间主张。`,
+    `围绕“${subject}”组织空间体验。`,
+    "以明确的空间动作回应本页主题。",
+  ];
+  const bodyCandidates = /泡茶|茶香|品鉴|甜/u.test(subject)
+    ? [
+        "以泡茶、闻香与品鉴组织现场互动。",
+        "通过泡茶与品鉴形成可参与的体验。",
+      ]
+    : /瓷|器|共创|斗器/u.test(subject)
+      ? [
+          "以可替换共创模块组织观众参与。",
+          "通过共创模块形成现场文化记忆。",
+        ]
+      : /真|山泉|源头/u.test(subject)
+        ? [
+            "以层叠透光与穿行触摸呈现澄澈感受。",
+            "通过穿行、触摸与自然光影组织体验。",
+          ]
+        : /复用|收起|搭建/u.test(page.headline_zh)
+          ? [
+              "主体构件按可拆分、可收纳、可再次部署组织。",
+              "以可拆分构件支撑收起与再次部署。",
+            ]
+          : [
+              "以进入、停留与观看组织现场体验。",
+              "通过具体空间动作回应本页主题。",
+            ];
+  for (const coreMessage of coreCandidates) {
+    for (const body of bodyCandidates) {
+      if (!visibleBodyExceedsLimit(body, coreMessage, true)) {
+        return { coreMessage, body };
+      }
+    }
+  }
+  return {
+    coreMessage: "围绕当前主题组织空间体验。",
+    body: "通过明确的空间动作回应本页结论。",
+  };
+}
+
 const factsProperties = projectFactsSchema.properties as Record<string, unknown>;
 const planProperties = pagePlanSchema.properties as Record<string, unknown>;
 const registrationSchema = {
@@ -2132,6 +2204,16 @@ function repairSmallModeParallelBody(
   body: string,
   projectFacts: DesignReportProjectFacts,
 ) {
+  // The model is the copy editor.  These deterministic rules are only a
+  // fallback for an empty/backstage draft; expanding an already valid short
+  // draft here was the reason a later normalization pass could reintroduce
+  // overflow after the model had compressed it.
+  if (
+    body.trim() &&
+    !containsBackstagePresentationText(body)
+  ) {
+    return body;
+  }
   if (
     !/三件|三类|矩阵|对照|总览|分工/u.test(page.headline_zh)
   ) {
@@ -2201,6 +2283,12 @@ function repairSmallModeRoleBody(
   projectFacts: DesignReportProjectFacts,
 ) {
   const headline = page.headline_zh;
+  if (
+    body.trim() &&
+    !containsBackstagePresentationText(body)
+  ) {
+    return body;
+  }
   const existingBodyIsSpecific =
     body.trim().length >= 90 &&
     !/(现状依据|核心问题|设计动作|落位结果|技术原则|关键构造关系|性能验证|本页用于|当前页)/u.test(
@@ -2562,6 +2650,15 @@ function alignSmallModeObjectBodyToDesignSystem(
   page: ReportPage,
   fallbackBody: string,
 ) {
+  // Do not replace a model-written visible paragraph with the much longer
+  // internal design-system expansion.  The design system remains prompt
+  // context; the returned paragraph must remain the model's bounded copy.
+  if (
+    fallbackBody.trim() &&
+    !containsBackstagePresentationText(fallbackBody)
+  ) {
+    return fallbackBody;
+  }
   const designObject = smallModeDesignObjectForPage(page);
   if (!designObject) return fallbackBody;
   const name = compactDesignSystemSentence(designObject["方案名"]);
@@ -2693,6 +2790,21 @@ function normalizeSmallModePage(
     normalized.body_copy,
     projectFacts,
   );
+  if (
+    visibleBodyExceedsLimit(
+      normalized.body_copy,
+      normalized.core_message,
+      true,
+    )
+  ) {
+    const bounded = deterministicBoundedBody(normalized, true);
+    normalized.core_message = bounded.coreMessage;
+    normalized.core_message_en = englishPresentationText(
+      bounded.coreMessage,
+      englishCoreFallback(normalized.page_type),
+    );
+    normalized.body_copy = bounded.body;
+  }
   normalized.body_zh = normalized.body_copy;
   const parallelOverview = /三件|三类|矩阵|对照|总览|分工/u.test(
     normalized.headline_zh,
@@ -3227,7 +3339,7 @@ export async function generatePageWithModel(
       pageTypeEnglishLabels[sourcePage.page_type],
     ),
   );
-  const generatedCoreMessageEn = sanitizePresentationText(
+  let generatedCoreMessageEn = sanitizePresentationText(
     generated.core_message_en,
     sourcePage.core_message_en || englishCoreFallback(sourcePage.page_type),
   );
@@ -3245,6 +3357,35 @@ export async function generatePageWithModel(
       sourcePage,
       bodyCopy,
       projectFacts,
+    );
+  }
+  if (visibleBodyExceedsLimit(bodyCopy, generatedCoreMessage, smallMode)) {
+    if (canRepair) {
+      return generatePageWithModel(
+        projectFacts,
+        pagePlan,
+        pageId,
+        runtimeOverride,
+        createRepairContext(
+          [
+            smallMode
+              ? "小型建筑页面最终可见的 core_message 加 body_copy 超过150字。必须同时整体重写两者，不能保留旧长句。"
+              : "本页最终可见正文超过150字，必须整体重写为更短的完整句子。",
+            "不得由程序删尾、截断句子或添加省略号；缩写后必须在完整句号或完整分句处结束。",
+          ],
+          { lengthOnly: true, compressionOnly: true },
+        ),
+      );
+    }
+    // A model retry is preferred. This bounded, meaning-preserving fallback
+    // is only used after all retries so one overlong provider response cannot
+    // block the entire cloud export.
+    const bounded = deterministicBoundedBody(sourcePage, smallMode);
+    generatedCoreMessage = bounded.coreMessage;
+    bodyCopy = bounded.body;
+    generatedCoreMessageEn = englishPresentationText(
+      generatedCoreMessage,
+      englishCoreFallback(sourcePage.page_type),
     );
   }
   const visibleEnglishFields = [

@@ -807,23 +807,37 @@ export function createSmallModeVisualImageSlots(
     ] as VisualTask["image_slots"];
   }
   if (page.page_type === "summary") {
+    const summaryObjectName = (objectId: string, fallback: string) => {
+      const line = (page.visual_brief ?? []).find((item) =>
+        item.startsWith(`对象${objectId}｜`),
+      );
+      const name = line?.match(/方案名=([^｜]+)/u)?.[1]?.trim();
+      return name && !/^(?:装置|对象|方案)\s*[一二三四五六七八九十\d]+$/u.test(name)
+        ? name
+        : fallback;
+    };
+    const summaryNames = [
+      summaryObjectName("1", "第一方案"),
+      summaryObjectName("2", "第二方案"),
+      summaryObjectName("3", "第三方案"),
+    ];
     return [
       slot(
         "S1",
-        "装置1主效果图",
-        "直接复用装置1效果页已经生成的主效果图，作为总结页的总体形象证据；不重新调用图像模型。",
+        `${summaryNames[0]}主效果图`,
+        `直接复用${summaryNames[0]}效果页已经生成的主效果图，作为总结页的总体形象证据；不重新调用图像模型。`,
         "landscape",
       ),
       slot(
         "S2",
-        "装置2主效果图",
-        "直接复用装置2效果页已经生成的主效果图，作为总结页的公共空间与互动证据；不重新调用图像模型。",
+        `${summaryNames[1]}主效果图`,
+        `直接复用${summaryNames[1]}效果页已经生成的主效果图，作为总结页的公共空间与互动证据；不重新调用图像模型。`,
         "landscape",
       ),
       slot(
         "S3",
-        "装置3主效果图",
-        "直接复用装置3效果页已经生成的主效果图，作为总结页的重点空间与文化体验证据；不重新调用图像模型。",
+        `${summaryNames[2]}主效果图`,
+        `直接复用${summaryNames[2]}效果页已经生成的主效果图，作为总结页的重点空间与文化体验证据；不重新调用图像模型。`,
         "landscape",
       ),
     ] as VisualTask["image_slots"];

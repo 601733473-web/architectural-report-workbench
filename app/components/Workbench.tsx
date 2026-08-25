@@ -144,6 +144,72 @@ const DEFAULT_COMPANY_NAME = "设计汇报 DESIGN PRESENTATION";
 const SMALL_COVER_REPORT_TITLE_EN =
   "THREE-THEME INSTALLATION DESIGN PRESENTATION";
 
+function boundedSmallModeRestoreCopy(
+  page: DesignReportPagePlan["pages"][number],
+) {
+  const visibleBody = /[A-Za-z]{3,}/u.test(page.body_copy)
+    ? page.body_zh
+    : page.body_copy;
+  const visibleLength = Array.from(
+    `${page.core_message}${visibleBody}`.replace(/\s+/gu, ""),
+  ).length;
+  const frameLimit = page.page_type === "rendering" ? 24 : 150;
+  if (visibleLength <= frameLimit) return page;
+
+  const subject = page.headline_zh
+    .replace(/^装置\s*[0-9一二三四五六七八九十]+\s*[|｜:：]?\s*/u, "")
+    .trim() || "当前主题";
+  const shortSubject = /泡茶|茶香|品鉴|甜/u.test(subject)
+    ? "泡茶"
+    : /瓷|器|共创|斗器/u.test(subject)
+      ? "共创"
+      : /真|山泉|源头/u.test(subject)
+        ? "源头"
+        : /复用|收起|搭建/u.test(page.headline_zh)
+          ? "复用"
+          : Array.from(subject).slice(0, 4).join("") || "现场";
+  const body = /泡茶|茶香|品鉴|甜/u.test(subject)
+    ? "以泡茶与闻香组织互动。"
+    : /瓷|器|共创|斗器/u.test(subject)
+      ? "以共创模块组织观众参与。"
+      : /真|山泉|源头/u.test(subject)
+        ? "以透光与触摸呈现澄澈感。"
+        : /复用|收起|搭建/u.test(page.headline_zh)
+          ? "以可拆分构件支撑复用。"
+          : "以进入与停留组织现场体验。";
+  const core = `围绕“${shortSubject}”组织体验。`;
+  return {
+    ...page,
+    core_message: core,
+    core_message_en: englishPresentationText(core, "SPACE EXPERIENCE"),
+    body_copy: body,
+    body_zh: body,
+  };
+}
+
+function normalizeRestoredSmallModeDraft(draft: LocalProjectDraft) {
+  const taskMode =
+    draft.result.projectFacts.task_mode ??
+    draft.result.pagePlan.task_mode ??
+    DEFAULT_TASK_MODE;
+  if (!isSmallBuildingMode(taskMode)) return draft;
+  return {
+    ...draft,
+    result: {
+      ...draft.result,
+      projectFacts: {
+        ...draft.result.projectFacts,
+        task_mode: taskMode,
+      },
+      pagePlan: {
+        ...draft.result.pagePlan,
+        task_mode: taskMode,
+        pages: draft.result.pagePlan.pages.map(boundedSmallModeRestoreCopy),
+      },
+    },
+  };
+}
+
 const AUTOSAVE_INTERVAL_MS = 15 * 60 * 1000;
 const AUTOSAVE_INTERVAL_30M_MS = 30 * 60 * 1000;
 
@@ -1737,6 +1803,71 @@ function userFacingVisualText(value: string | undefined, fallback: string) {
   return value && !isBackstageVisualPayload(value) ? value.trim() : fallback;
 }
 
+function visualTitleFallback(
+  headline: string,
+  pageType: DesignReportPagePlan["pages"][number]["page_type"],
+  index: number,
+) {
+  const subject = headline
+    .replace(/^装置\s*[0-9一二三四五六七八九十]+\s*[|｜:：]?\s*/u, "")
+    .replace(/^核心概念\s*[：:]\s*/u, "")
+    .trim();
+  if (pageType === "summary") {
+    return ["总体形象", "公共空间", "重点空间"][index] ?? "方案效果";
+  }
+  const suffix = subject || "当前页面";
+  const role = ["产品表达", "空间转译", "现场体验", "材料与光影"][index];
+  return `${suffix}${role ? ` · ${role}` : ""}`;
+}
+
+function humanVisualTitle(
+  value: string | undefined,
+  fallback: string,
+) {
+  const safe = userFacingVisualText(value, "")
+    .replace(/^图片(?:\s*\d+)?待生成\s*[:：]?\s*/u, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  const firstPart = safe.split(/[｜|:：]/u)[0]?.trim() || safe;
+  const generic = /^(?:装置|对象|方案)\s*[0-9一二三四五六七八九十]+(?:主效果图|效果图|主题与现场体验)?$/u;
+  const promptLike = /当前图框|只聚焦|图像必须|不得生成|提示词|任务书|后台/u.test(
+    safe,
+  );
+  if (!safe || generic.test(firstPart) || promptLike) return fallback;
+  if (firstPart.length <= 22) return firstPart;
+  const concise = firstPart
+    .split(/[，。；、]/u)
+    .map((part) => part.trim())
+    .find((part) => part.length >= 3 && part.length <= 22);
+  return concise || fallback;
+}
+
+function compactSmallModeCaptionTitle(value: string, fallback: string) {
+  const safe = value.trim();
+  if (safe.length <= 10) return safe;
+  const withoutImageSuffix = safe
+    .replace(/(?:现场)?互动效果图$/u, "")
+    .replace(/(?:主题与现场体验|主效果图|效果图)$/u, "")
+    .trim();
+  if (withoutImageSuffix && withoutImageSuffix.length <= 10) {
+    return withoutImageSuffix;
+  }
+  const concise = withoutImageSuffix
+    .split(/[，。；、·｜|:：]/u)
+    .map((part) => part.trim())
+    .find((part) => part.length >= 2 && part.length <= 10);
+  return concise || fallback;
+}
+
+function compactSmallModeCaptionDetail(value: string, fallback: string) {
+  const safe = value
+    .replace(/(?:现场)?互动效果图$/u, "")
+    .replace(/(?:主题与现场体验|主效果图|效果图)$/u, "")
+    .trim();
+  if (safe.length >= 2 && safe.length <= 8) return safe;
+  return fallback;
+}
+
 function promptSummary(value: string | undefined, fallback: string) {
   const safe = userFacingVisualText(value, fallback).replace(/\s+/g, " ");
   return safe.length > 48 ? `${safe.slice(0, 47)}…` : safe;
@@ -2398,8 +2529,15 @@ function A3PagePreview({
   const usesMultipleVisualFrames = expectedImageSlotCount > 1;
   const visibleCaptionForSlot = (index: number) => {
     const slot = imageSlots[index];
-    const defaultTitle =
-      reportDiagramLabels[index] || slot?.label || reportHeadline;
+    const titleFallback = visualTitleFallback(
+      reportHeadline,
+      page.page_type,
+      index,
+    );
+    const defaultTitle = humanVisualTitle(
+      reportDiagramLabels[index] || slot?.label || reportHeadline,
+      titleFallback,
+    );
     const defaultDetail =
       callouts[index]?.label && callouts[index]?.label !== defaultTitle
         ? callouts[index].label
@@ -2444,7 +2582,11 @@ function A3PagePreview({
       const captionParts = rawCaption.match(
         /^([^｜|:：]{1,32})[｜|:：]\s*(.+)$/u,
       );
-      const title = captionParts?.[1]?.trim() || rawCaption;
+      const title = humanVisualTitle(
+        captionParts?.[1]?.trim() || rawCaption,
+        titleFallback,
+      );
+      const compactTitle = compactSmallModeCaptionTitle(title, titleFallback);
       const embeddedDetail = captionParts?.[2]?.trim();
       const detail = [
         embeddedDetail,
@@ -2456,12 +2598,18 @@ function A3PagePreview({
         .find(
           (value) =>
             Boolean(value) &&
-            value !== title &&
+            value !== compactTitle &&
             captionCharacterCount(value) <= 25,
         );
       const boundedDetail =
-        detail || shortCaptionFallback(`${title} ${slot?.label ?? ""}`);
-      return { title, detail: boundedDetail };
+        detail || shortCaptionFallback(`${compactTitle} ${slot?.label ?? ""}`);
+      return {
+        title: compactTitle,
+        detail: compactSmallModeCaptionDetail(
+          boundedDetail,
+          shortCaptionFallback(`${compactTitle} ${slot?.label ?? ""}`),
+        ),
+      };
     }
     if (page.page_type === "strategy") {
       return {
@@ -2486,8 +2634,12 @@ function A3PagePreview({
   };
   const pendingVisualPrompt = (index: number) => {
     const slot = imageSlots[index];
-    return differentiatedVisualPromptSummary(
+    const title = humanVisualTitle(
       slot?.label,
+      visualTitleFallback(reportHeadline, page.page_type, index),
+    );
+    return differentiatedVisualPromptSummary(
+      title,
       slot?.prompt_focus,
       slot?.purpose,
       reportDiagramLabels[index] || `图片 ${index + 1}待生成`,
@@ -4688,6 +4840,7 @@ export function Workbench({
     let active = true;
     const restoreDraft = (saved: LocalProjectDraft) => {
       if (!active) return;
+          saved = normalizeRestoredSmallModeDraft(saved);
           saved = migrateStoredProjectDraft(saved);
           setProjectTitle(saved.title?.trim() ?? "");
           setCompanyName(saved.companyName?.trim() ?? "");

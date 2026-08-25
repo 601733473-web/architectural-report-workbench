@@ -1,6 +1,7 @@
 import { Workbench } from "@/app/components/Workbench";
 import type { InputDocument, PipelineResult } from "@/app/lib/pipeline";
 import { createVisualTask } from "@/app/lib/visual-task";
+import { normalizeExistingSmallModePlan } from "@/app/lib/model-pipeline";
 import taskBrief from "@/fixtures/jingdezhen-small/task-brief.json";
 import fixtureResult from "@/fixtures/jingdezhen-small/full-run.json";
 
@@ -43,6 +44,10 @@ type PreviewGeneratedImages = NonNullable<PreviewVisualTask["generated_images"]>
 
 function withPreviewVisualAssets(result: PipelineResult): PipelineResult {
   const previewResult = structuredClone(result);
+  previewResult.pagePlan = normalizeExistingSmallModePlan(
+    previewResult.projectFacts,
+    previewResult.pagePlan,
+  );
   previewResult.pagePlan.pages = previewResult.pagePlan.pages.map((page) => {
     const visualTask = createVisualTask(previewResult.projectFacts, page);
     const urls = pageAssetMap[page.display_page_number ?? 0] ?? [];

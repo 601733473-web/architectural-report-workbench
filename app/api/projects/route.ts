@@ -12,19 +12,8 @@ import {
   type PersistedImageUrlUpdate,
 } from "@/app/lib/memfire-store";
 import { normalizeExistingSmallModePlan } from "@/app/lib/model-pipeline";
-import {
-  DEFAULT_TASK_MODE,
-  isSmallBuildingMode,
-} from "@/app/lib/task-mode";
 
 function normalizeSmallModeDraft(draft: LocalProjectDraft): LocalProjectDraft {
-  if (
-    !isSmallBuildingMode(
-      draft.result.projectFacts.task_mode ?? DEFAULT_TASK_MODE,
-    )
-  ) {
-    return draft;
-  }
   return {
     ...draft,
     result: {
