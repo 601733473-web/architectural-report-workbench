@@ -647,7 +647,7 @@ export function createSmallModeVisualImageSlots(
 ): VisualTask["image_slots"] {
   const context = `${page.headline_zh}；${page.core_message}`;
   const installationId = page.headline_zh.match(
-    /装置\s*([0-9一二三四五六七八九十]+)/u,
+    /(?:装置|节点)\s*0?([0-9一二三四五六七八九十]+)/u,
   )?.[1];
   const relevantDesignSystemLines = (page.visual_brief ?? []).filter((item) =>
     /^全篇设计系统｜/u.test(item) ||
@@ -669,7 +669,7 @@ export function createSmallModeVisualImageSlots(
     }
     const titleName = page.headline_zh
       .split("｜")
-      .slice(1)
+      .slice(1, 2)
       .join("｜")
       .replace(/^装置\s*[一二三四五六七八九十\d]+\s*[|｜:]?/u, "")
       .trim();
@@ -680,13 +680,19 @@ export function createSmallModeVisualImageSlots(
     label: string,
     purpose: string,
     aspectRatio: "wide" | "landscape" | "portrait" | "square" = "wide",
-  ) => ({
-    slot_id: slotId,
-    label,
-    purpose,
-    prompt_focus: `${context}；${designSystemContext}；当前图框任务：${purpose}；严格沿用全篇设计系统中当前对象的方案名、主体轮廓、空间机制、材料灯光和互动构件。只生成独立视觉资产，不生成整张汇报页面、标题、Logo、边框或拼贴文字。`,
-    aspect_ratio: aspectRatio,
-  });
+  ) => {
+    const isWhiteModelAnalysis = /纯白白模线稿风格/u.test(purpose);
+    const continuityInstruction = isWhiteModelAnalysis
+      ? "严格沿用全篇设计系统中当前对象的方案名、主体轮廓、空间机制与互动构件；保持纯白白模和黑灰细线的分析表达，不添加写实材质或灯光。"
+      : "严格沿用全篇设计系统中当前对象的方案名、主体轮廓、空间机制、材料灯光和互动构件。";
+    return {
+      slot_id: slotId,
+      label,
+      purpose,
+      prompt_focus: `${context}；${designSystemContext}；当前图框任务：${purpose}；${continuityInstruction}${isWhiteModelAnalysis ? "图内可包含少量简体中文短标签，但不生成整页标题、大段正文或拼贴文字。" : "只生成独立视觉资产，不生成整张汇报页面、标题、Logo、边框或拼贴文字。"}`,
+      aspect_ratio: aspectRatio,
+    };
+  };
 
   if (page.page_type === "cover") {
     return [
@@ -704,7 +710,10 @@ export function createSmallModeVisualImageSlots(
       slot("S3", "真人 IP 现场互动", "呈现真人穿着同一套角色服装，在当前项目现场引导观众参与的真实尺度场景。", "landscape"),
     ] as VisualTask["image_slots"];
   }
-  if (/三类产品与三件装置|主题矩阵|三件装置的.*分工/u.test(page.headline_zh)) {
+  if (
+    page.page_type === "comparison" ||
+    /三类产品与三件装置|主题矩阵|三件装置的.*分工/u.test(page.headline_zh)
+  ) {
     const objectIds = [
       ...new Set(
         (page.visual_brief ?? [])
@@ -741,12 +750,12 @@ export function createSmallModeVisualImageSlots(
       ] as VisualTask["image_slots"];
     }
     const labels = unique([
-      ...page.diagram_labels,
-      ...(page.callouts ?? []).map((callout) => callout.label_zh),
-      ...page.visual_requirements.filter(
-        (item) => !/^全篇设计系统｜|^对象/u.test(item),
-      ),
-    ]).slice(0, 3);
+          ...page.diagram_labels,
+          ...(page.callouts ?? []).map((callout) => callout.label_zh),
+          ...page.visual_requirements.filter(
+            (item) => !/^全篇设计系统｜|^对象/u.test(item),
+          ),
+        ]).filter((label) => !/轻国风|少女|斗器|三件装置/u.test(label)).slice(0, 3);
     const strategyLabels = labels.length >= 3
       ? labels
       : ["项目任务与活动目标", "设计语言与体验机制", "传播与复用结果"];
@@ -768,6 +777,23 @@ export function createSmallModeVisualImageSlots(
       ),
     ] as VisualTask["image_slots"];
   }
+  if (page.page_type === "rendering" && installationId) {
+    const objectName = designObjectName(installationId);
+    return [
+      slot(
+        "S1",
+        `${objectName}现场互动效果图`,
+        "以一张完整现场效果图证明本方案的空间主张、观众动作、产品触点和文化氛围；人物、装置和前后页面使用同一设计语言。",
+        "wide",
+      ),
+      slot(
+        "S2",
+        `${objectName}设计分析图`,
+        "以纯白白模线稿风格的概念分析图说明本方案的形体来源、重复构件、材料层次与可拆分装配关系；只用黑灰细线、白色实体和简洁轴测/分解关系表达设计逻辑，禁止写实材质、灯光氛围、人物、场景渲染、尺寸、结构计算、工程节点或整张汇报页面。",
+        "landscape",
+      ),
+    ] as VisualTask["image_slots"];
+  }
   if (/IP与三件装置|现场联动/u.test(page.headline_zh)) {
     return [
       slot(
@@ -777,25 +803,19 @@ export function createSmallModeVisualImageSlots(
       ),
     ] as VisualTask["image_slots"];
   }
-  if (
-    page.page_type === "technical" &&
-    !installationId &&
-    /复用|收起|搭建/u.test(page.headline_zh)
-  ) {
-    return [
+  if (page.page_type === "technical" && !installationId) {
+    const labels = unique([
+      ...(page.diagram_labels ?? []),
+      ...page.visual_requirements.filter((item) => !/^全篇设计系统｜|^对象/u.test(item)),
+    ]).slice(0, 2);
+    return (labels.length ? labels : ["构件与安装", "运营与复用"]).map((label, index) =>
       slot(
-        "S1",
-        "三件装置的可拆分构件总览",
-        "在同一干净场景中并列呈现全篇设计系统中各对象可识别的主体构件、互动构件和分类收纳单元；表达可拆分、可运输和可收纳，不生成尺寸、节点详图或工程参数。",
+        `S${index + 1}`,
+        label,
+        `依据当前任务书说明${label}，表达可理解的构件、现场使用或复用关系；不生成未经证实的尺寸、工程参数或整张汇报页面。`,
         "landscape",
       ),
-      slot(
-        "S2",
-        "今年使用—收起—明年再部署",
-        "用连续的真实场景表达全部对象从现场使用、构件分类收起到再次部署的关系；各对象的稳定母型仍可识别，不生成流程图、箭头、尺寸和工程节点。",
-        "landscape",
-      ),
-    ] as VisualTask["image_slots"];
+    ) as VisualTask["image_slots"];
   }
   if (page.page_type === "technical") {
     const prefix = installationId
@@ -816,31 +836,30 @@ export function createSmallModeVisualImageSlots(
         ? name
         : fallback;
     };
-    const summaryNames = [
-      summaryObjectName("1", "第一方案"),
-      summaryObjectName("2", "第二方案"),
-      summaryObjectName("3", "第三方案"),
-    ];
-    return [
+    const namedBriefs = (page.visual_brief ?? [])
+      .map((item) => item.match(/^方案\s*([0-9一二三四五六七八九十]+)\s*[｜|：:]\s*(.+)$/u))
+      .filter((match): match is RegExpMatchArray => Boolean(match));
+    const objectIds = [
+      ...new Set([
+        ...namedBriefs.map((match) => match[1]),
+        ...(page.visual_brief ?? [])
+          .map((item) => item.match(/^对象\s*([0-9一二三四五六七八九十]+)｜/u)?.[1])
+          .filter((value): value is string => Boolean(value)),
+      ]),
+    ].sort((left, right) => Number(left) - Number(right));
+    const summaryIds = objectIds.length ? objectIds : ["1"];
+    const summaryNames = summaryIds.map((id, index) =>
+      namedBriefs.find((match) => match[1] === id || match[1] === ["一", "二", "三"][index])?.[2]?.trim() ||
+      summaryObjectName(id, `方案${id}`),
+    );
+    return summaryNames.map((name, index) =>
       slot(
-        "S1",
-        `${summaryNames[0]}主效果图`,
-        `直接复用${summaryNames[0]}效果页已经生成的主效果图，作为总结页的总体形象证据；不重新调用图像模型。`,
+        `S${index + 1}`,
+        `${name}主效果图`,
+        `直接复用${name}效果页已经生成的主效果图，作为总结页的方案形象证据；不重新调用图像模型。`,
         "landscape",
       ),
-      slot(
-        "S2",
-        `${summaryNames[1]}主效果图`,
-        `直接复用${summaryNames[1]}效果页已经生成的主效果图，作为总结页的公共空间与互动证据；不重新调用图像模型。`,
-        "landscape",
-      ),
-      slot(
-        "S3",
-        `${summaryNames[2]}主效果图`,
-        `直接复用${summaryNames[2]}效果页已经生成的主效果图，作为总结页的重点空间与文化体验证据；不重新调用图像模型。`,
-        "landscape",
-      ),
-    ] as VisualTask["image_slots"];
+    ) as VisualTask["image_slots"];
   }
 
   const label = installationId
@@ -1860,7 +1879,9 @@ export function updatePageVisualTask(
       const compatibleSlotIds = new Set(
         specializedTask.image_slots
           .filter(
-            (slot) => previousSlots.get(slot.slot_id) === slot.label,
+            (slot) =>
+              previousSlots.get(slot.slot_id) === slot.label ||
+              previousSlots.has(slot.slot_id),
           )
           .map((slot) => slot.slot_id),
       );

@@ -29,7 +29,7 @@ function activeFactCorpus(projectFacts: DesignReportProjectFacts) {
  * Deterministic fail-closed verification used only when the current small-mode
  * deck already exists but the text-review provider is temporarily unavailable.
  * It never generates or repairs content; it only decides whether image calls
- * may start from the current 19-page plan.
+ * may start from the current task-brief-derived plan.
  */
 export function evaluateSmallModeImageReadiness(
   projectFacts: DesignReportProjectFacts,
@@ -61,8 +61,18 @@ export function evaluateSmallModeImageReadiness(
     .filter(Boolean)
     .join("\n");
 
-  if (pagePlan.pages.length !== 19) {
-    issues.push(`当前小型建筑/装置汇报为 ${pagePlan.pages.length} 页，应为 19 页完整骨架`);
+  const installationIds = [
+    ...new Set(
+      projectFacts.facts
+        .map((fact) => fact.field_path.match(/^installation\.([^.]+)\./u)?.[1])
+        .filter((value): value is string => Boolean(value)),
+    ),
+  ];
+  const minimumPageCount = Math.max(8, 5 + installationIds.length * 3);
+  if (pagePlan.pages.length < minimumPageCount) {
+    issues.push(
+      `当前小型建筑/装置汇报为 ${pagePlan.pages.length} 页，依据 ${installationIds.length || "当前"} 个空间节点至少应形成 ${minimumPageCount} 页骨架`,
+    );
   }
   if (!projectFacts.facts.some((fact) => fact.source_role === "brief_fact")) {
     issues.push("当前项目没有可核验的任务书事实");
@@ -83,29 +93,27 @@ export function evaluateSmallModeImageReadiness(
 
   const requirements = [
     {
-      label: "活动背景与发布会任务",
-      matched: /斗器大会|活动背景|发布会|开幕式/u.test(visibleCorpus),
+      label: "当前任务书的项目主题、目标与场景",
+      matched: projectFacts.facts.some((fact) => /^(?:project|event)\./u.test(fact.field_path)) &&
+        /主题|目标|活动|空间|节点|入口|场地/u.test(visibleCorpus),
     },
     {
-      label: "三类产品主题与三件装置",
-      matched: ["1", "2", "3"].every((id) =>
-        new RegExp(`装置\\s*${id}`, "u").test(visibleCorpus),
+      label: "当前任务书列出的各空间节点及对应方向",
+      matched: installationIds.length === 0 || installationIds.every((id) =>
+        new RegExp(`(?:装置|节点)\\s*0?${id}`, "u").test(visibleCorpus),
       ),
     },
     {
-      label: "轻国风少女 IP 与真人现场互动",
+      label: "任务书要求的互动、传播或使用结果",
       matched:
-        /轻国风少女/u.test(visibleCorpus) &&
-        /真人|现场角色|现场互动/u.test(visibleCorpus),
+        !projectFacts.facts.some((fact) => /互动|传播|体验|共创|分享|使用/u.test(`${fact.field_path} ${String(fact.value_raw)}`)) ||
+        /互动|传播|体验|共创|分享|停留|使用/u.test(visibleCorpus),
     },
     {
-      label: "观众共创与社交传播",
+      label: "任务书要求的建造、运营或复用边界",
       matched:
-        /共创/u.test(visibleCorpus) && /传播|分享|留影|拍照/u.test(visibleCorpus),
-    },
-    {
-      label: "今年使用、收起与明年复用",
-      matched: /收起|再次部署|年度复用|明年/u.test(visibleCorpus),
+        !projectFacts.facts.some((fact) => /reuse|复用|收起|安装|运输|运营|安全/u.test(`${fact.field_path} ${String(fact.value_raw)}`)) ||
+        /收起|复用|安装|运输|运营|安全|维护/u.test(visibleCorpus),
     },
   ];
   for (const requirement of requirements) {
@@ -129,7 +137,7 @@ export function evaluateSmallModeImageReadiness(
     }
     if (
       page.page_type === "concept" &&
-      /装置\s*[123一二三]/u.test(page.headline_zh)
+      /(?:装置|节点)\s*0?[0-9一二三四五六七八九十]+/u.test(page.headline_zh)
     ) {
       const callouts = (page.callouts ?? []).map((callout) => callout.label_zh);
       const missing = chainPrefixes.filter(
@@ -139,7 +147,7 @@ export function evaluateSmallModeImageReadiness(
         issues.push(`${page.page_id}“${page.headline_zh}”六段设计链缺少：${missing.join("、")}`);
       }
       const designLine = (page.visual_brief ?? []).find((line) =>
-        /^对象[123一二三]｜/u.test(line),
+        /^对象(?:[0-9一二三四五六七八九十]+)｜/u.test(line),
       );
       if (
         !designLine ||

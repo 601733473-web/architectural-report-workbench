@@ -8,6 +8,13 @@ import {
 } from "@/app/lib/model-client";
 import { localCultureFusionPrompt } from "@/app/lib/local-culture-fusion";
 import { smallScaleBuildabilityPrompt } from "@/app/lib/small-scale-buildability";
+import {
+  canonicalizeSmallModeHeadline,
+} from "@/app/lib/small-mode-design-directions";
+import {
+  englishPresentationText,
+  pageTypeEnglishLabels,
+} from "@/app/lib/bilingual-copy";
 
 type SmallModePage = DesignReportPagePlan["pages"][number];
 
@@ -158,7 +165,7 @@ function installationIdsFromPagePlan(pagePlan: DesignReportPagePlan) {
     ...new Set(
       pagePlan.pages
         .map((page) =>
-          page.headline_zh.match(/装置\s*([0-9一二三四五六七八九十]+)/u)?.[1],
+          page.headline_zh.match(/(?:装置|节点)\s*0?([0-9一二三四五六七八九十]+)/u)?.[1],
         )
         .filter((value): value is string => Boolean(value))
         .map(normalizeInstallationId),
@@ -176,7 +183,7 @@ function objectBrief(
   );
   const matchingPages = pagePlan.pages.filter((page) => {
     const match = page.headline_zh.match(
-      /装置\s*([0-9一二三四五六七八九十]+)/u,
+      /(?:装置|节点)\s*0?([0-9一二三四五六七八九十]+)/u,
     )?.[1];
     return match ? normalizeInstallationId(match) === objectId : false;
   });
@@ -202,6 +209,7 @@ function objectBrief(
     const value = String(fact.value_raw ?? "");
     return (
       value.includes(`装置${objectId}`) ||
+      value.includes(`节点${objectId}`) ||
       Boolean(chineseId && value.includes(`装置${chineseId}`))
     );
   });
@@ -271,6 +279,7 @@ function sanitizeProposalText(value: string, sourceCorpus: string) {
     .replace(/降低耗材成本/gu, "减少重复制作")
     .replace(/容纳\s*\d+\s*[-—至]\s*\d+\s*人/gu, "容纳多人")
     .replace(/标签关联#[^，。；\s]+/gu, "形成统一传播记忆")
+    .replace(/模块化装配节点/gu, "统一材料与识别语汇")
     .replace(/#[^，。；\s]+/gu, "")
     .replace(/默认色温为冷白光/gu, "采用清冷白光")
     .replace(/配重基座（无损地面）/gu, "可逆配重基座")
@@ -471,6 +480,13 @@ export async function generateSmallModeDesignSystemWithModel(
           })),
         },
       ];
+  const confirmedDirections = (projectFacts.gate_b_proposals ?? [])
+    .filter((proposal) => proposal.status === "confirmed")
+    .map((proposal) => ({
+      topic: proposal.missing_label,
+      title: proposal.user_defined_title ?? proposal.question,
+      direction: proposal.confirmed_direction,
+    }));
   const response = await createStructuredResponse<SmallModeDesignSystem>({
     name: "small_mode_design_system",
     schema: designSystemSchema,
@@ -486,6 +502,7 @@ export async function generateSmallModeDesignSystemWithModel(
       "不得把传感器、喷淋、投影、水泵、香氛机、自动售货机、二维码、社交话题标签或精确色温写成已确定配置，除非任务书明确出现；优先用人的进入、绕行、停留、触摸、品鉴、共创与材料自然响应建立互动。",
       "product_or_gift 只能逐字使用当前对象任务书事实中的产品或赠品，绝对不能替换为浓缩液、茶包或其他自创赠品。",
       "若任务书把某种互动写成开放性示例，不得把它强加给所有对象；只在与对应对象和页面任务一致时采用。",
+      "用户已经确认的设计方向是当前方案决策，必须优先于模型自行补写；它应贯穿对象命名、造型母题、空间机制、互动和后续视觉提示词。",
       "输出必须使用简体中文。只返回 JSON。",
     ].join("\n"),
     content: [
@@ -499,6 +516,7 @@ export async function generateSmallModeDesignSystemWithModel(
             source_page: fact.source.page,
           })),
           design_objects: objects,
+          confirmed_user_directions: confirmedDirections,
           deck_page_roles: pagePlan.pages.map(pageRole),
           local_culture_fusion: localCultureFusionPrompt(projectFacts),
           buildability_guard: smallScaleBuildabilityPrompt(projectFacts),
@@ -618,7 +636,7 @@ export async function generateSmallModeDesignSystemWithModel(
 
 function relevantObjects(page: SmallModePage, designSystem: SmallModeDesignSystem) {
   const installationId = page.headline_zh.match(
-    /装置\s*([0-9一二三四五六七八九十]+)/u,
+    /(?:装置|节点)\s*0?([0-9一二三四五六七八九十]+)/u,
   )?.[1];
   if (installationId) {
     return designSystem.objects.filter(
@@ -671,10 +689,19 @@ export function applySmallModeDesignSystem(
   designSystem: SmallModeDesignSystem,
 ) {
   const result = structuredClone(pagePlan);
+  const names = new Map(
+    designSystem.objects.map((object) => [object.object_id, object.proposal_name]),
+  );
   result.pages = result.pages.map((page) => {
+    const headlineZh = canonicalizeSmallModeHeadline(page.headline_zh, names);
     const designLines = designSystemLinesForPage(page, designSystem);
     return {
       ...page,
+      headline_zh: headlineZh,
+      headline_en: englishPresentationText(
+        headlineZh,
+        pageTypeEnglishLabels[page.page_type],
+      ),
       visual_brief: designLines,
       visual_requirements: [
         ...new Set([

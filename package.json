@@ -14,6 +14,7 @@
     "fixture:run": "tsx scripts/run-fixture.ts",
     "fixture:brief": "tsx scripts/run-brief-fixture.ts",
     "fixture:small": "tsx scripts/run-small-mode-fixture.ts",
+    "fixture:small:docx": "tsx scripts/run-small-docx-task-brief-regression.ts",
     "fixture:jingdezhen": "tsx scripts/run-jingdezhen-fixture.ts",
     "site-research:test": "tsx scripts/test-site-research.ts",
     "reference:enhance:4399": "node scripts/enhance-4399-reference.mjs",
@@ -30,9 +31,11 @@
   "dependencies": {
     "ajv": "^8.20.0",
     "docx": "^9.6.1",
+    "jszip": "^3.10.1",
     "lucide-react": "^1.27.0",
     "next": "16.2.6",
     "pdfjs-dist": "^6.1.200",
+    "pptxgenjs": "^4.0.1",
     "react": "19.2.6",
     "react-dom": "19.2.6"
   },

@@ -93,7 +93,7 @@ export default function JingdezhenPreview() {
         baseUrl: "",
         model: "local-rule",
         imageBaseUrl: "",
-        imageModel: "",
+        imageModel: "gpt-image-2",
         configured: false,
         imageConfigured: false,
         mapConfigured: false,

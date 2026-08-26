@@ -52,6 +52,8 @@ import {
 import { localCultureFusionPrompt } from "@/app/lib/local-culture-fusion";
 import {
   ensureSmallModeDesignDirectionState,
+  canonicalizeSmallModeHeadline,
+  smallModeInstallationName,
   smallModeDesignDirectionFacts,
 } from "@/app/lib/small-mode-design-directions";
 import { smallModeNarrativeGuidance } from "@/app/lib/small-mode-narrative";
@@ -790,6 +792,15 @@ function sanitizePlan(
   taskMode: TaskMode = resolvedTaskMode(facts, value),
 ) {
   if (isSmallBuildingMode(taskMode)) {
+    const installationNames = new Map(
+      [...new Set(
+        facts.facts
+          .map((fact) => fact.field_path.match(/^installation\.([^.]+)\.name$/u)?.[1])
+          .filter((value): value is string => Boolean(value)),
+      )]
+        .map((id) => [id, smallModeInstallationName(facts, id)])
+        .filter((entry): entry is [string, string] => Boolean(entry[1])),
+    );
     const factIds = new Set(facts.facts.map((fact) => fact.fact_id));
     const proposalIds = new Set(
       (facts.gate_b_proposals ?? [])
@@ -810,7 +821,10 @@ function sanitizePlan(
       ),
       proposal_context_hash: undefined,
       fact_refs: (page.fact_refs ?? []).filter((factId) => factIds.has(factId)),
-      headline_zh: normalizePageHeadline(page.headline_zh, "当前页"),
+      headline_zh: canonicalizeSmallModeHeadline(
+        normalizePageHeadline(page.headline_zh, "当前页"),
+        installationNames,
+      ),
       headline_en: sanitizePresentationText(
         page.headline_en,
         englishPresentationText(page.headline_zh, pageTypeEnglishLabels[page.page_type]),
@@ -2226,6 +2240,27 @@ function repairSmallModeParallelBody(
         .filter((value): value is string => Boolean(value)),
     ),
   ].sort((left, right) => Number(left) - Number(right));
+  const sourceCorpus = projectFacts.facts
+    .filter((fact) => fact.status !== "superseded" && fact.status !== "conflict")
+    .map((fact) => String(fact.value_raw))
+    .join(" ");
+  const hasLegacyJingdezhenContext = /景德镇|斗器大会|浮梁|真山泉/u.test(sourceCorpus);
+  if (!hasLegacyJingdezhenContext) {
+    const entries = ids.map((id) => {
+      const facts = projectFacts.facts.filter((fact) =>
+        fact.field_path.startsWith(`installation.${id}.`),
+      );
+      const name = String(facts.find((fact) => fact.field_path.endsWith(".name"))?.value_raw ?? `节点${id}`);
+      const core = String(facts.find((fact) => fact.field_path.endsWith(".core"))?.value_raw ?? "围绕当前任务书组织空间体验");
+      const interaction = String(facts.find((fact) => fact.field_path.endsWith(".interaction"))?.value_raw ?? "形成可参与的现场动作");
+      const product = String(facts.find((fact) => /\.(?:product|gift)$/u.test(fact.field_path))?.value_raw ?? "");
+      return `${name}以${core}为主线，${interaction}${product ? `，并衔接${product}` : ""}`;
+    });
+    if (page.page_type === "summary" || /收束|总结/u.test(page.headline_zh)) {
+      return entries.length ? `${entries.join("；")}。共同设计语言负责统一识别，节点体验保持差异。` : body;
+    }
+    return entries.length >= 2 ? `${entries.join("；")}。` : body;
+  }
   const bodyCoversAllObjects =
     body.trim().length >= 120 &&
     ids.every((id) =>
@@ -2724,6 +2759,14 @@ function ensureSmallModeConceptCallouts(
 
 function ensureSmallModeVisibleCallouts(page: ReportPage) {
   if (page.page_type === "cover") return page.callouts;
+  if (/共同设计语言/u.test(page.headline_zh)) {
+    return [
+      { label_zh: "轻国风视觉语汇", label_en: "Light Guofeng visual language" },
+      { label_zh: "主动参与与现场体验", label_en: "Active participation and experience" },
+      { label_zh: "可拍摄的现场记忆", label_en: "Photogenic on-site memory" },
+      { label_zh: "社交分享与传播", label_en: "Social sharing and communication" },
+    ] as ReportPage["callouts"];
+  }
   const slotCount = createSmallModeVisualImageSlots(page).length;
   const targetCount = Math.min(6, Math.max(2, 4 - slotCount));
   const invalidVisibleLabel = (value: string) =>
@@ -2767,6 +2810,19 @@ function normalizeSmallModePage(
   projectFacts: DesignReportProjectFacts,
 ) {
   const normalized = structuredClone(page);
+  const installationNames = new Map(
+    [...new Set(
+      projectFacts.facts
+        .map((fact) => fact.field_path.match(/^installation\.([^.]+)\.name$/u)?.[1])
+        .filter((value): value is string => Boolean(value)),
+    )]
+      .map((id) => [id, smallModeInstallationName(projectFacts, id)])
+      .filter((entry): entry is [string, string] => Boolean(entry[1])),
+  );
+  normalized.headline_zh = canonicalizeSmallModeHeadline(
+    normalized.headline_zh,
+    installationNames,
+  );
   if (smallModeHeadlineNeedsTranslation(normalized)) {
     const translatedHeadline = englishPresentationText(
       normalized.headline_zh,
@@ -2806,35 +2862,40 @@ function normalizeSmallModePage(
     normalized.body_copy = bounded.body;
   }
   normalized.body_zh = normalized.body_copy;
-  const parallelOverview = /三件|三类|矩阵|对照|总览|分工/u.test(
+  const parallelOverview = /三件|三类|矩阵|对照|总览|分工|节点/u.test(
     normalized.headline_zh,
   );
   if (parallelOverview) {
-    const overviewLabels = ["1", "2", "3"].flatMap((installationId) => {
+    const installationIds = [
+      ...new Set(
+        projectFacts.facts
+          .map((fact) => fact.field_path.match(/^installation\.([^.]+)\./u)?.[1])
+          .filter((value): value is string => Boolean(value)),
+      ),
+    ].sort((left, right) => Number(left) - Number(right));
+    const overviewLabels = installationIds.flatMap((installationId) => {
       const facts = projectFacts.facts.filter((fact) =>
         fact.field_path.startsWith(`installation.${installationId}.`),
       );
+      const name = facts.find((fact) => fact.field_path.endsWith(".name"))?.value_raw;
       const core = facts.find((fact) => fact.field_path.endsWith(".core"))?.value_raw;
       const brief = String(
         facts.find((fact) => fact.field_path.endsWith(".brief"))?.value_raw ?? "",
       );
       const theme =
+        name ||
         core ||
         (installationId === "3" && /斗器大会|瓷器/u.test(brief)
           ? "斗器大会与瓷器"
           : brief.split(/[。；]/u)[0]);
-      return theme ? [`装置${installationId}｜${String(theme)}`] : [];
+      return theme ? [`节点${installationId}｜${String(theme)}`] : [];
     });
-    if (overviewLabels.length === 3) {
+    if (overviewLabels.length >= 2) {
       normalized.diagram_labels = overviewLabels;
-      normalized.diagram_labels_en = [
-        "Installation 1",
-        "Installation 2",
-        "Installation 3",
-      ];
+      normalized.diagram_labels_en = overviewLabels.map((_, index) => `Node ${index + 1}`);
     }
     normalized.speaker_notes =
-      "先说明三件装置共享同一活动与设计语言，再依次讲清每件装置对应的产品主题、互动要求和赠品，最后回收它们对新品发布、观众参与与现场传播的共同作用。";
+      "先说明各节点共享的活动主题与设计语言，再按并列结构讲清每个节点的核心主题、产品或功能和互动方式，最后回收它们共同形成的体验结果。";
   }
   if (
     parallelOverview &&
@@ -2843,7 +2904,7 @@ function normalizeSmallModePage(
     )
   ) {
     normalized.body_en =
-      "The three installations form a parallel matrix: the first expresses the truth of spring water, the second translates tea-brewing water into a sweet tasting experience, and the third connects the Douqi theme with porcelain and tea culture. Their products, interactions, gifts and communication roles are different but belong to one shared event system.";
+      "The current project is organized as a parallel system of distinct nodes. Each node keeps its own theme, product or function, and interaction while sharing one visual language.";
   }
   if (
     parallelOverview &&
@@ -2853,7 +2914,7 @@ function normalizeSmallModePage(
       "先说明所有对象的共同主线，再按平行结构解释每件装置的主题、互动、产品或赠品，最后回收它们之间的体验与传播分工。";
   }
   const installationId = normalized.headline_zh.match(
-    /装置\s*([0-9一二三四五六七八九十]+)/u,
+    /(?:装置|节点)\s*0?([0-9一二三四五六七八九十]+)/u,
   )?.[1];
   if (installationId) {
     const installationEvidence = projectFacts.facts
@@ -3905,7 +3966,10 @@ export async function prepareExportWithModel(
   pagePlan: DesignReportPagePlan,
   format: "pdf" | "docx",
   runtimeOverride?: ModelRuntimeOverride,
-  options: { layoutOverflowPageIds?: string[] } = {},
+  options: {
+    layoutOverflowPageIds?: string[];
+    forceSmallModeCopyRegeneration?: boolean;
+  } = {},
 ) {
   const smallMode = isSmallBuildingMode(
     projectFacts.task_mode ?? DEFAULT_TASK_MODE,
@@ -3958,6 +4022,10 @@ export async function prepareExportWithModel(
           ) &&
           !hasSubstantialEnglishText(
             `${page.core_message} ${page.body_zh ?? ""} ${page.body_copy ?? ""}`,
+          ) &&
+          !(
+            smallMode &&
+            options.forceSmallModeCopyRegeneration
           ) &&
           evaluatePageContentDepth(projectFacts, page).status !==
             "needs_improvement" &&

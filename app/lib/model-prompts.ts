@@ -18,7 +18,10 @@ export const FACT_EXTRACTION_PROMPT = `你是建筑设计竞赛项目的事实�
 6. 数字保存原始值、标准化值和单位；同一字段多值分别保存并标记 conflict。
 7. 设计目标只有在原文明确表达时才作为事实；综合判断不得伪装成原文事实。
 8. 同一表格行或同一句中连续出现多个技术指标时，必须按字段拆成多条事实；例如用地面积、容积率、建筑限高、计容建筑面积、总建筑面积、地上与地下建筑面积不得合并进 planning.site_area 或任一单字段。
-9. 本节点暂不判断 Gate：missing_items 先输出空数组，gate_report 使用 blocked 和空缺失数组作为临时值。`;
+9. 小型建筑/装置管线必须逐页读取当前任务书：项目身份、活动/使用主题、设计目标、场地条件、空间节点、节点名称、对应产品或功能、核心主题、造型边界、互动方向、功能需求、材料风格、运营、安全、建造、复用、预算和成果要求都要按原文分别提取，并保留页码与原文 quote；“节点 01/节点1”视为同一节点编号。
+10. 任务书中的“设计目标”“总体设计目标”“整体设计风格要求”“建议互动方向”等明确方向属于当前项目事实，不能因为字段名称不在预设词表中而漏提，也不能被历史项目、历史参考或示例内容覆盖。
+11. 更换任务书时只保留新任务书的 authoritative/proposal 事实；不得沿用上一个项目的名称、产品、节点、文化语汇或设计结论。
+12. 本节点暂不判断 Gate：missing_items 先输出空数组，gate_report 使用 blocked 和空缺失数组作为临时值。`;
 
 export const COMPLETENESS_PROMPT = `你是资料完整度与证据审查员。读取完整 project_facts，保持 documents、facts、style_observations、reference_style_examples 和 conflicts 原样不变，只判断：
 1. 是否足够生成 ${DEFAULT_TARGET_PAGE_COUNT} 页 A3 汇报骨架（Gate A）；只要任务书包含项目身份和基本任务要求，就应允许生成骨架。

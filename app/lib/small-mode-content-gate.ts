@@ -50,9 +50,9 @@ function pageCoverageRole(page: DesignReportPagePlan["pages"][number]) {
   if (/复用|收起|搭建|运营|交付/u.test(headline)) {
     return "负责今年使用、收起、明年复用和交付边界";
   }
-  const installation = headline.match(/装置\s*([0-9一二三四五六七八九十]+)/u)?.[1];
+  const installation = headline.match(/(?:装置|节点)\s*0?([0-9一二三四五六七八九十]+)/u)?.[1];
   if (installation) {
-    return `只负责装置${installation}自己的核心、互动、产品/赠品和视觉表达`;
+    return `只负责节点${installation}自己的核心、互动、产品/赠品和视觉表达`;
   }
   if (/活动|发布|背景|策略|主题/u.test(headline)) {
     return "负责活动背景、发布会任务与共同设计语言";
@@ -88,6 +88,32 @@ function contentPayload(
         source_quote: fact!.source.quote,
       })),
   }));
+  const installationIds = [
+    ...new Set(
+      briefFacts
+        .map((fact) => fact.field_path.match(/^installation\.([^.]+)\./u)?.[1])
+        .filter((value): value is string => Boolean(value)),
+    ),
+  ].sort((left, right) => left.localeCompare(right, "zh-CN", { numeric: true }));
+  const nodeNames = installationIds.map((id) => {
+    const fact = briefFacts.find((candidate) => candidate.field_path === `installation.${id}.name`);
+    return String(fact?.value_raw ?? `节点${id}`);
+  });
+  const mustCover = [
+    "当前项目主题、场地/使用条件与设计目标",
+    ...(installationIds.length
+      ? [`${nodeNames.join("、")}各自的主题、空间动作、互动与产品/功能关系`]
+      : []),
+    ...(briefFacts.some((fact) => /^ip\./u.test(fact.field_path))
+      ? ["任务书要求的角色、IP或现场视觉延展"]
+      : []),
+    ...(briefFacts.some((fact) => /互动|传播|分享|共创/u.test(`${fact.field_path} ${String(fact.value_raw)}`))
+      ? ["观众参与、互动结果与传播触点"]
+      : []),
+    ...(briefFacts.some((fact) => /复用|收起|搭建|运输|安装/u.test(`${fact.field_path} ${String(fact.value_raw)}`))
+      ? ["建造、运营、收起与后续复用边界"]
+      : []),
+  ];
   return {
     task_mode: "small_building_or_interior",
     brief_facts: projectFacts.facts
@@ -119,22 +145,21 @@ function contentPayload(
     coverage_rule:
       "只要任务书事实在 page_fact_coverage 中被页面 fact_refs 引用，并且页面核心文案没有与事实冲突，就算该要求已覆盖；不要求每页把全部事实重复写入正文。",
     whole_deck_coverage_owners: {
-      "活动背景与发布会任务": "活动背景/发布会/策略页或收束页",
-      "三类产品主题与三件装置": "三类产品与三件装置的矩阵/总览页",
-      "装置1、装置2、装置3各自的核心、互动、产品或赠品":
-        "对应装置的单件页面与装置对照页",
-      "轻国风少女IP与真人现场互动": "IP/现场联动页",
-      "观众共创与社交传播": "互动/传播/IP页",
-      "今年使用、收起、明年复用": "搭建/收起/复用/运营页或收束页",
+      "当前项目主题、场地/使用条件与设计目标": "项目定位与总体策略页",
+      ...(installationIds.length
+        ? { [`${nodeNames.join("、")}各自的主题、空间动作、互动与产品/功能关系`]: "对应节点的概念、现场与构造页" }
+        : {}),
+      ...(mustCover.includes("任务书要求的角色、IP或现场视觉延展")
+        ? { "任务书要求的角色、IP或现场视觉延展": "角色或视觉延展页" }
+        : {}),
+      ...(mustCover.includes("观众参与、互动结果与传播触点")
+        ? { "观众参与、互动结果与传播触点": "互动、传播或总结页" }
+        : {}),
+      ...(mustCover.includes("建造、运营、收起与后续复用边界")
+        ? { "建造、运营、收起与后续复用边界": "实施与复用页" }
+        : {}),
     },
-    must_cover: [
-      "活动背景与发布会任务",
-      "三类产品主题与三件装置",
-      "装置1、装置2、装置3各自的核心、互动、产品或赠品",
-      "轻国风少女IP与真人现场互动",
-      "观众共创与社交传播",
-      "今年使用、收起、明年复用",
-    ],
+    must_cover: mustCover,
     must_not_add: [
       "场地分析",
       "平面图",
@@ -158,7 +183,7 @@ export async function validateSmallModeContentMatchWithModel(
     name: "small_mode_content_match_gate",
     schema: contentMatchSchema,
     instructions:
-      "你是小型建筑/装置汇报的最终内容匹配审查员。审查对象是整套 pagePlan，不是单页逐项重复检查。先按 whole_deck_coverage_owners 判断任务书要求是否由全篇页面共同覆盖，再按每页的 page_coverage_role 判断该页是否完成自己的页面任务。must_cover 是整套汇报的验收清单，不是每一页的必填清单；严禁把 P003/P004 等总览或策略页当成必须重复 P016 的 IP 内容、P018 的复用内容或三件装置全部细节的页面。页面通过 fact_refs 引用了任务书事实，即视为该要求获得证据支撑；不要求把同一事实重复写进每一页正文。除封面外，每页必须有4—6个互补的可见信息单元；信息单元由正文模块、设计动作卡和带图内标题的图像组成，不能用后台字段名凑数。装置concept页必须按产品诉求、装置转译、空间形态、互动动作、材料灯光、传播/复用形成六段链条；同一装置跨concept/rendering/technical页必须维持同一造型母题。只有负责该主题的页面和其事实引用都缺失、页面过薄、跨页方案漂移或整套页面存在事实冲突时，match 才能为 false。检查是否出现任务书没有给出的数字、尺寸、性能和永久建筑结论。小型建筑/装置管线不要求大型建筑的 Gate B 方案，也不要求场地分析、平面图、剖面图、系统图或流线分析图；不要因缺少这些内容判 false。只返回 JSON。",
+      "你是小型建筑/装置汇报的最终内容匹配审查员。审查对象是整套 pagePlan，不是单页逐项重复检查。先按 whole_deck_coverage_owners 判断当前任务书要求是否由全篇页面共同覆盖，再按每页的 page_coverage_role 判断该页是否完成自己的页面任务。must_cover 是整套汇报的验收清单，不是每一页的必填清单；不得把总览或策略页当成必须重复某个节点专页的全部细节。页面通过 fact_refs 引用了当前任务书事实，即视为该要求获得证据支撑；不要求把同一事实重复写进每一页正文。除封面外，每页必须有4—6个互补的可见信息单元；信息单元由正文模块、设计动作卡和带图内标题的图像组成，不能用后台字段名凑数。每个节点的 concept 页必须按产品/功能诉求、设计转译、空间形态、互动动作、材料灯光、传播/复用形成六段链条；同一节点跨 concept/rendering/technical 页必须维持同一造型母题。只有负责该主题的页面和其事实引用都缺失、页面过薄、跨页方案漂移或整套页面存在事实冲突时，match 才能为 false。检查是否出现任务书没有给出的数字、尺寸、性能和永久建筑结论。小型建筑/装置管线不要求大型建筑的 Gate B 方案，也不要求场地分析、平面图、剖面图、系统图或流线分析图；不要因缺少这些内容判 false。只返回 JSON。",
     content: [
       {
         type: "input_text",
@@ -197,7 +222,7 @@ function localRichnessCheck(pagePlan: DesignReportPagePlan) {
     }
     if (
       page.page_type === "concept" &&
-      /装置\s*[0-9一二三四五六七八九十]+/u.test(page.headline_zh)
+      /(?:装置|节点)\s*0?[0-9一二三四五六七八九十]+/u.test(page.headline_zh)
     ) {
       const chainCorpus = visibleCallouts.join("；");
       const missingLinks = [
@@ -228,7 +253,7 @@ const visibleSixChain = [
     prefix: "产品诉求",
     pattern: /产品|品牌|山泉|泡茶|瓷器|赠品|发布/u,
     fallback: (page: DesignReportPagePlan["pages"][number]) =>
-      `承接“${page.headline_zh.replace(/^装置\s*[0-9一二三四五六七八九十]+\s*[｜|·:]?\s*/u, "")}”对应的产品表达与现场任务`,
+      `承接“${page.headline_zh.replace(/^(?:装置|节点)\s*0?[0-9一二三四五六七八九十]+\s*[｜|·:]?\s*/u, "")}”对应的产品表达与现场任务`,
   },
   {
     prefix: "装置转译",
@@ -343,7 +368,7 @@ function ensureVisibleSixChain(pagePlan: DesignReportPagePlan) {
   for (const page of result.pages) {
     if (
       page.page_type !== "concept" ||
-      !/装置\s*[0-9一二三四五六七八九十]+/u.test(page.headline_zh)
+      !/(?:装置|节点)\s*0?[0-9一二三四五六七八九十]+/u.test(page.headline_zh)
     ) {
       continue;
     }
@@ -452,35 +477,30 @@ function localCoverageCheck(
   ];
   const globalRequirements = [
     {
-      label: "活动背景与发布会任务",
-      test: /斗器大会|活动背景|发布会|开幕式/u.test(evidenceCorpus),
+      label: "当前项目主题、目标与场景",
+      test:
+        briefFacts.some((fact) => /^(?:project|event)\./u.test(fact.field_path)) &&
+        /主题|目标|活动|空间|节点|场地|入口/u.test(evidenceCorpus),
     },
     {
-      label: "三件装置及其对应主题",
+      label: "任务书列出的各空间节点及对应方向",
       test:
-        installationIds.length < 2 ||
+        installationIds.length < 1 ||
         installationIds.every((id) =>
-          new RegExp(`装置\\s*${id}`, "u").test(evidenceCorpus),
+          new RegExp(`(?:装置|节点)\\s*0?${id}`, "u").test(evidenceCorpus),
         ),
     },
     {
-      label: "轻国风少女 IP 与真人现场互动",
+      label: "任务书要求的互动、传播或使用结果",
       test:
-        !briefFacts.some((fact) => /ip|人物|服装|真人/u.test(fact.field_path)) ||
-        /轻国风少女|真人|现场互动/u.test(evidenceCorpus),
+        !briefFacts.some((fact) => /互动|传播|体验|共创|分享|使用/u.test(`${fact.field_path} ${String(fact.value_raw)}`)) ||
+        /互动|传播|体验|共创|分享|停留|使用/u.test(evidenceCorpus),
     },
     {
-      label: "观众共创与社交传播",
+      label: "任务书要求的建造、运营或复用边界",
       test:
-        !briefFacts.some((fact) => /共创|传播|社交|分享/u.test(String(fact.value_raw))) ||
-        (/共创/u.test(evidenceCorpus) &&
-          /传播|社交|分享/u.test(evidenceCorpus)),
-    },
-    {
-      label: "今年使用、收起、明年复用",
-      test:
-        !briefFacts.some((fact) => /reuse|复用|收起|年度/u.test(fact.field_path)) ||
-        /收起|复用|再部署/u.test(evidenceCorpus),
+        !briefFacts.some((fact) => /reuse|复用|收起|安装|运输|运营|安全/u.test(`${fact.field_path} ${String(fact.value_raw)}`)) ||
+        /收起|复用|安装|运输|运营|安全|维护/u.test(evidenceCorpus),
     },
   ];
   const missingGlobalRequirements = globalRequirements
@@ -534,7 +554,7 @@ function prepareSmallModeCoverageRefs(
     if (installationId) {
       return (
         result.pages.find((page) =>
-          new RegExp(`装置\\s*${installationId}`, "u").test(pageText(page)),
+          new RegExp(`(?:装置|节点)\\s*0?${installationId}`, "u").test(pageText(page)),
         ) ??
         result.pages.find((page) =>
           ["comparison", "summary"].includes(page.page_type),

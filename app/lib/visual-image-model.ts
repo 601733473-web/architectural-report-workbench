@@ -1156,6 +1156,11 @@ export async function generateVisualImageWithModel(
   const selectedSlotIndex = imageSlots.findIndex(
     (slot) => slot.slot_id === selectedSlot.slot_id,
   );
+  const smallModeAnalysisDiagram =
+    smallTaskMode &&
+    page.page_type === "rendering" &&
+    selectedSlot.slot_id === "S2" &&
+    /设计分析图/u.test(selectedSlot.label);
   const visibleCaption = resolveVisibleSlotCaption(
     page,
     selectedSlot,
@@ -1438,15 +1443,13 @@ ${systemRenderingPromptGuard(page)}`;
       `P8 项目事实未完整传递到图像模型，已阻止提交：${trafficPromptTransferAudit.missingSignals.slice(0, 6).join("；")}`,
     );
   }
-  // Small mode uses the provider's actual image-generation model. The gateway
-  // also lists gpt-5.5, but that model returns a text Responses envelope when
-  // asked for image_generation and therefore contains no pixels to persist.
+  // Both pipelines use the actual image-generation model. A text model such
+  // as gpt-5.5 can return a successful metadata envelope without pixels, so it
+  // must never be selected for an image request.
   const smallMode = isSmallBuildingMode(
     projectFacts.task_mode ?? "large_public_building",
   );
-  const imageRuntimeOverride = smallMode
-    ? { ...runtimeOverride, imageModel: "gpt-image-2" }
-    : runtimeOverride;
+  const imageRuntimeOverride = { ...runtimeOverride, imageModel: "gpt-image-2" };
   // Small-scale work is intentionally text-to-image. The user explicitly does
   // not require image-to-image continuity, and forwarding a previous generated
   // image makes the compatible provider treat otherwise simple interaction or
@@ -1467,7 +1470,9 @@ ${systemRenderingPromptGuard(page)}`;
       ));
   const compactSmallModePrompt = ultraCompactSmallModeSlot
     ? [
-        "生成一张独立、写实、可用于设计汇报图框的视觉素材，不生成PPT、海报或拼贴。",
+        smallModeAnalysisDiagram
+          ? "生成一张独立的纯白白模线稿概念分析图，不生成PPT、海报或拼贴。"
+          : "生成一张独立、写实、可用于设计汇报图框的视觉素材，不生成PPT、海报或拼贴。",
         `图像主题：${sanitizeImagePromptText(visibleCaption.title)}`,
         smallModeMustShowAllObjects
           ? `多对象构图硬约束（缺少任一对象即失败）：必须在同一个连续现场中，把下列每一个既定对象分别安排在左、中、右等互不遮挡的独立区域；每件主体轮廓都要完整、可单独识别，不得合并、替换、隐藏或省略。对象清单：${smallModeAllObjectDna}`
@@ -1475,9 +1480,13 @@ ${systemRenderingPromptGuard(page)}`;
         `固定方案 DNA（最高优先级，跨页不得改变）：${sanitizeImagePromptText(visualInvariantContract).slice(0, 900)}`,
         `场景任务：${sanitizeImagePromptText(selectedSlot.purpose).slice(0, 320)}`,
         `人物与动作：${sanitizeImagePromptText(visibleCaption.detail).slice(0, 320)}`,
-        `材料与氛围：${sanitizeImagePromptText(imagePrompt.prompt_zh).slice(0, 300)}`,
-        `构图：${outputSpec.orientation}，宽高比 ${outputSpec.aspect_ratio}；主体完整、人物尺度真实、动作清楚。`,
-        "只画一个连续场景；不得出现文字、标题、Logo、页码、边框、表格、箭头或说明带。",
+        smallModeAnalysisDiagram
+          ? "图面表达：白色实体、黑灰细线、简洁轴测或分解关系；主体严格居中，四周预留约8%至12%的纯白边。可生成2至4个与当前方案直接相关的简体中文短标签，贴近引线或构件；不要生成大标题、大段正文、英文、Logo、页码或整页说明带。"
+          : `材料与氛围：${sanitizeImagePromptText(imagePrompt.prompt_zh).slice(0, 300)}`,
+        `构图：${outputSpec.orientation}，宽高比 ${outputSpec.aspect_ratio}；${smallModeAnalysisDiagram ? "分析主体居中、留白均衡、引线清楚。" : "主体完整、人物尺度真实、动作清楚。"}`,
+        smallModeAnalysisDiagram
+          ? "只画一张独立分析图，不生成整张汇报页面。"
+          : "只画一个连续场景；不得出现文字、标题、Logo、页码、边框、表格、箭头或说明带。",
       ]
         .filter(Boolean)
         .join("\n")

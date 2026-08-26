@@ -1,6 +1,7 @@
 import type { InputDocument } from "@/app/lib/pipeline";
 import { inferRole } from "@/app/lib/pipeline";
 import { scoreSiteResearchPageText } from "@/app/lib/site-source-pages";
+import JSZip from "jszip";
 
 interface PdfTextItem {
   str: string;
@@ -133,11 +134,43 @@ function countMarkedTextPages(text: string) {
   return pageNumbers.length > 0 ? Math.max(...pageNumbers) : 1;
 }
 
+async function readDocx(file: File) {
+  const archive = await JSZip.loadAsync(await file.arrayBuffer());
+  const documentXml = await archive.file("word/document.xml")?.async("string");
+  if (!documentXml) {
+    throw new Error("DOCX 中没有可读取的正文内容。");
+  }
+  const xml = new DOMParser().parseFromString(documentXml, "application/xml");
+  if (xml.querySelector("parsererror")) {
+    throw new Error("DOCX 正文结构无法解析。");
+  }
+  const paragraphs = Array.from(xml.getElementsByTagNameNS("*", "p"))
+    .map((paragraph) =>
+      Array.from(paragraph.getElementsByTagNameNS("*", "t"))
+        .map((text) => text.textContent ?? "")
+        .join(""),
+    )
+    .map((text) => text.replace(/\s+/gu, " ").trim())
+    .filter(Boolean);
+  const text = paragraphs.join("\n");
+  return {
+    text,
+    pageCount: 1,
+    visualPages: [],
+  };
+}
+
 export async function fileToInputDocument(file: File): Promise<InputDocument> {
   const isPdf =
     file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
+  const isDocx =
+    file.type ===
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
+    file.name.toLowerCase().endsWith(".docx");
   const parsed = isPdf
     ? await readPdf(file)
+    : isDocx
+      ? await readDocx(file)
     : await file.text().then((text) => ({
         text,
         pageCount: countMarkedTextPages(text),
@@ -164,7 +197,13 @@ export async function fileToInputDocument(file: File): Promise<InputDocument> {
     page_count: parsed.pageCount,
     text: parsed.text,
     file_data: fileData,
-    mime_type: file.type || (isPdf ? "application/pdf" : "text/plain"),
+    mime_type:
+      file.type ||
+      (isPdf
+        ? "application/pdf"
+        : isDocx
+          ? "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+          : "text/plain"),
     visual_pages: parsed.visualPages,
   };
 }

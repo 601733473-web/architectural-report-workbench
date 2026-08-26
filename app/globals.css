@@ -505,6 +505,20 @@ button {
   position: relative;
 }
 
+.topbar-primary-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.topbar-primary-action {
+  min-width: 0;
+  padding-inline: 12px;
+  white-space: nowrap;
+}
+
 .topbar-more-tools > summary {
   list-style: none;
 }
@@ -5362,6 +5376,113 @@ blockquote {
   text-align: left;
 }
 
+.small-mode-rendering-analysis-layout {
+  grid-template-columns: minmax(280px, 44%) minmax(0, 1fr);
+  gap: 3.2%;
+  align-items: stretch;
+}
+
+.small-mode-rendering-analysis-layout .small-mode-page-copy {
+  grid-template-rows: minmax(0, 1fr) minmax(220px, 58%);
+  gap: 4%;
+  padding: 2.5% 0;
+  min-height: 0;
+}
+
+.small-mode-rendering-copy {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-height: 0;
+  overflow: hidden;
+}
+
+.small-mode-rendering-copy .small-mode-page-core {
+  overflow: hidden;
+}
+
+.small-mode-rendering-analysis-card,
+.small-mode-rendering-main-card {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) clamp(42px, 14%, 76px);
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.small-mode-rendering-analysis-card {
+    grid-template-rows: minmax(0, 1fr);
+    height: 100%;
+    /* The analysis image has no caption. Reserve the same bottom band as the
+       effect image so both image frames end on one baseline. */
+    margin-bottom: clamp(42px, 14%, 76px);
+  }
+
+.small-mode-rendering-analysis-card > div:first-child,
+.small-mode-rendering-main-card > div:first-child {
+  min-height: 0;
+  border: 1px solid var(--small-line);
+  background: linear-gradient(135deg, #f5f1ec, #e8e0d7);
+}
+
+.small-mode-rendering-analysis-caption {
+  display: grid;
+  grid-template-rows: auto auto;
+  align-content: center;
+  gap: 2px;
+  min-height: 0;
+  padding: 7px 9px;
+  border: 1px solid var(--small-line);
+  border-top: 0;
+  background: linear-gradient(135deg, #f2e9df, #e6d6c7);
+  overflow: hidden;
+  text-align: center;
+  font-family: Arial, "Helvetica Neue", sans-serif;
+  pointer-events: none;
+}
+
+.small-mode-rendering-analysis-caption strong,
+.small-mode-rendering-analysis-caption small {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  color: #5a3827;
+  line-height: 1.25;
+  text-overflow: clip;
+}
+
+.small-mode-rendering-analysis-caption strong {
+  font-size: clamp(
+    calc(7px + var(--a3-font-step)),
+    calc(0.7vw + var(--a3-font-step)),
+    calc(10px + var(--a3-font-step))
+  );
+}
+
+.small-mode-rendering-analysis-caption small {
+  color: #7b5a48;
+  font-size: clamp(
+    calc(6px + var(--a3-font-step)),
+    calc(0.58vw + var(--a3-font-step)),
+    calc(8px + var(--a3-font-step))
+  );
+}
+
+.small-mode-rendering-main-card {
+  width: auto;
+  height: 100%;
+}
+
+.small-mode-rendering-analysis-layout
+  .small-mode-rendering-analysis-card > div:first-child,
+.small-mode-rendering-analysis-layout
+  .small-mode-rendering-main-card > div:first-child {
+  height: 100%;
+}
+
+.small-mode-rendering-main-card .small-mode-visual-caption {
+  text-align: left;
+}
+
 .a3-reference-heading {
   display: flex;
   align-items: flex-end;
@@ -8354,6 +8475,12 @@ blockquote {
   --a3-font-step: 5px;
 }
 
+/* The final PDF gets slightly larger body copy without changing the live
+   preview or image-caption typography. */
+.pdf-export-page .a3-sheet p {
+  font-size: calc(var(--a3-body-font-size) + 1.5pt) !important;
+}
+
 @keyframes spin {
   to {
     transform: rotate(360deg);
@@ -8491,6 +8618,14 @@ blockquote {
     display: inline-flex;
   }
 
+  .topbar-primary-actions {
+    flex-wrap: wrap;
+  }
+
+  .topbar-primary-action {
+    flex: 1 1 210px;
+  }
+
   .workbench-grid {
     grid-template-columns: 210px 290px minmax(0, 1fr);
   }
@@ -8503,6 +8638,10 @@ blockquote {
     align-items: flex-start;
     flex-direction: column;
     padding: var(--space-4);
+  }
+
+  .topbar-primary-actions {
+    width: 100%;
   }
 
   .project-summary {

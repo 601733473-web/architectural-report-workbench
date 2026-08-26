@@ -16,6 +16,8 @@ export interface ModelRuntimeOverride {
   imageBaseUrl?: string;
 }
 
+export const DEFAULT_IMAGE_MODEL = "gpt-image-2";
+
 interface ImageProviderFallback {
   baseUrl: string;
   apiKey: string;
@@ -44,6 +46,11 @@ export interface ImageGenerationCallRecord {
   submittedPrompt: string;
   /** Negative prompt value included in or sent alongside the provider request. */
   submittedNegativePrompt?: string;
+  /** Provider usage when available; otherwise a deterministic prompt estimate. */
+  inputTokens: number;
+  /** Image endpoints do not return text completion tokens, so this is usually 0. */
+  outputTokens: number;
+  tokenUsageEstimated?: boolean;
 }
 
 export interface ImageGenerationReference {
@@ -231,7 +238,7 @@ export function getModelRuntime(override?: ModelRuntimeOverride) {
     override?.imageModel?.trim() ||
     runtime?.imageModel ||
     readProcessEnv("IMAGE_MODEL") ||
-    (isQwenCompatibleBaseUrl(imageBaseUrl) ? "wan2.7-image" : "gpt-5.5");
+    DEFAULT_IMAGE_MODEL;
   const imageApiKey =
     override?.imageApiKey ||
     runtime?.imageApiKey ||
@@ -565,6 +572,30 @@ const imageModelThrottles = (() => {
 
 function sleep(milliseconds: number) {
   return new Promise((resolve) => setTimeout(resolve, milliseconds));
+}
+
+function usageToken(
+  usage: Record<string, unknown>,
+  keys: string[],
+) {
+  for (const key of keys) {
+    const value = Number(usage[key]);
+    if (Number.isFinite(value) && value > 0) return Math.round(value);
+  }
+  return undefined;
+}
+
+/**
+ * OpenAI-compatible image endpoints often omit usage. Keep the UI honest by
+ * exposing an estimate for the submitted prompt instead of reporting 0.
+ * CJK characters are counted as one token; other text is grouped roughly as
+ * four characters per token. This is a display estimate, not billing data.
+ */
+export function estimatePromptTokens(value: string) {
+  const normalized = value.replace(/\s+/gu, "");
+  const cjk = normalized.match(/[\u3400-\u9fff]/gu)?.length ?? 0;
+  const other = normalized.replace(/[\u3400-\u9fff]/gu, "").length;
+  return Math.max(1, cjk + Math.ceil(other / 4));
 }
 
 async function runInImageModelQueue<T>(
@@ -1259,6 +1290,21 @@ ${hasProjectContinuity && hasStyleReference
     throw lastError ?? new Error("图像模型请求失败。");
   }
   const raw = resolvedRaw;
+  const usage =
+    raw.usage && typeof raw.usage === "object"
+      ? (raw.usage as Record<string, unknown>)
+      : {};
+  const measuredInputTokens = usageToken(usage, [
+    "input_tokens",
+    "prompt_tokens",
+    "input",
+  ]);
+  const measuredOutputTokens = usageToken(usage, [
+    "output_tokens",
+    "completion_tokens",
+    "output",
+  ]);
+  const estimatedInputTokens = estimatePromptTokens(finalSubmittedPrompt);
   if (!useQwenNative) {
     return {
       responseId: String(raw.id ?? ""),
@@ -1269,12 +1315,11 @@ ${hasProjectContinuity && hasStyleReference
       size: responseSize,
       submittedPrompt: finalSubmittedPrompt,
       submittedNegativePrompt: negativePrompt,
+      inputTokens: measuredInputTokens ?? estimatedInputTokens,
+      outputTokens: measuredOutputTokens ?? 0,
+      tokenUsageEstimated: measuredInputTokens === undefined,
     };
   }
-  const usage =
-    raw.usage && typeof raw.usage === "object"
-      ? (raw.usage as Record<string, unknown>)
-      : {};
   const output =
     raw.output && typeof raw.output === "object"
       ? (raw.output as Record<string, unknown>)
@@ -1288,6 +1333,9 @@ ${hasProjectContinuity && hasStyleReference
     size,
     submittedPrompt: finalSubmittedPrompt,
     submittedNegativePrompt: negativePrompt,
+    inputTokens: measuredInputTokens ?? estimatedInputTokens,
+    outputTokens: measuredOutputTokens ?? 0,
+    tokenUsageEstimated: measuredInputTokens === undefined,
   };
 }
 

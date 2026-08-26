@@ -639,6 +639,232 @@ function appendSmallBriefFact(
   });
 }
 
+function smallBriefSection(
+  lines: string[],
+  heading: RegExp,
+  stopHeadings: RegExp[],
+) {
+  const normalizeHeading = (line: string) => line.replace(/^\d{1,2}\s+/u, "");
+  const headingIndex = lines.findIndex(
+    (line) => heading.test(line) || heading.test(normalizeHeading(line)),
+  );
+  if (headingIndex < 0) return "";
+  const content: string[] = [];
+  for (const line of lines.slice(headingIndex + 1)) {
+    if (
+      stopHeadings.some(
+        (stop) => stop.test(line) || stop.test(normalizeHeading(line)),
+      )
+    ) break;
+    if (/^\d{1,2}$/.test(line)) continue;
+    content.push(line);
+  }
+  return content.join(" ").replace(/\s+/g, " ").trim();
+}
+
+function appendGenericSmallBriefFacts(
+  facts: ProjectFact[],
+  input: InputDocument,
+  page: number,
+  lines: string[],
+) {
+  const appendLabel = (
+    fieldPath: string,
+    label: RegExp,
+    category: FactCategory,
+  ) => {
+    const line = lines.find((candidate) => label.test(candidate));
+    if (!line) return;
+    const value = line.replace(label, "").trim();
+    if (value) {
+      appendSmallBriefFact(
+        facts,
+        input,
+        page,
+        fieldPath,
+        value,
+        category,
+        line,
+      );
+    }
+  };
+
+  const taskTitleLine =
+    lines.find((line) => /设计任务书|任务书/.test(line) && /[|｜]/u.test(line)) ??
+    lines.find((line) => /设计任务书|任务书/.test(line));
+  if (taskTitleLine) {
+    const pipeName = taskTitleLine.match(/^([^|｜]{2,40})\s*[|｜]/u)?.[1]?.trim();
+    const projectName = pipeName && !/设计任务书/.test(pipeName) ? pipeName : "";
+    if (projectName) {
+      appendSmallBriefFact(
+        facts,
+        input,
+        page,
+        "project.name",
+        projectName,
+        "project",
+        taskTitleLine,
+      );
+    }
+    const eventName = taskTitleLine.match(
+      /[|｜]\s*([^·•|｜]+?)\s*[·•]\s*设计任务书/u,
+    )?.[1]?.trim();
+    if (eventName) {
+      appendSmallBriefFact(facts, input, page, "event.name", eventName, "project", taskTitleLine);
+    }
+  }
+  const projectSentence = lines.find((line) => /[“"]([^”"]{2,40})[”"](?:拟于|计划|将)/u.test(line));
+  if (projectSentence) {
+    const projectMatch = projectSentence.match(/[“"]([^”"]{2,40})[”"](?:拟于|计划|将)/u);
+    const eventMatch = projectSentence.match(/(?:拟于|计划在|将在)[^“"]*[“"]([^”"]{2,60})[””]/u);
+    if (projectMatch?.[1]) {
+      appendSmallBriefFact(facts, input, page, "project.name", projectMatch[1], "project", projectSentence);
+    }
+    if (eventMatch?.[1]) {
+      appendSmallBriefFact(facts, input, page, "event.name", eventMatch[1], "project", projectSentence);
+    }
+  }
+  const themeLine = lines.find((line) => /活动主题(?:为|是)\s*[“"]([^”"]+)[””]/u.test(line));
+  const quotedTheme = themeLine?.match(/活动主题(?:为|是)\s*[“"]([^”"]+)[””]/u)?.[1];
+  if (!quotedTheme) appendLabel("event.theme", /^活动主题\s*/u, "project");
+  appendLabel("event.focus_product", /^重点新品\s*/u, "program");
+  appendLabel("brand.slogan", /^(?:宣传语|slogan)\s*[:：]?\s*/iu, "evaluation_priority");
+  appendLabel("event.period", /^活动时间\s*/u, "project");
+  appendLabel("deliverable.page_format", /^(?:成果形式|设计成果)\s*/u, "deliverable");
+  appendLabel("budget.limit", /^预算上限\s*/u, "planning_control");
+
+  const audienceLine = lines.find((line) => /面向/u.test(line) && /活动期|活动时长|持续/u.test(line));
+  const projectBrief = lines.find((line) => /展示|通过临时建筑|互动装置|公众共创/u.test(line));
+  if (quotedTheme) appendSmallBriefFact(facts, input, page, "event.theme", quotedTheme, "project", themeLine);
+  if (audienceLine) appendSmallBriefFact(facts, input, page, "event.audience", audienceLine, "space_requirement", audienceLine);
+  if (projectBrief) appendSmallBriefFact(facts, input, page, "project.brief", projectBrief, "project", projectBrief);
+
+  const normalizeDirectionId = (value: string) =>
+    ({ 一: "1", 二: "2", 三: "3", 四: "4", 五: "5" } as Record<string, string>)[value] ?? value;
+  const directionHeaders = lines
+    .map((line, index) => ({
+      line,
+      index,
+      match: line.match(/^(?:\d{1,2}\s*)?设计方向\s*([0-9一二三四五六七八九十]+)\s*[｜|:：]\s*(.+)$/u),
+    }))
+    .filter((item): item is { line: string; index: number; match: RegExpMatchArray } => Boolean(item.match));
+  for (const [directionIndex, header] of directionHeaders.entries()) {
+    const id = normalizeDirectionId(header.match[1] ?? String(directionIndex + 1));
+    const nextHeader = directionHeaders[directionIndex + 1]?.index ?? lines.length;
+    const directionText = lines
+      .slice(header.index + 1, nextHeader)
+      .join(" ")
+      .replace(/\s+/gu, " ")
+      .trim();
+    appendSmallBriefFact(facts, input, page, `installation.${id}.name`, header.match[2] ?? `节点${id}`, "proposal_design", header.line);
+    if (directionText) {
+      appendSmallBriefFact(facts, input, page, `installation.${id}.brief`, directionText, "proposal_design", directionText);
+      const area = directionText.match(/\d+\s*[—-]\s*\d+\s*平方米|不超过\s*\d+\s*平方米/u)?.[0];
+      const height = directionText.match(/最高不超过\s*\d+(?:\.\d+)?\s*米/u)?.[0];
+      const interaction = directionText.match(/(?:游客|观众)[^。；]*?(?:互动|进入|穿行|停留|参与)[^。；]*[。；]?/u)?.[0];
+      if (area) appendSmallBriefFact(facts, input, page, `installation.${id}.area_limit`, area, "planning_control", area);
+      if (height) appendSmallBriefFact(facts, input, page, `installation.${id}.height_limit`, height, "planning_control", height);
+      if (interaction) appendSmallBriefFact(facts, input, page, `installation.${id}.interaction`, interaction, "space_requirement", interaction);
+    }
+  }
+
+  const directionSections: Array<[
+    string,
+    RegExp,
+    RegExp[],
+    FactCategory,
+  ]> = [
+    ["design_requirement.goals", /^(?:设计目标|总体设计目标)(?:\s+\d{1,2})?\s*$/u, [/^重要提示/u, /^设计范围/u], "evaluation_priority"],
+    ["design_requirement.style", /^整体设计风格要求(?:\s+\d{1,2})?\s*$/u, [/^游客体验与传播要求/u, /^活动IP形象设计/u], "proposal_design"],
+    ["design_requirement.experience", /^游客体验与传播要求(?:\s+\d{1,2})?\s*$/u, [/^活动IP形象设计/u, /^建造与复用要求/u], "space_requirement"],
+    ["design_requirement.reuse", /^建造与复用要求(?:\s+\d{1,2})?\s*$/u, [/^安全与设备要求/u, /^项目预算/u], "technical_requirement"],
+    ["design_requirement.safety", /^安全与设备要求(?:\s+\d{1,2})?\s*$/u, [/^运营需求/u, /^项目预算/u], "technical_requirement"],
+    ["operation.requirement", /^运营需求(?:\s+\d{1,2})?\s*$/u, [/^项目预算/u, /^设计成果要求/u], "space_requirement"],
+    ["deliverable.requirements", /^设计成果要求(?:\s+\d{1,2})?\s*$/u, [/^方案评审标准/u, /^明确禁止事项/u], "deliverable"],
+    ["design_requirement.constraints", /^明确禁止事项(?:\s+\d{1,2})?\s*$/u, [/^Agent测试观察重点/u], "technical_requirement"],
+  ];
+  for (const [fieldPath, heading, stops, category] of directionSections) {
+    const value = smallBriefSection(lines, heading, stops);
+    if (value) {
+      appendSmallBriefFact(facts, input, page, fieldPath, value, category, value);
+    }
+  }
+
+  const nodeHeaderIndex = lines.findIndex((line) => /节点\s*0?([1-9]\d*)/u.test(line));
+  if (nodeHeaderIndex < 0) return;
+  const headerMatch = lines[nodeHeaderIndex].match(
+    /节点\s*0?([1-9]\d*)/u,
+  );
+  const nodeId = headerMatch?.[1];
+  if (!nodeId) return;
+  const nodeLines =
+    nodeHeaderIndex > Math.floor(lines.length / 2)
+      ? lines.slice(0, nodeHeaderIndex)
+      : lines.slice(nodeHeaderIndex + 1);
+  const title = nodeLines
+    .find((line) =>
+      line.length >= 2 &&
+      !/^(?:对应产品|核心主题|造型边界|建议(?:体验|互动)方向|设备边界|功能需求|产品赠送)/u.test(line) &&
+      !/^\d{1,2}$/.test(line),
+    );
+  if (title) {
+    appendSmallBriefFact(facts, input, page, `installation.${nodeId}.name`, title, "proposal_design", title);
+  }
+  const nodeText = nodeLines.join(" ").replace(/\s+/gu, " ").trim();
+  const pairedLabelIndex = nodeLines.findIndex(
+    (line) => /对应产品/u.test(line) && /核心主题/u.test(line),
+  );
+  const pairedValue =
+    pairedLabelIndex >= 0
+      ? nodeLines[pairedLabelIndex + 1]?.replace(/\s+/gu, " ").trim() ?? ""
+      : "";
+  const pairedMatch = pairedValue.match(/^(.{2,12})\s+(.{8,})$/u);
+  const nodeValueByLabel = (label: string, nextLabels: string[]) => {
+    if (pairedMatch && (label === "对应产品" || label === "核心主题")) {
+      return label === "对应产品" ? pairedMatch[1].trim() : pairedMatch[2].trim();
+    }
+    if (!nextLabels.length) {
+      return nodeText.match(new RegExp(`${label}\\s*([\\s\\S]*)$`, "u"))?.[1]?.trim() ?? "";
+    }
+    const next = nextLabels.join("|");
+    return nodeText.match(
+      new RegExp(`${label}\\s*([\\s\\S]*?)(?=${next}|$)`, "u"),
+    )?.[1]?.trim() ?? "";
+  };
+  const product = nodeValueByLabel("对应产品", ["核心主题"]);
+  const core = nodeValueByLabel("核心主题", ["造型边界", "建议(?:体验|互动)方向", "设备边界", "功能需求", "产品赠送"]);
+  const shape = smallBriefSection(nodeLines, /^造型边界\s*$/u, [/^建议(?:体验|互动)方向/u, /^设备边界/u, /^功能需求/u, /^产品赠送/u]);
+  const interaction = smallBriefSection(nodeLines, /^建议(?:体验|互动)方向\s*$/u, [/^设备边界/u, /^功能需求/u, /^产品赠送/u]);
+  const requirements = smallBriefSection(nodeLines, /^功能需求\s*$/u, [/^产品赠送/u]);
+  const gift = nodeValueByLabel("产品赠送", []);
+  const brief = [core, shape, interaction, requirements]
+    .filter(Boolean)
+    .join(" ")
+    .trim();
+  const nodeFacts: Array<[string, string, FactCategory]> = [
+    ["product", product, "program"],
+    ["core", core, "proposal_design"],
+    ["shape", shape, "proposal_design"],
+    ["interaction", interaction, "space_requirement"],
+    ["requirements", requirements, "space_requirement"],
+    ["gift", gift, "program"],
+    ["brief", brief, "proposal_design"],
+  ];
+  for (const [suffix, value, category] of nodeFacts) {
+    if (value) {
+      appendSmallBriefFact(
+        facts,
+        input,
+        page,
+        `installation.${nodeId}.${suffix}`,
+        value,
+        category,
+        value,
+      );
+    }
+  }
+}
+
 function enrichSmallBuildingBriefFacts(
   inputs: InputDocument[],
   projectFacts: DesignReportProjectFacts,
@@ -649,6 +875,7 @@ function enrichSmallBuildingBriefFacts(
       continue;
     }
     for (const { page, lines } of splitPages(input.text)) {
+      appendGenericSmallBriefFacts(facts, input, page, lines);
       const pageText = lines.join("\n");
       if (!/(装置\s*[1-3]|泡茶水|斗器大会|轻国风|IP|复用)/iu.test(pageText)) {
         continue;
@@ -1169,12 +1396,247 @@ function planSmallBuildingOrInterior(projectFacts: DesignReportProjectFacts) {
   } satisfies DesignReportPagePlan;
 }
 
+function planSmallBuildingOrInteriorFromCurrentBrief(
+  projectFacts: DesignReportProjectFacts,
+) {
+  const validFacts = projectFacts.facts.filter(
+    (fact) => fact.status !== "superseded" && fact.status !== "conflict",
+  );
+  const sourceFacts = (patterns: RegExp[]) =>
+    validFacts.filter((fact) =>
+      patterns.some((pattern) =>
+        pattern.test(`${fact.field_path} ${String(fact.value_raw)}`),
+      ),
+    );
+  const installationIds = [
+    ...new Set(
+      validFacts
+        .map((fact) => fact.field_path.match(/^installation\.([^.]+)\./u)?.[1])
+        .filter((value): value is string => Boolean(value)),
+    ),
+  ].sort((left, right) => left.localeCompare(right, "zh-CN", { numeric: true }));
+  const factValue = (fieldPath: string) =>
+    validFacts.find((fact) => fact.field_path === fieldPath)?.value_raw;
+  const nodeFacts = (id: string) =>
+    validFacts.filter((fact) => fact.field_path.startsWith(`installation.${id}.`));
+  const nodeValue = (id: string, suffix: string) =>
+    nodeFacts(id).find((fact) => fact.field_path.endsWith(`.${suffix}`))?.value_raw;
+  const projectName = String(
+    factValue("project.name") ?? projectFacts.project_name_anonymized ?? "当前小型建筑项目",
+  );
+  const theme = String(factValue("event.theme") ?? "任务书主题");
+  const focusProduct = String(factValue("event.focus_product") ?? "重点产品");
+  const nodeLabel = (id: string) =>
+    String(nodeValue(id, "name") ?? nodeValue(id, "product") ?? `节点${id}`)
+      .replace(/^节点\s*0?\d+\s*[|｜:：]?\s*/u, "")
+      .trim();
+  const nodeCore = (id: string) => {
+    const explicit = nodeValue(id, "core");
+    if (explicit) {
+      const sentence = String(explicit).split(/[。；]/u)[0].trim();
+      if (sentence.length <= 48) return sentence;
+    }
+    const brief = String(nodeValue(id, "brief") ?? "围绕当前任务书要求组织空间体验");
+    if (/纤维|吸声板|材料展示/u.test(brief)) return "以纤维层叠、压制和切割转译材料体验";
+    if (/织带|穿插|风廊|滨河/u.test(brief)) return "以织带穿插组织可进入、可停留的互动风廊";
+    if (/共创|互动/u.test(brief)) return "以观众参与和共同制作形成现场体验";
+    return "围绕任务书主题组织可进入、可参与的节点空间";
+  };
+  const nodeProduct = (id: string) => String(nodeValue(id, "product") ?? "对应产品待确认");
+  const allBriefFacts = validFacts.filter(
+    (fact) => fact.source_role === "brief_fact" || fact.source_role === "proposal_fact",
+  );
+  const sharedFacts = sourceFacts([
+    /^project\./u,
+    /^event\./u,
+    /^brand\./u,
+    /^design_requirement\./u,
+    /^operation\./u,
+    /^budget\./u,
+    /^deliverable\./u,
+  ]);
+  const sections: DesignReportPagePlan["sections"] = [
+    {
+      section_id: "S00",
+      title_zh: "项目定位",
+      title_en: "PROJECT POSITIONING",
+      purpose: "把当前任务书的项目身份、活动目标、场地和交付边界组织成清晰入口。",
+      answers_question: "当前项目要解决什么问题？",
+    },
+    {
+      section_id: "S01",
+      title_zh: "总体叙事与节点策略",
+      title_en: "NARRATIVE & NODE STRATEGY",
+      purpose: `建立任务书要求的共同设计语言，并区分${installationIds.length || "各"}个节点的空间主题、互动动作和产品关系。`,
+      answers_question: "不同节点如何统一又不重复？",
+    },
+    {
+      section_id: "S02",
+      title_zh: "节点设计",
+      title_en: "NODE DESIGN",
+      purpose: "按平行结构展开每个节点的空间主张、形态、互动、材料与运营证据。",
+      answers_question: "每个节点如何把任务书方向落到空间？",
+    },
+    {
+      section_id: "S03",
+      title_zh: "实施与复用",
+      title_en: "DELIVERY & REUSE",
+      purpose: "依据当前任务书的结构、安装、设备、安全、预算和复用要求组织实施边界。",
+      answers_question: "方案如何建造、运营、收起并再次部署？",
+    },
+    {
+      section_id: "S04",
+      title_zh: "设计总结",
+      title_en: "DESIGN SUMMARY",
+      purpose: "回收当前项目的节点关系、共同语言、体验结果和实施逻辑。",
+      answers_question: "这套方案最终形成了什么可执行的设计系统？",
+    },
+  ];
+  const pages: ReportPage[] = [];
+  const add = (
+    sectionId: string,
+    pageType: ReportPage["page_type"],
+    headline: string,
+    message: string,
+    facts: ProjectFact[],
+    visuals: string[],
+    missing: string[] = [],
+  ) => {
+    pages.push(
+      buildPage(
+        pages.length + 1,
+        sectionId,
+        pageType,
+        headline,
+        message,
+        facts,
+        visuals,
+        [],
+        [],
+        missing,
+        missing.length ? "placeholder" : "ready",
+      ),
+    );
+  };
+
+  add(
+    "S00",
+    "cover",
+    projectName,
+    `${theme}；当前汇报围绕${focusProduct}及任务书明确的节点、体验和实施要求展开。`,
+    sourceFacts([/^project\./u, /^event\./u, /^brand\./u, /^deliverable\./u]),
+    ["项目主题与主要场地", "活动或使用场景", "项目识别主视觉", "当前任务书交付目标"],
+  );
+  add(
+    "S00",
+    "strategy",
+    "任务书目标与空间回应",
+    `${theme}提出了清晰的使用、传播与实施边界；本项目将这些要求转译为可进入、可停留、可参与并可复用的节点空间。`,
+    sharedFacts,
+    ["项目目标", "场地与使用条件", "体验对象", "实施与交付边界"],
+  );
+  if (installationIds.length >= 2) {
+    add(
+      "S01",
+      "comparison",
+      "空间节点与主题分工",
+      `当前任务书将${installationIds.length}个节点组织为互有关联的体验序列；每个节点保留自己的空间主题、对应对象和互动结果。`,
+      installationIds.flatMap(nodeFacts),
+      ["节点名称并列对照", "对应产品或功能", "核心主题", "互动与结果关系"],
+    );
+  }
+  add(
+    "S01",
+    "strategy",
+    "共同设计语言与体验路径",
+    `${theme}是全篇共同命题；统一的材料、构件、识别和传播方式服务于不同节点，但不替代各节点自身的空间逻辑。`,
+    sourceFacts([/^design_requirement\./u, /^event\./u, /^brand\./u, /^operation\./u]),
+    ["共同材料与构件语言", "统一识别系统", "进入—停留—参与路径", "传播与运营触点"],
+  );
+  for (const id of installationIds) {
+    const label = nodeLabel(id);
+    const facts = nodeFacts(id);
+    add(
+      "S02",
+      "concept",
+      `节点${id}｜${label}｜空间主张`,
+      `${label}以${nodeProduct(id)}为对象，${nodeCore(id)}。`,
+      facts,
+      ["对应对象与核心主题", "空间形态", "互动动作", "材料与构件", "运营或传播结果"],
+    );
+    add(
+      "S02",
+      "rendering",
+      `节点${id}｜${label}｜现场体验`,
+      `本页聚焦${label}的进入、停留与参与场景，效果表达只服务于当前节点的任务书主题和已提取的空间动作。`,
+      facts,
+      ["主要空间画面", "人物与尺度", "互动发生瞬间", "产品或功能触点"],
+    );
+    add(
+      "S02",
+      "technical",
+      `节点${id}｜${label}｜构造与运营`,
+      `本页围绕${label}的构件、安装、运营、维护和收起边界组织实施表达；未在任务书中明确的参数保留为待确认项。`,
+      [...facts, ...sharedFacts],
+      ["构件拆分", "材料与连接", "现场安装", "维护、收纳与复用"],
+    );
+  }
+  if (sourceFacts([/^ip\./u]).length) {
+    add(
+      "S03",
+      "concept",
+      "活动角色与视觉延展",
+      "当前任务书要求的角色、服装、导视或视觉延展将节点体验转化为可识别的现场沟通方式。",
+      sourceFacts([/^ip\./u, /^design_requirement\./u]),
+      ["角色或IP形象", "现场服装与动作", "导视与品牌触点", "传播应用"],
+    );
+  }
+  add(
+    "S03",
+    "technical",
+    "建造、运营与复用边界",
+    "方案依据当前任务书的建造周期、结构与安全要求、运营动作、预算边界和后续复用要求组织实施；缺少的工程参数列为待确认信息。",
+    sourceFacts([/^design_requirement\./u, /^operation\./u, /^budget\./u, /^deliverable\./u, /^technical\./u]),
+    ["结构与模块策略", "运输、安装与拆除", "安全、设备与维护", "预算与待确认信息"],
+  );
+  add(
+    "S04",
+    "summary",
+    "设计总结",
+      `本项目以${theme}为共同命题，将${installationIds.length || "多个"}个空间节点的主题、参与方式和实施边界组织成一套可识别、可运营、可复用的设计系统。`,
+    allBriefFacts,
+    [
+      ...installationIds.map((id) => `方案${id}｜${nodeLabel(id)}`),
+      "共同设计语言",
+      "体验与传播结果",
+      "实施与复用逻辑",
+    ],
+  );
+  return {
+    task_mode: "small_building_or_interior" as const,
+    narrative_claim: `以${theme}和当前任务书明确的空间、体验与实施要求为依据，形成节点差异清晰且可落地复用的临时建筑/互动装置方案。`,
+    page_format: "A3_landscape_420x297mm" as const,
+    language_mode: "zh_en" as const,
+    target_page_count: pages.length,
+    sections,
+    pages,
+  } satisfies DesignReportPagePlan;
+}
+
 export function planReport(
   projectFacts: DesignReportProjectFacts,
   taskMode: TaskMode = projectFacts.task_mode ?? DEFAULT_TASK_MODE,
 ) {
   if (isSmallBuildingMode(taskMode)) {
-    return planSmallBuildingOrInterior(projectFacts);
+    const currentBriefCorpus = projectFacts.facts
+      .filter((fact) => fact.status !== "superseded" && fact.status !== "conflict")
+      .map((fact) => String(fact.value_raw))
+      .join(" ");
+    // Keep the historical Jingdezhen compatibility fixture stable, while all
+    // other small-mode briefs use the current-brief-derived planner.
+    return /景德镇|斗器大会|浮梁|真山泉/u.test(currentBriefCorpus)
+      ? planSmallBuildingOrInterior(projectFacts)
+      : planSmallBuildingOrInteriorFromCurrentBrief(projectFacts);
   }
   const projectName =
     projectFacts.project_name_anonymized ?? "未命名单项目";

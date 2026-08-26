@@ -1096,11 +1096,11 @@ test("visual drafts use graphic-only crops and never render backstage copy", asy
   assert.doesNotMatch(workbenchSource, /素材库参考图 · 双击查看大图/);
   assert.match(
     workbenchSource,
-    /backgroundSize:\s*"cover"/,
+    /backgroundSize:\s*centeredWhiteMargin\s*\?\s*"90% 90%"\s*:\s*"cover"/,
   );
   assert.match(
     workbenchSource,
-    /backgroundColor: isLibraryReference \? "#fff" : undefined/,
+    /backgroundColor: centeredWhiteMargin \|\| isLibraryReference \? "#fff" : undefined/,
   );
   assert.match(
     css,
@@ -1679,6 +1679,18 @@ test("A3 text auto-fits its frame and never uses an ellipsis as the overflow res
   assert.match(css, /\.small-mode-visual-caption small\s*\{[\s\S]*?color:\s*#7b5a48;/);
   assert.match(css, /\.small-mode-visual-caption small\s*\{[\s\S]*?display:\s*block;/);
   assert.match(css, /\.small-mode-visual-caption\s*\{[\s\S]*?background:\s*linear-gradient/);
+  assert.match(workbenchSource, /hasSmallModeRenderingAnalysis/);
+  assert.match(workbenchSource, /small-mode-rendering-analysis-card/);
+  assert.match(workbenchSource, /exportPptx/);
+  assert.match(workbenchSource, /导出 PPTX/);
+  assert.match(
+    css,
+    /\.small-mode-rendering-analysis-layout\s*\{[\s\S]*?grid-template-columns:\s*minmax\(280px, 44%\) minmax\(0, 1fr\);/,
+  );
+  assert.match(
+    css,
+    /\.small-mode-rendering-analysis-card\s*\{[\s\S]*?margin-bottom:\s*clamp\(42px, 14%, 76px\);/,
+  );
   assert.match(
     css,
     /\.a3-generated-multi-grid article \{[\s\S]*?grid-template-rows:[\s\S]*?var\(--a3-multi-caption-title-row\)[\s\S]*?var\(--a3-multi-caption-detail-row\);/,
@@ -1713,6 +1725,41 @@ test("image prompts allow necessary graphic labels without turning the image int
   assert.match(imageModelSource, /function sanitizeImagePromptText/);
   assert.match(imageModelSource, /P\\d\{1,4\}\[\\s_-\]\*D\\d\{1,3\}/);
   assert.match(imageModelSource, /blanketTextBans/);
+});
+
+test("small-building rendering analysis uses a wide model-generated white-model diagram", async () => {
+  const [visualTaskSource, imageModelSource, workbenchSource] =
+    await Promise.all([
+      readFile(new URL("../app/lib/visual-task.ts", import.meta.url), "utf8"),
+      readFile(
+        new URL("../app/lib/visual-image-model.ts", import.meta.url),
+        "utf8",
+      ),
+      readFile(
+        new URL("../app/components/Workbench.tsx", import.meta.url),
+        "utf8",
+      ),
+    ]);
+
+  assert.match(visualTaskSource, /`\$\{objectName\}设计分析图`/);
+  assert.match(visualTaskSource, /纯白白模线稿风格/);
+  assert.match(visualTaskSource, /"landscape"/);
+  assert.match(
+    visualTaskSource,
+    /isWhiteModelAnalysis[\s\S]*?不添加写实材质或灯光/,
+  );
+  assert.match(imageModelSource, /smallModeAnalysisDiagram/);
+  assert.match(imageModelSource, /四周预留约8%至12%的纯白边/);
+  assert.match(imageModelSource, /2至4个与当前方案直接相关的简体中文短标签/);
+  assert.match(
+    workbenchSource,
+    /centeredWhiteMargin: true/,
+  );
+  assert.match(
+    workbenchSource,
+    /backgroundPosition:[\s\S]*?centeredWhiteMargin[\s\S]*?"center"/,
+  );
+  assert.match(workbenchSource, /backgroundSize: centeredWhiteMargin \? "90% 90%"/);
 });
 
 test("P8 traffic prompts fail closed unless current project facts reach the image model", async () => {
@@ -1969,8 +2016,11 @@ test("server-renders the multi-project reporting workbench without reference cat
   assert.match(html, /快速开始/);
   assert.doesNotMatch(html, /\bMVP\b/);
   assert.match(html, /页级目录/);
-  assert.match(html, /事实就绪/);
-  assert.match(html, /提案就绪/);
+  assert.doesNotMatch(html, /事实就绪/);
+  assert.doesNotMatch(html, /提案就绪/);
+  assert.match(html, /生成整套终稿文案/);
+  assert.match(html, /生成整套 AI 图纸/);
+  assert.match(html, /导出 PPTX/);
   assert.doesNotMatch(visibleHtml, /框架就绪|内容就绪/);
   assert.doesNotMatch(html, />Gate A</);
   assert.doesNotMatch(html, />Gate B</);
@@ -2931,7 +2981,7 @@ test.skip("legacy visual draft started from a visible reference crop", async () 
     model: "gpt-5.5",
     apiKey: "test-text-key",
     imageBaseUrl: "https://ruishiglobal.com/v1",
-    imageModel: "gpt-5.5",
+    imageModel: "gpt-image-2",
     imageApiKey: "test-image-key",
   };
   let imageGenerationBody;
@@ -4196,7 +4246,7 @@ test("API uses the real-model path and keeps every response schema-bound", async
     baseUrl: expectedWebApiConfig.baseUrl,
     model: expectedWebApiConfig.model,
     imageBaseUrl: expectedWebApiConfig.baseUrl,
-    imageModel: "gpt-5.5",
+    imageModel: "gpt-image-2",
     modelAvailable: true,
     imageModelAvailable: false,
     availableImageModels: [],
@@ -5997,7 +6047,8 @@ test("small mode waits for explicit final-copy and full-image actions", async ()
   );
   assert.match(routeSource, /smallModeContentMatchVerified/);
   assert.match(routeSource, /incomingHasRequestedSlot/);
-  assert.match(routeSource, /!incomingHasRequestedSlot/);
+  assert.match(routeSource, /canonicalSlots\.length === 1/);
+  assert.match(routeSource, /slot_id: payload\.slotId/);
   assert.match(
     imageModelSource,
     /imageModel: "gpt-image-2"/,
@@ -6032,7 +6083,7 @@ test("small mode waits for explicit final-copy and full-image actions", async ()
   );
   assert.match(imageModelSource, /const promptResponse = smallTaskMode/);
   assert.match(imageModelSource, /local-small-mode-visual-prompt/);
-  assert.match(workbenchSource, /SMALL_BUILDING_IMAGE_MODEL = "gpt-image-2"/);
+  assert.match(workbenchSource, /const DEFAULT_PIPELINE_IMAGE_MODEL = "gpt-image-2"/);
   assert.equal(
     workbenchSource.match(/imageApiSettingsForTaskMode\(apiSettings, taskMode\)/g)
       ?.length,
@@ -6045,7 +6096,7 @@ test("small mode waits for explicit final-copy and full-image actions", async ()
   assert.match(routeSource, /const promptModelCallCount =/);
   assert.match(workbenchSource, /verifiedSmallModeImageNodeOutputs/);
   assert.match(workbenchSource, /verification: "deterministic_current_plan"/);
-  assert.match(localReadinessSource, /pagePlan\.pages\.length !== 19/);
+  assert.match(localReadinessSource, /minimumPageCount/);
   assert.match(localReadinessSource, /六段设计链缺少/);
   assert.match(localReadinessSource, /缺少完整的造型与建造性母题/);
   assert.match(localReadinessSource, /任务书未确认的配置/);
@@ -6125,7 +6176,7 @@ test("small mode extracts or proposes three editable design directions", async (
   assert.match(directionSource, /M_SMALL_DESIGN_DIRECTION/);
   assert.match(directionSource, /smallModeDesignDirectionFacts/);
   assert.match(directionSource, /event\.positioning/);
-  assert.match(directionSource, /装置\\s\*\(\[1-3\]\)/);
+  assert.match(directionSource, /(?:装置\|节点)/);
   assert.match(directionSource, /母题转译与场所体验/);
   assert.match(directionSource, /模块化构件与可复用系统/);
   assert.match(directionSource, /材料界面与光影参与/);

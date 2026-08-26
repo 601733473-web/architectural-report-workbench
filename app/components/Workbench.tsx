@@ -17,6 +17,7 @@ import {
   Layers3,
   LoaderCircle,
   LogOut,
+  Pause,
   Pencil,
   Play,
   Plus,
@@ -91,6 +92,7 @@ import {
 } from "@/app/lib/bilingual-copy";
 import {
   canGenerateVisualImageForSlot,
+  createSmallModeVisualImageSlots,
   getVisualFrameLayout,
   getVisualImageSlotCount,
   getVisualImageSlotCountForPage,
@@ -352,13 +354,6 @@ function agentWorkDisplay(
       pageLabel: wholeDeckLabel,
     };
   }
-  if (busy === "visual-all") {
-    return {
-      title: "Agent 正在建立整套视觉任务",
-      detail: "正在按每页内容生成独立图框、差异化图片说明和统一的跨页形态约束。",
-      pageLabel: wholeDeckLabel,
-    };
-  }
   if (busy === "export-pdf") {
     return {
       title: "Agent 正在整理 PDF 终稿",
@@ -370,6 +365,13 @@ function agentWorkDisplay(
     return {
       title: "Agent 正在编写设计说明",
       detail: "正在汇总事实、提案、数据和各页正文，形成约 2000 字说明文本。",
+      pageLabel: wholeDeckLabel,
+    };
+  }
+  if (busy === "export-pptx") {
+    return {
+      title: "Agent 正在导出 PPTX",
+      detail: "正在把当前页面文字整理为可编辑文本框，并嵌入已生成的项目图片。",
       pageLabel: wholeDeckLabel,
     };
   }
@@ -591,6 +593,7 @@ interface PageTextDraft {
   coreMessageEn: string;
   bodyZh: string;
   bodyEn: string;
+  imageTitles: EditableTextPair[];
   diagramLabels: EditableTextPair[];
   callouts: EditableTextPair[];
   speakerNotes: string;
@@ -749,18 +752,17 @@ function safePdfFileName(value: string) {
   return sanitized || "建筑设计汇报";
 }
 
-// The small-building cloud route exposes a real image endpoint for gpt-image-2.
+// Both pipelines use the configured image endpoint's image model by default.
 // gpt-5.5 is a text/reasoning model on the same gateway; sending it the
 // Responses image tool returns a successful metadata envelope without pixels.
-const SMALL_BUILDING_IMAGE_MODEL = "gpt-image-2";
+const DEFAULT_PIPELINE_IMAGE_MODEL = "gpt-image-2";
 
 function imageApiSettingsForTaskMode(
   settings: ApiSettings,
   taskMode: TaskMode,
 ) {
-  return isSmallBuildingMode(taskMode)
-    ? { ...settings, imageModel: SMALL_BUILDING_IMAGE_MODEL }
-    : settings;
+  void taskMode;
+  return { ...settings, imageModel: DEFAULT_PIPELINE_IMAGE_MODEL };
 }
 
 function pageTextTranslationInput(
@@ -774,6 +776,7 @@ function pageTextTranslationInput(
     headline_zh: normalizePageHeadline(draft.headlineZh, "当前页"),
     core_message_zh: draft.coreMessage,
     body_zh: draft.bodyZh,
+    image_titles_zh: draft.imageTitles.map((item) => item.zh),
     diagram_labels_zh: draft.diagramLabels.map((item) => item.zh),
     callouts_zh: draft.callouts.map((item) => item.zh),
     toc_sections: draft.tocSections.map((item) => ({
@@ -788,7 +791,7 @@ function applyPageTextTranslation(
   translation: PageTextTranslation,
 ): PageTextDraft {
   const tocEnglishById = new Map(
-    translation.toc_sections_en.map((section) => [
+    (translation.toc_sections_en ?? []).map((section) => [
       section.section_id,
       section.title_en,
     ]),
@@ -799,13 +802,17 @@ function applyPageTextTranslation(
     headlineEn: translation.headline_en,
     coreMessageEn: translation.core_message_en,
     bodyEn: translation.body_en,
+    imageTitles: draft.imageTitles.map((item, index) => ({
+      ...item,
+      en: translation.image_titles_en?.[index] ?? "",
+    })),
     diagramLabels: draft.diagramLabels.map((item, index) => ({
       ...item,
-      en: translation.diagram_labels_en[index] ?? "",
+      en: translation.diagram_labels_en?.[index] ?? "",
     })),
     callouts: draft.callouts.map((item, index) => ({
       ...item,
-      en: translation.callouts_en[index] ?? "",
+      en: translation.callouts_en?.[index] ?? "",
     })),
     tocSections: draft.tocSections.map((section) => ({
       ...section,
@@ -1005,6 +1012,18 @@ function mergeVisualImagePipelineResult(
       pages: current.pagePlan.pages.map((currentPage) => {
         if (currentPage.page_id !== pageId) return currentPage;
         const currentTask = currentPage.visual_task ?? responseTask;
+        const responseSlot = responseTask.image_slots.find(
+          (slot) => slot.slot_id === slotId,
+        );
+        const mergedSlots = currentTask.image_slots.map((slot) =>
+          slot.slot_id === slotId &&
+          responseSlot &&
+          /^(?:图片\s*\d+|图片\s*\d+\s*设计证据|视觉证据\s*\d+|装置\s*[123])$/u.test(
+            slot.label.trim(),
+          )
+            ? { ...slot, label: responseSlot.label }
+            : slot,
+        );
         const mergedImages = [
           ...(currentTask.generated_images ?? []).filter(
             (image) => image.slot_id !== slotId,
@@ -1037,6 +1056,7 @@ function mergeVisualImagePipelineResult(
           ...currentPage,
           visual_task: {
             ...currentTask,
+            image_slots: mergedSlots as typeof currentTask.image_slots,
             image_prompt: responseTask.image_prompt,
             generated_images:
               mergedImages as typeof currentTask.generated_images,
@@ -1476,36 +1496,6 @@ function StatusPill({
   );
 }
 
-function GatePill({
-  label,
-  status,
-}: {
-  label: string;
-  status?: string;
-}) {
-  return (
-    <div className={`gate-pill gate-${status ?? "waiting"}`}>
-      {status === "ready" || status === "confirmed" ? (
-        <Check size={13} />
-      ) : (
-        <CircleDot size={13} />
-      )}
-      <span>{label}</span>
-      <strong>
-        {!status
-          ? "待判断"
-          : status === "ready"
-            ? "已就绪"
-            : status === "confirmed"
-              ? "已就绪"
-            : status === "partial"
-              ? "部分就绪"
-              : "未就绪"}
-      </strong>
-    </div>
-  );
-}
-
 function userFacingReadinessIssue(value: string) {
   return value
     .replace(/^Gate A 缺少：/, "事实缺少：")
@@ -1908,20 +1898,26 @@ function userFacingMissingMaterials(values: string[]) {
   return [...new Set(safe)];
 }
 
-function visualAssetStyle(asset?: PageVisualAsset) {
+function visualAssetStyle(
+  asset?: PageVisualAsset,
+  options?: { centeredWhiteMargin?: boolean },
+) {
   if (!asset) return undefined;
   const isLibraryReference =
     "crop_zoom" in asset ||
     asset.image_url.startsWith("/reference-library/");
+  const centeredWhiteMargin = options?.centeredWhiteMargin === true;
   return {
     backgroundImage: `url("${asset.image_url}")`,
     backgroundPosition:
-      "background_position" in asset
-        ? asset.background_position
-        : "center",
-    backgroundSize: "cover",
+      centeredWhiteMargin
+        ? "center"
+        : "background_position" in asset
+          ? asset.background_position
+          : "center",
+    backgroundSize: centeredWhiteMargin ? "90% 90%" : "cover",
     backgroundRepeat: "no-repeat",
-    backgroundColor: isLibraryReference ? "#fff" : undefined,
+    backgroundColor: centeredWhiteMargin || isLibraryReference ? "#fff" : undefined,
   };
 }
 
@@ -2380,7 +2376,7 @@ function A3PagePreview({
           label: String(fact.value_raw),
           source: fact.source,
         }));
-  const smallModeInstallationPage = /装置\s*[0-9一二三四五六七八九十]+/u.test(
+  const smallModeInstallationPage = /(?:装置|节点)\s*0?[0-9一二三四五六七八九十]+/u.test(
     page.headline_zh,
   );
   const smallModeInfoLimit =
@@ -2424,17 +2420,83 @@ function A3PagePreview({
               : strategyStepDescription(label, index);
         })
       : [];
-  const imageSlots = page.visual_task?.image_slots ?? [];
+  const imageSlots =
+    smallMode &&
+    page.page_type === "rendering" &&
+    smallModeInstallationPage
+      ? createSmallModeVisualImageSlots(page)
+      : page.visual_task?.image_slots ?? [];
+  const schemeNameFromPage = (
+    candidate?: DesignReportPagePlan["pages"][number],
+  ) => {
+    if (!candidate) return "";
+    const objectId = candidate.headline_zh.match(
+      /(?:装置|节点)\s*0?([123一二三])/u,
+    )?.[1];
+    const visualBriefName = objectId
+      ? candidate.visual_brief
+          ?.find((item) => item.startsWith(`对象${objectId}｜`))
+          ?.match(/方案名=([^｜]+)/u)?.[1]
+      : undefined;
+    const titleName = candidate.headline_zh
+      .replace(/^(?:装置|节点)\s*0?[123一二三]\s*[｜|:：]\s*/u, "")
+      .trim();
+    const value = sanitizePresentationText(visualBriefName || titleName);
+    return value && !/^装置\s*[123一二三]$/u.test(value) ? value : "";
+  };
+  const summaryObjectIds = [
+    ...new Set(
+      pages
+        .map((candidate) =>
+          candidate.headline_zh.match(/(?:装置|节点)\s*0?([0-9一二三四五六七八九十]+)/u)?.[1],
+        )
+        .filter((value): value is string => Boolean(value)),
+    ),
+  ].sort((left, right) => Number(left) - Number(right));
+  const summaryPlanNames = (summaryObjectIds.length ? summaryObjectIds : ["1"]).map((objectId) => {
+    const candidates = pages
+      .filter((candidate) =>
+        new RegExp(`(?:装置|节点)\\s*0?${objectId}(?:\\D|$)`, "u").test(
+          candidate.headline_zh,
+        ),
+      )
+      .sort(
+        (left, right) =>
+          Number(right.page_type === "concept") -
+            Number(left.page_type === "concept") ||
+          (left.display_page_number ?? 0) - (right.display_page_number ?? 0),
+      );
+    return schemeNameFromPage(candidates[0]) || `方案${objectId}`;
+  });
+  const schemeNameForPage = (
+    targetPage: DesignReportPagePlan["pages"][number],
+    index: number,
+  ) => {
+    const objectId = targetPage.headline_zh.match(
+      /(?:装置|节点)\s*0?([123一二三])/u,
+    )?.[1];
+    const numericId = objectId
+      ? ({ 一: "1", 二: "2", 三: "3" } as Record<string, string>)[objectId] ?? objectId
+      : "";
+    return numericId
+      ? summaryPlanNames[Number(numericId) - 1] || `方案${numericId}`
+      : schemeNameFromPage(targetPage) || `方案${index + 1}`;
+  };
   // Page type fixes the frame count before any visual material is matched.
   // Later visual work may fill frames, but must not change the A3 layout.
   const expectedImageSlotCount = Math.max(
     imageSlots.length,
     smallMode
       ? page.page_type === "summary"
-        ? 3
+        ? Math.max(1, imageSlots.length)
         : 1
       : getVisualImageSlotCountForPage(page),
   );
+  const hasSmallModeRenderingAnalysis =
+    smallMode &&
+    page.page_type === "rendering" &&
+    expectedImageSlotCount >= 2 &&
+    /(?:装置|节点)\s*0?[123一二三]/u.test(page.headline_zh);
   const frameLayout =
     page.visual_task?.frame_layout ??
     getVisualFrameLayout(
@@ -2457,8 +2519,10 @@ function A3PagePreview({
               (left.display_page_number ?? 0) -
               (right.display_page_number ?? 0),
           )
-          .filter((candidate) => /装置\s*[123]/u.test(candidate.headline_zh))
-          .slice(0, 3)
+          .filter((candidate) =>
+            /(?:装置|节点)\s*0?[0-9一二三四五六七八九十]+/u.test(candidate.headline_zh),
+          )
+          .slice(0, Math.max(1, imageSlots.length))
           .map(
             (candidate) =>
               candidate.visual_task?.generated_images?.[0] ??
@@ -2550,11 +2614,16 @@ function A3PagePreview({
         };
       }
       const cleanAudienceText = (values: Array<string | undefined>, fallback: string) => {
+        const isGenericSmallCaption = (value: string) =>
+          /^(?:图片\s*\d+|图片\s*\d+\s*设计证据|视觉证据\s*\d+|装置\s*[一二三四五六七八九十\d]+|节点\s*[一二三四五六七八九十\d]+)$/u.test(
+            value.trim(),
+          );
         const candidate = values
           .map((value) => sanitizePresentationText(value))
           .find(
             (value) =>
               Boolean(value) &&
+              !isGenericSmallCaption(value) &&
               !containsBackstagePresentationText(value) &&
               !/(只用一张|必须|不得|当前图框|提示词|证明本页|任务书|图像需要|图像必须)/u.test(
                 value,
@@ -2573,10 +2642,16 @@ function A3PagePreview({
         if (/IP|少女|角色/u.test(context)) return "现场角色互动";
         if (/复用|收起|再部署/u.test(context)) return "收起与再次部署";
         if (/总结|收束|总览/u.test(context)) return "三件装置整体收束";
-        return `图片${index + 1}设计证据`;
+        return `${schemeNameForPage(page, index)}主视觉`;
       };
+      if (page.page_type === "summary") {
+        return {
+          title: summaryPlanNames[index] || `方案${index + 1}`,
+          detail: "",
+        };
+      }
       const rawCaption = cleanAudienceText(
-        [callouts[index]?.label, reportDiagramLabels[index], slot?.label],
+        [slot?.label, callouts[index]?.label, reportDiagramLabels[index]],
         `${reportHeadline} · ${index + 1}`,
       );
       const captionParts = rawCaption.match(
@@ -2598,6 +2673,9 @@ function A3PagePreview({
         .find(
           (value) =>
             Boolean(value) &&
+            !/^(?:图片\s*\d+|图片\s*\d+\s*设计证据|视觉证据\s*\d+|装置\s*[一二三四五六七八九十\d]+|节点\s*[一二三四五六七八九十\d]+)$/u.test(
+              value.trim(),
+            ) &&
             value !== compactTitle &&
             captionCharacterCount(value) <= 25,
         );
@@ -2624,10 +2702,9 @@ function A3PagePreview({
       };
     }
     if (page.page_type === "summary") {
-      const summaryLabels = ["总体形象", "公共空间", "重点空间"];
       return {
-        title: summaryLabels[index] || defaultTitle,
-        detail: previewItems[index] || defaultDetail,
+        title: summaryPlanNames[index] || `方案${index + 1}`,
+        detail: "",
       };
     }
     return { title: defaultTitle, detail: defaultDetail };
@@ -2969,8 +3046,10 @@ function A3PagePreview({
         <div className="a3-main">
           {smallMode && page.page_type === "cover" ? (
             <section
-              className="small-mode-cover-layout"
+              className={slotClassName(0, "small-mode-cover-layout")}
               style={generatedVisual ? generatedVisualStyle : undefined}
+              aria-label={`${reportHeadline}封面主视觉图框`}
+              {...slotInteraction(0)}
             >
               <div className="small-mode-cover-atmosphere" aria-hidden="true">
                 <span className="small-mode-cover-orbit small-mode-cover-orbit-one" />
@@ -2987,6 +3066,44 @@ function A3PagePreview({
                 <span className="small-mode-cover-rule" aria-hidden="true" />
                 <p>{reportCoreMessage || reportBody}</p>
               </div>
+            </section>
+          ) : hasSmallModeRenderingAnalysis ? (
+            <section className="small-mode-page-layout small-mode-layout-rendering small-mode-rendering-analysis-layout">
+              <aside className="small-mode-page-copy">
+                <div className="small-mode-rendering-copy">
+                  <h3>
+                    {reportHeadline}
+                    <small>{reportHeadlineEn}</small>
+                  </h3>
+                  <p className="small-mode-page-core">
+                    {reportBodyWithCore}
+                  </p>
+                </div>
+                <article className="small-mode-rendering-analysis-card">
+                  <div
+                    className={slotClassName(1, slotVisuals[1] ? "a3-ai-image-slot" : "")}
+                    role={slotVisuals[1] ? "img" : undefined}
+                    aria-label={`${reportHeadline} 设计分析图`}
+                    style={visualAssetStyle(slotVisuals[1], {
+                      centeredWhiteMargin: true,
+                    })}
+                    {...slotInteraction(1)}
+                  />
+                </article>
+              </aside>
+              <article className="small-mode-rendering-main-card">
+                <div
+                  className={slotClassName(0, slotVisuals[0] ? "a3-ai-image-slot" : "")}
+                  role={slotVisuals[0] ? "img" : undefined}
+                  aria-label={`${reportHeadline} 主效果图`}
+                  style={visualAssetStyle(slotVisuals[0])}
+                  {...slotInteraction(0)}
+                />
+                <div className="small-mode-visual-caption">
+                  <strong>{visibleCaptionForSlot(0).title}</strong>
+                  <small>{visibleCaptionForSlot(0).detail}</small>
+                </div>
+              </article>
             </section>
           ) : smallMode ? (
             <section
@@ -4744,6 +4861,8 @@ export function Workbench({
   const [backgroundTask, setBackgroundTask] = useState<string | null>(null);
   const [visualImageJob, setVisualImageJob] =
     useState<VisualImageJobState | null>(null);
+  const [visualBatchPaused, setVisualBatchPaused] = useState(false);
+  const visualBatchPausedRef = useRef(false);
   const latestSelectedPageIdRef = useRef(selectedPageId);
   const latestVisualImageJobRef = useRef(visualImageJob);
   const [error, setError] = useState("");
@@ -5108,6 +5227,12 @@ export function Workbench({
       coreMessageEn: selectedPage.core_message_en ?? "",
       bodyZh,
       bodyEn: selectedPage.body_en ?? "",
+      imageTitles: (selectedPage.visual_task?.image_slots ?? []).map(
+        (slot, index) => ({
+          zh: slot.label,
+          en: selectedPage.diagram_labels_en?.[index] ?? "",
+        }),
+      ),
       diagramLabels: Array.from({ length: labelCount }, (_, index) => ({
         zh: visibleLabels[index] ?? "",
         en:
@@ -5299,6 +5424,8 @@ export function Workbench({
       coreMessageEn: normalize(pageTextDraft.coreMessageEn),
       bodyZh: normalize(pageTextDraft.bodyZh),
       bodyEn: normalize(pageTextDraft.bodyEn),
+      imageTitles: pageTextDraft.imageTitles
+        .map((item) => ({ zh: normalize(item.zh), en: normalize(item.en) })),
       diagramLabels: pageTextDraft.diagramLabels
         .map((item) => ({ zh: normalize(item.zh), en: normalize(item.en) }))
         .filter((item) => item.zh || item.en),
@@ -5330,6 +5457,7 @@ export function Workbench({
       draft.coreMessageEn,
       draft.bodyZh,
       draft.bodyEn,
+      ...draft.imageTitles.flatMap((item) => [item.zh, item.en]),
       ...draft.diagramLabels.flatMap((item) => [item.zh, item.en]),
       ...draft.callouts.flatMap((item) => [item.zh, item.en]),
       ...(selectedPage.page_type === "toc"
@@ -5418,6 +5546,17 @@ export function Workbench({
             body_zh: draft.bodyZh,
             body_en: draft.bodyEn,
             body_copy: draft.bodyZh,
+            visual_task: page.visual_task
+              ? ({
+                  ...page.visual_task,
+                  image_slots: page.visual_task.image_slots.map(
+                    (slot, index) => ({
+                      ...slot,
+                      label: draft.imageTitles[index]?.zh || slot.label,
+                    }),
+                  ),
+                } as typeof page.visual_task)
+              : page.visual_task,
             diagram_labels: draft.diagramLabels.map((item) => item.zh),
             diagram_labels_en: draft.diagramLabels.map((item) => item.en),
             callouts: nextCallouts,
@@ -5531,6 +5670,18 @@ export function Workbench({
           body_zh: pageTextDraft.bodyZh,
           body_en: pageTextDraft.bodyEn,
           body_copy: pageTextDraft.bodyZh,
+          visual_task: selectedPage.visual_task
+            ? ({
+                ...selectedPage.visual_task,
+                image_slots: selectedPage.visual_task.image_slots.map(
+                  (slot, index) => ({
+                    ...slot,
+                    label:
+                      pageTextDraft.imageTitles[index]?.zh || slot.label,
+                  }),
+                ),
+              } as typeof selectedPage.visual_task)
+            : selectedPage.visual_task,
           diagram_labels: pageTextDraft.diagramLabels.map((item) => item.zh),
           diagram_labels_en: pageTextDraft.diagramLabels.map(
             (item) => item.en,
@@ -5904,6 +6055,36 @@ export function Workbench({
     setShowHistory(false);
   };
 
+  const invalidateSmallModeCopyForDirectionChange = (next: PipelineResult) => {
+    if (!isSmallBuildingMode(next.projectFacts.task_mode ?? taskMode)) {
+      return next;
+    }
+    return {
+      ...next,
+      pagePlan: {
+        ...next.pagePlan,
+        audit_report: undefined,
+        pages: next.pagePlan.pages.map((page) => ({
+          ...page,
+          body_zh: "",
+          body_en: "",
+          body_copy: "",
+          core_message: "依据当前设计方向重写本页。",
+          core_message_en: "Rewrite this page from the current design direction.",
+          diagram_labels: [],
+          diagram_labels_en: [],
+          callouts: [],
+          speaker_notes: "",
+          generation_status: ["cover", "toc", "section_divider"].includes(
+            page.page_type,
+          )
+            ? page.generation_status
+            : ("ready" as const),
+        })),
+      },
+    } as PipelineResult;
+  };
+
   const acceptPipelineResult = (
     next: PipelineResult,
     historyLabel = "更新项目",
@@ -6242,6 +6423,22 @@ export function Workbench({
     nextDocuments: InputDocument[],
     mode: "fast" | "deep" = "fast",
   ) => {
+    const existingProjectDocumentIds = new Set(
+      documents
+        .filter((document) => document.role !== "reference_style")
+        .map((document) => document.document_id),
+    );
+    const nextProjectDocumentIds = new Set(
+      nextDocuments
+        .filter((document) => document.role !== "reference_style")
+        .map((document) => document.document_id),
+    );
+    const taskBriefReplaced =
+      existingProjectDocumentIds.size > 0 &&
+      nextProjectDocumentIds.size > 0 &&
+      [...existingProjectDocumentIds].every(
+        (documentId) => !nextProjectDocumentIds.has(documentId),
+      );
     setBusy(mode === "fast" ? "run-fast" : "run-deep");
     setError("");
     try {
@@ -6252,7 +6449,7 @@ export function Workbench({
           documents: nextDocuments,
           mode,
           taskMode,
-          ...(mode === "deep"
+          ...(mode === "deep" && !taskBriefReplaced
             ? {
                 projectFacts: facts,
                 pagePlan: plan,
@@ -6262,14 +6459,13 @@ export function Workbench({
         },
         apiSettings,
       );
-      let preservedFacts = preserveUserDefinedProposals(
-        facts,
-        preserveConfirmedFactRevisions(
-          facts,
-          next.projectFacts,
-        ),
-      );
-      if (mode === "deep") {
+      let preservedFacts = taskBriefReplaced
+        ? next.projectFacts
+        : preserveUserDefinedProposals(
+            facts,
+            preserveConfirmedFactRevisions(facts, next.projectFacts),
+          );
+      if (mode === "deep" && !taskBriefReplaced) {
         preservedFacts = preserveSiteResearchFacts(facts, preservedFacts);
       }
       const smallModeProposalIds = new Set(
@@ -6795,6 +6991,8 @@ export function Workbench({
     }
     const totalJobCount = jobs.length;
 
+    visualBatchPausedRef.current = false;
+    setVisualBatchPaused(false);
     setBusy("visual-image-all");
     setError("");
     recordHistory("生成整套 AI 图纸", { result: latestResultRef.current });
@@ -6837,10 +7035,18 @@ export function Workbench({
       }
     };
 
+    const waitForVisualBatchResume = async () => {
+      while (visualBatchPausedRef.current) {
+        await new Promise((resolve) => window.setTimeout(resolve, 250));
+      }
+    };
+
     const runJob = async (job: { pageId: string; slotId: string }) => {
+      await waitForVisualBatchResume();
       const taskId = crypto.randomUUID();
       const maxJobAttempts = isSmallBuildingMode(taskMode) ? 3 : 2;
       for (let attempt = 1; attempt <= maxJobAttempts; attempt += 1) {
+        await waitForVisualBatchResume();
         const currentPage = workingResult.pagePlan.pages.find(
           (page) => page.page_id === job.pageId,
         );
@@ -6996,8 +7202,27 @@ export function Workbench({
         );
       }
     } finally {
+      visualBatchPausedRef.current = false;
+      setVisualBatchPaused(false);
       setBusy(null);
     }
+  };
+
+  const toggleVisualBatchPause = () => {
+    if (busy !== "visual-image-all") return;
+    const nextPaused = !visualBatchPausedRef.current;
+    visualBatchPausedRef.current = nextPaused;
+    setVisualBatchPaused(nextPaused);
+    setVisualImageJob((current) =>
+      current
+        ? {
+            ...current,
+            message: nextPaused
+              ? "已暂停；当前正在请求的图片完成后暂停，继续时自动跳过已完成图片。"
+              : "已继续；已完成图片不会重复生成。",
+          }
+        : current,
+    );
   };
 
   const updateGateBProposal = async (
@@ -7022,7 +7247,12 @@ export function Workbench({
         },
         apiSettings,
       );
-      acceptPipelineResult(next, "更新设计提案");
+      acceptPipelineResult(
+        ["select", "custom", "confirm"].includes(operation)
+          ? invalidateSmallModeCopyForDirectionChange(next)
+          : next,
+        "更新设计提案",
+      );
       if (operation === "custom") {
         setGateBInputs((current) => ({
           ...current,
@@ -7055,7 +7285,10 @@ export function Workbench({
         },
         apiSettings,
       );
-      acceptPipelineResult(next, "新增用户提案");
+      acceptPipelineResult(
+        invalidateSmallModeCopyForDirectionChange(next),
+        "新增用户提案",
+      );
       setUserProposalDraft({
         topic: "设计概念",
         title: "",
@@ -7172,7 +7405,15 @@ export function Workbench({
             }
           : document,
       );
-      const nextDocuments = [...documents, ...parsed];
+      const looksLikeReplacementBrief = parsed.some(
+        (document) =>
+          document.role === "authoritative" ||
+          /任务书|招标|brief|tender/i.test(document.file_name),
+      );
+      const documentBase = looksLikeReplacementBrief
+        ? documents.filter((document) => document.role === "reference_style")
+        : documents;
+      const nextDocuments = [...documentBase, ...parsed];
       setDocuments(nextDocuments);
       await processDocuments(nextDocuments);
     } catch (caught) {
@@ -7250,6 +7491,7 @@ export function Workbench({
     exportProjectFacts = facts,
     exportPagePlan = plan,
     layoutOverflowPageIds: string[] = [],
+    forceSmallModeCopyRegeneration = false,
   ) =>
     callPipeline(
       {
@@ -7259,6 +7501,7 @@ export function Workbench({
         projectFacts: exportProjectFacts,
         pagePlan: exportPagePlan,
         layoutOverflowPageIds,
+        forceSmallModeCopyRegeneration,
         documents:
           format === "docx"
             ? documents
@@ -7336,6 +7579,7 @@ export function Workbench({
     exportProjectFacts = facts,
     exportPagePlan = plan,
     layoutOverflowPageIds: string[] = [],
+    forceSmallModeCopyRegeneration = false,
   ) => {
     const taskId = crypto.randomUUID();
     let lastError: unknown;
@@ -7347,6 +7591,7 @@ export function Workbench({
           exportProjectFacts,
           exportPagePlan,
           layoutOverflowPageIds,
+          forceSmallModeCopyRegeneration,
         );
       } catch (caught) {
         lastError = caught;
@@ -7376,6 +7621,7 @@ export function Workbench({
       let next = await prepareExportWithRecovery("pdf");
       acceptPipelineResult(next, "模型整理 PDF 导出终稿");
       next = await rewriteUntilA3Fits(next, "按 A3 实际溢出重写终稿");
+      await saveCurrentProjectNow();
       await waitForPdfVisualAssets();
       restorePdfRasterAssets = await preparePdfRasterAssets(pdfExportPpi);
       replaceBrowserDocumentTitle(safePdfFileName(
@@ -7400,44 +7646,21 @@ export function Workbench({
     setBusy("generate-all");
     setError("");
     try {
-      const next = await prepareExportWithRecovery("pdf");
+      const next = await prepareExportWithRecovery(
+        "pdf",
+        facts,
+        plan,
+        [],
+        isSmallBuildingMode(taskMode),
+      );
       acceptPipelineResult(next, "生成整套终稿文案");
       await rewriteUntilA3Fits(next, "按 A3 实际溢出重写终稿");
+      await saveCurrentProjectNow();
     } catch (caught) {
       setError(
         caught instanceof Error
           ? caught.message
           : "整套终稿文案生成失败",
-      );
-    } finally {
-      setBusy(null);
-    }
-  };
-
-  const createAllVisualTasks = () => {
-    if (!hasProjectSource || busy) return;
-    setBusy("visual-all");
-    setError("");
-    try {
-      let nextPlan = plan;
-      for (const page of plan.pages) {
-        nextPlan = updatePageVisualTask(
-          facts,
-          nextPlan,
-          page.page_id,
-          undefined,
-          true,
-        );
-      }
-      acceptPipelineResult(
-        { ...result, pagePlan: nextPlan },
-        "建立整套视觉任务",
-      );
-    } catch (caught) {
-      setError(
-        caught instanceof Error
-          ? caught.message
-          : "整套视觉任务建立失败",
       );
     } finally {
       setBusy(null);
@@ -7546,6 +7769,356 @@ export function Workbench({
           ? caught.message
           : "DOCX 导出失败",
       );
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const exportPptx = async () => {
+    if (!hasProjectSource) return;
+    setBusy("export-pptx");
+    setError("");
+    try {
+      const pptxModule = await import("pptxgenjs");
+      const PptxGenJS = pptxModule.default;
+      const pptx = new PptxGenJS();
+      pptx.defineLayout({
+        name: "A3-LANDSCAPE",
+        width: 16.54,
+        height: 11.69,
+      });
+      pptx.layout = "A3-LANDSCAPE";
+      pptx.author = "设计汇报文本 Agent";
+      pptx.subject = "建筑设计汇报可编辑演示文稿";
+      pptx.title = facts.project_name_anonymized ?? "建筑设计汇报";
+      pptx.company = companyName.trim() || "设计汇报 DESIGN PRESENTATION";
+
+      const exportReferenceLibrary = facts.reference_style_examples ?? [];
+      const exportPages = plan.pages;
+      const summaryReuseAssets = exportPages
+        .filter(
+          (page) =>
+            page.page_type === "rendering" &&
+            /(?:装置|节点)\s*0?[0-9一二三四五六七八九十]+/u.test(page.headline_zh),
+        )
+        .sort(
+          (left, right) =>
+            (left.display_page_number ?? 0) -
+            (right.display_page_number ?? 0),
+        )
+        .slice(0, Math.max(1, plan.pages.find((candidate) => candidate.page_type === "summary")?.visual_task?.image_slots.length ?? 1))
+        .map(
+          (page) =>
+            page.visual_task?.generated_images?.[0] ??
+            page.visual_task?.generated_image,
+        );
+
+      const getPageFacts = (page: (typeof exportPages)[number]) =>
+        (page.fact_refs ?? [])
+          .map((factId) => facts.facts.find((fact) => fact.fact_id === factId))
+          .filter(Boolean) as DesignReportProjectFacts["facts"];
+      const getPageAssets = (page: (typeof exportPages)[number]) => {
+        if (page.page_type === "summary") return summaryReuseAssets;
+        const generated = page.visual_task?.generated_images ?? [];
+        return page.visual_task?.image_slots.map(
+          (slot) =>
+            generated.find((asset) => asset.slot_id === slot.slot_id) ??
+            (slot.slot_id === page.visual_task?.image_slots[0]?.slot_id
+              ? page.visual_task.generated_image
+              : undefined),
+        ) ?? [];
+      };
+      const addImageOrPlaceholder = async (
+        slide: ReturnType<typeof pptx.addSlide>,
+        asset: PageVisualAsset | undefined,
+        x: number,
+        y: number,
+        w: number,
+        h: number,
+        label: string,
+      ) => {
+        if (asset?.image_url) {
+          try {
+            const data = await visualImageToDataUrl(asset.image_url);
+            slide.addImage({ data, x, y, w, h });
+            return;
+          } catch {
+            // Keep the slide editable and exportable when an old project image
+            // URL is temporarily unavailable; do not replace cloud data.
+          }
+        }
+        slide.addText(`图片待生成：${label}`, {
+          x,
+          y,
+          w,
+          h,
+          color: "9AA39F",
+          fill: { color: "E9EEEB" },
+          line: { color: "D7D0C7", width: 0.7 },
+          align: "center",
+          valign: "middle",
+          fontFace: "Arial",
+          fontSize: 15,
+          margin: 0.08,
+          fit: "shrink",
+        });
+      };
+
+      for (const page of exportPages) {
+        const slide = pptx.addSlide();
+        slide.background = { color: "FBFAF7" };
+        const section = plan.sections.find(
+          (candidate) => candidate.section_id === page.section_id,
+        );
+        const pageFacts = getPageFacts(page);
+        const body =
+          presentationBody(page, pageFacts, exportReferenceLibrary) ||
+          sanitizePresentationText(page.core_message) ||
+          "";
+        const headline = displayPageHeadline(
+          page,
+          isSmallBuildingMode(taskMode),
+        );
+        const headlineEn = sanitizePresentationText(page.headline_en);
+        const pageNumber = String(page.display_page_number ?? "").padStart(
+          2,
+          "0",
+        );
+        slide.addText(
+          `${section?.section_id ?? page.section_id}  ${sanitizePresentationText(
+            section?.title_zh,
+            displayPageTypeLabel(page),
+          )}`,
+          {
+            x: 0.55,
+            y: 0.28,
+            w: 6.8,
+            h: 0.28,
+            color: "8C4F2E",
+            fontFace: "Arial",
+            fontSize: 11,
+            bold: true,
+            margin: 0,
+          },
+        );
+        slide.addText(pageNumber, {
+          x: 15.3,
+          y: 0.24,
+          w: 0.7,
+          h: 0.35,
+          color: "8C4F2E",
+          fontFace: "Arial",
+          fontSize: 14,
+          bold: true,
+          align: "right",
+          margin: 0,
+        });
+        slide.addShape(pptx.ShapeType.line, {
+          x: 0.55,
+          y: 0.78,
+          w: 15.44,
+          h: 0,
+          line: { color: "D8D0C7", width: 0.8 },
+        });
+        slide.addText(headline, {
+          x: 0.65,
+          y: 1.05,
+          w: 4.45,
+          h: 1.15,
+          color: "292B2A",
+          fontFace: "Arial",
+          fontSize: 28,
+          bold: true,
+          breakLine: false,
+          margin: 0,
+          fit: "shrink",
+          valign: "middle",
+        });
+        if (headlineEn) {
+          slide.addText(headlineEn, {
+            x: 0.65,
+            y: 2.22,
+            w: 4.45,
+            h: 0.35,
+            color: "6E716F",
+            fontFace: "Arial",
+            fontSize: 14,
+            charSpacing: 1.1,
+            margin: 0,
+            fit: "shrink",
+          });
+        }
+        slide.addText(body, {
+          x: 0.65,
+          y: 2.78,
+          w: 4.15,
+          h: 4.35,
+          color: "4A4D4B",
+          fontFace: "Arial",
+          fontSize: 15,
+          breakLine: false,
+          // PptxGenJS determines wrapping from the fitted text box.
+          margin: 0,
+          valign: "top",
+          fit: "shrink",
+          paraSpaceAfter: 5,
+        });
+
+        const assets = getPageAssets(page);
+        const captions = page.visual_task?.image_slots ?? [];
+        if (assets.length === 1) {
+          await addImageOrPlaceholder(
+            slide,
+            assets[0],
+            5.25,
+            1.22,
+            10.55,
+            7.65,
+            captions[0]?.label || headline,
+          );
+          slide.addText(
+            sanitizePresentationText(captions[0]?.label, headline),
+            {
+              x: 5.25,
+              y: 8.98,
+              w: 10.55,
+              h: 0.65,
+              color: "5A3827",
+              fill: { color: "EEE3D7" },
+              fontFace: "Arial",
+              fontSize: 18,
+              bold: true,
+              align: "center",
+              valign: "middle",
+              margin: 0.08,
+              fit: "shrink",
+            },
+          );
+        } else if (assets.length === 2) {
+          await addImageOrPlaceholder(
+            slide,
+            assets[0],
+            5.25,
+            1.22,
+            10.55,
+            7.0,
+            captions[0]?.label || headline,
+          );
+          await addImageOrPlaceholder(
+            slide,
+            assets[1],
+            0.65,
+            7.55,
+            4.15,
+            2.08,
+            captions[1]?.label || "设计分析图",
+          );
+          slide.addText(
+            sanitizePresentationText(captions[0]?.label, headline),
+            {
+              x: 5.25,
+              y: 8.42,
+              w: 10.55,
+              h: 0.58,
+              color: "5A3827",
+              fill: { color: "EEE3D7" },
+              fontFace: "Arial",
+              fontSize: 18,
+              bold: true,
+              align: "center",
+              valign: "middle",
+              margin: 0.08,
+              fit: "shrink",
+            },
+          );
+          slide.addText(
+            sanitizePresentationText(captions[1]?.label, "设计分析图"),
+            {
+              x: 0.65,
+              y: 9.68,
+              w: 4.15,
+              h: 0.45,
+              color: "7B5A48",
+              fontFace: "Arial",
+              fontSize: 11,
+              align: "center",
+              margin: 0,
+              fit: "shrink",
+            },
+          );
+        } else if (assets.length >= 3) {
+          const widths = [4.95, 4.95, 4.95];
+          for (let index = 0; index < 3; index += 1) {
+            const x = 0.65 + index * 5.2;
+            await addImageOrPlaceholder(
+              slide,
+              assets[index],
+              x,
+              3.85,
+              widths[index],
+              4.85,
+              captions[index]?.label || `方案${index + 1}`,
+            );
+            slide.addText(
+              sanitizePresentationText(
+                captions[index]?.label,
+                `方案${index + 1}`,
+              ),
+              {
+                x,
+                y: 8.88,
+                w: widths[index],
+                h: 0.65,
+                color: "5A3827",
+                fill: { color: "EEE3D7" },
+                fontFace: "Arial",
+                fontSize: 16,
+                bold: true,
+                align: "center",
+                valign: "middle",
+                margin: 0.08,
+                fit: "shrink",
+              },
+            );
+          }
+        } else {
+          slide.addText("本页暂无已生成图片", {
+            x: 5.25,
+            y: 2.2,
+            w: 10.55,
+            h: 5.6,
+            color: "9AA39F",
+            fill: { color: "E9EEEB" },
+            line: { color: "D7D0C7", width: 0.7 },
+            align: "center",
+            valign: "middle",
+            fontFace: "Arial",
+            fontSize: 18,
+            margin: 0.1,
+          });
+        }
+        slide.addText(
+          companyName.trim() || "设计汇报 DESIGN PRESENTATION",
+          {
+            x: 0.65,
+            y: 11.08,
+            w: 6.4,
+            h: 0.22,
+            color: "7B5A48",
+            fontFace: "Arial",
+            fontSize: 9,
+            margin: 0,
+          },
+        );
+      }
+
+      await pptx.writeFile({
+        fileName: `${safePdfFileName(
+          facts.project_name_anonymized ?? facts.project_id,
+        )}_建筑设计汇报.pptx`,
+      });
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "PPTX 导出失败");
     } finally {
       setBusy(null);
     }
@@ -7720,6 +8293,8 @@ export function Workbench({
     setGateBInputs({});
     setHistory([]);
     setVisualImageJob(null);
+    visualBatchPausedRef.current = false;
+    setVisualBatchPaused(false);
     setPageTextDraft(null);
     setVisualAssetPreview(null);
     setSessionTokenUsage(sumTokenUsage(emptyResult.nodeOutputs));
@@ -8072,26 +8647,6 @@ export function Workbench({
                 : "大型公共建筑 · 完整建筑汇报模式"}
             </small>
           </div>
-          <GatePill
-            label="事实就绪"
-            status={
-              hasProjectSource
-                ? facts.gate_report?.planner_readiness
-                : undefined
-            }
-          />
-          {!isSmallBuildingMode(taskMode) ? (
-            <GatePill
-              label="提案就绪"
-              status={
-                hasProjectSource
-                  ? gateBDisplayStatus
-                  : undefined
-              }
-            />
-          ) : (
-            <span className="task-mode-inline-status">任务书方向直达页面</span>
-          )}
           <label className="pdf-resolution-select" title="控制 PDF 中图片的采样精度；文字保持矢量">
             <span>PDF</span>
             <select
@@ -8121,6 +8676,62 @@ export function Workbench({
               ? "模型整理 PDF"
               : "导出 PDF"}
           </button>
+          <div className="topbar-primary-actions" aria-label="常用操作">
+            <button
+              className="primary-button topbar-primary-action"
+              onClick={() => void generateAllPageCopy()}
+              disabled={!hasProjectSource || Boolean(busy)}
+              title="按当前任务书、当前设计方向和当前页面框架生成整套终稿文案"
+            >
+              {busy === "generate-all" ? (
+                <LoaderCircle className="spin" size={15} />
+              ) : (
+                <Sparkles size={15} />
+              )}
+              生成整套终稿文案
+            </button>
+            <button
+              className="primary-button topbar-primary-action"
+              onClick={
+                busy === "visual-image-all"
+                  ? toggleVisualBatchPause
+                  : () => void generateAllVisualImages()
+              }
+              disabled={
+                !hasProjectSource ||
+                (Boolean(busy) && busy !== "visual-image-all")
+              }
+              title={
+                busy === "visual-image-all"
+                  ? "暂停后不会启动新的图片请求；继续时自动跳过已经生成的图"
+                  : "仅生成尚未完成的图片槽；已生成图片不会重复调用模型"
+              }
+            >
+              {busy === "visual-image-all" ? (
+                visualBatchPaused ? <Play size={15} /> : <Pause size={15} />
+              ) : (
+                <ImageIcon size={15} />
+              )}
+              {busy === "visual-image-all"
+                ? visualBatchPaused
+                  ? "继续生成 AI 图纸"
+                  : "暂停生成 AI 图纸"
+                : "生成整套 AI 图纸"}
+            </button>
+            <button
+              className="primary-button topbar-primary-action"
+              onClick={() => void exportPptx()}
+              disabled={!hasProjectSource || Boolean(busy)}
+              title="把当前两条管线的页面文字导出为可编辑文本框，并嵌入已有项目图片"
+            >
+              {busy === "export-pptx" ? (
+                <LoaderCircle className="spin" size={15} />
+              ) : (
+                <Presentation size={15} />
+              )}
+              {busy === "export-pptx" ? "正在导出 PPTX" : "导出 PPTX"}
+            </button>
+          </div>
           {!hasProjectSource ? (
             <button
               className="primary-button"
@@ -8150,19 +8761,21 @@ export function Workbench({
               更多工具
             </summary>
             <div className="topbar-more-menu">
-              <button
-                className="ghost-button"
-                onClick={() => void runDeepAnalysis()}
-                disabled={!hasProjectSource || Boolean(busy)}
-                title="使用文本模型优化整套章节、34页标题和每页核心结论"
-              >
-                {busy === "run-deep" ? (
-                  <LoaderCircle className="spin" size={15} />
-                ) : (
-                  <Sparkles size={15} />
-                )}
-                {busy === "run-deep" ? "深度优化中" : "深度优化"}
-              </button>
+              {!isSmallBuildingMode(taskMode) ? (
+                <button
+                  className="ghost-button"
+                  onClick={() => void runDeepAnalysis()}
+                  disabled={!hasProjectSource || Boolean(busy)}
+                  title="使用文本模型优化整套章节、页面标题和每页核心结论"
+                >
+                  {busy === "run-deep" ? (
+                    <LoaderCircle className="spin" size={15} />
+                  ) : (
+                    <Sparkles size={15} />
+                  )}
+                  {busy === "run-deep" ? "深度优化中" : "深度优化"}
+                </button>
+              ) : null}
               <button
                 className="ghost-button"
                 onClick={() => void exportDocx()}
@@ -8175,33 +8788,6 @@ export function Workbench({
                   <FileText size={15} />
                 )}
                 {busy === "export-docx" ? "模型编写 DOCX" : "导出 DOCX"}
-              </button>
-              <button
-                className="ghost-button"
-                onClick={() => void generateAllPageCopy()}
-                disabled={!hasProjectSource || Boolean(busy)}
-                title="并行生成所有未完成页面的中英正文、图解标签与讲述提示，并完成全篇审核"
-              >
-                <Sparkles size={15} />
-                生成整套终稿文案
-              </button>
-              <button
-                className="ghost-button"
-                onClick={createAllVisualTasks}
-                disabled={!hasProjectSource || Boolean(busy)}
-                title="为 34 页建立空图框、差异化图片说明和跨页一致性约束；不会调用或裁剪公司素材库图片"
-              >
-                <Presentation size={15} />
-                建立整套视觉任务
-              </button>
-              <button
-                className="ghost-button"
-                onClick={() => void generateAllVisualImages()}
-                disabled={!hasProjectSource || Boolean(busy)}
-                title="仅补生成尚未完成的图框；每张图都会先调用提示词模型，再调用图像模型，最多两路并发"
-              >
-                <ImageIcon size={15} />
-                生成整套 AI 图纸
               </button>
               <button
                 className="ghost-button history-undo-button"
@@ -8645,7 +9231,7 @@ export function Workbench({
                         imageModel: event.target.value,
                       }))
                     }
-                    placeholder="gpt-5.5"
+                    placeholder="gpt-image-2"
                     aria-label="图像模型名称"
                   />
                 </label>
@@ -8782,12 +9368,16 @@ export function Workbench({
                 </div>
                 <div className="token-usage-grid">
                   <div>
-                    <span>提示词输入 Token</span>
+                    <span>提示词输入 Token（含估算）</span>
                     <strong>{formatTokenCount(sessionTokenUsage.imageInput)}</strong>
                   </div>
                   <div>
                     <span>提示词输出 Token</span>
-                    <strong>{formatTokenCount(sessionTokenUsage.imageOutput)}</strong>
+                    <strong>
+                      {sessionTokenUsage.imageOutput
+                        ? formatTokenCount(sessionTokenUsage.imageOutput)
+                        : "不适用"}
+                    </strong>
                   </div>
                   <div>
                     <span>图像模型调用</span>
@@ -8801,7 +9391,7 @@ export function Workbench({
               </section>
             </div>
             <small>
-              生图前的提示词整理由文本模型完成，因此单独计入“图像生成链路”；当前图像接口只返回成功张数，没有返回可核算的图像 Token。失败请求和连接测试不计入。
+              生图前的提示词会单独计入“图像生成链路”；如果图像接口未返回 usage，输入 token 按实际提交提示词估算，输出 token 因图像接口不产生文本补全而显示“不适用”。失败请求和连接测试不计入。
             </small>
           </div>
           <div className="api-settings-actions">
@@ -10305,6 +10895,38 @@ export function Workbench({
                             {pageTextDraft.bodyEn || "等待自动翻译…"}
                           </div>
                         </div>
+                      </fieldset>
+
+                      <fieldset className="page-text-repeatable">
+                        <div className="page-text-fieldset-heading">
+                          <legend>图片名称</legend>
+                        </div>
+                        {pageTextDraft.imageTitles.length ? (
+                          pageTextDraft.imageTitles.map((item, index) => (
+                            <div className="page-text-pair-row" key={`image-title-${index}`}>
+                              <span>{String(index + 1).padStart(2, "0")}</span>
+                              <input
+                                value={item.zh}
+                                onChange={(event) =>
+                                  updatePageTextDraft(
+                                    "imageTitles",
+                                    pageTextDraft.imageTitles.map((candidate, itemIndex) =>
+                                      itemIndex === index
+                                        ? { ...candidate, zh: event.target.value }
+                                        : candidate,
+                                    ),
+                                  )
+                                }
+                                placeholder={`图片${index + 1}名称`}
+                              />
+                              <div className="agent-translation-inline">
+                                {item.en || "等待 Agent 英文…"}
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <p className="empty-note">当前页没有可编辑的图片图框。</p>
+                        )}
                       </fieldset>
 
                       <fieldset className="page-text-repeatable">

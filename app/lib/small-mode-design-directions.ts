@@ -17,6 +17,7 @@ export interface SmallModeDirectionCard {
 }
 
 const directionFieldPatterns = [
+  /^installation\.[^.]+\.name$/u,
   /^installation\.[^.]+\.(?:brief|core|interaction|cultural_theme)$/u,
   /^proposal\.(?:design_concept|concept_statement|masterplan|key_spaces)$/u,
   /^evaluation\.(?:design_goal|priorities)$/u,
@@ -38,6 +39,68 @@ function factText(fact: ProjectFact) {
   return String(fact.value_raw ?? fact.value_normalized ?? "").trim();
 }
 
+function normalizeInstallationNumber(value: string) {
+  const numerals: Record<string, string> = {
+    一: "1",
+    二: "2",
+    三: "3",
+    四: "4",
+    五: "5",
+    六: "6",
+    七: "7",
+    八: "8",
+    九: "9",
+    十: "10",
+  };
+  return numerals[value.trim()] ?? value.trim();
+}
+
+/** Return the current task-brief name for one small-mode design object. */
+export function smallModeInstallationName(
+  projectFacts: DesignReportProjectFacts,
+  installationId: string,
+) {
+  const normalizedId = normalizeInstallationNumber(installationId);
+  const nameFact = projectFacts.facts.find(
+    (fact) =>
+      fact.status !== "superseded" &&
+      fact.status !== "conflict" &&
+      fact.field_path === `installation.${normalizedId}.name`,
+  );
+  const value = factText(nameFact ?? ({} as ProjectFact));
+  if (value && !/^(?:装置|节点|方案)\s*[一二三四五六七八九十\d]+$/u.test(value)) {
+    return value;
+  }
+  return undefined;
+}
+
+/**
+ * Keep the visible title identity stable across concept, rendering, technical
+ * and summary pages. The title's suffix (空间主张/现场体验/构造与运营) remains
+ * page-specific; only the object name is canonicalized.
+ */
+export function canonicalizeSmallModeHeadline(
+  headline: string,
+  names: ReadonlyMap<string, string> | Record<string, string>,
+) {
+  const match = String(headline ?? "").match(
+    /^(?:装置|节点)\s*0?([0-9一二三四五六七八九十]+)\s*[|｜:：]\s*(.+)$/u,
+  );
+  if (!match) return headline;
+  const id = normalizeInstallationNumber(match[1]);
+  const name =
+    typeof (names as ReadonlyMap<string, string>).get === "function"
+      ? (names as ReadonlyMap<string, string>).get(id)
+      : (names as Record<string, string>)[id];
+  if (!name) return headline;
+  const parts = match[2]
+    .split(/[|｜]/u)
+    .map((part) => part.trim())
+    .filter(Boolean);
+  const suffix = parts.slice(1).join("｜");
+  return `装置${id}｜${name}${suffix ? `｜${suffix}` : ""}`;
+}
+
 function activeFact(fact: ProjectFact) {
   return (
     fact.status !== "superseded" &&
@@ -57,7 +120,7 @@ function embeddedInstallationDirectionFacts(
       ),
   );
   const extracted: DirectionFact[] = [];
-  const pattern = /装置\s*([1-3])\s*[：:]\s*([\s\S]*?)(?=\s*装置\s*[1-3]\s*[：:]|\s*需求\s*[：:]|\s*另外需要|$)/gu;
+  const pattern = /(?:装置|节点)\s*0?([1-9]\d*)\s*[：:]\s*([\s\S]*?)(?=\s*(?:装置|节点)\s*0?[1-9]\d*\s*[：:]|\s*需求\s*[：:]|\s*另外需要|$)/gu;
   for (const fact of embedded) {
     for (const match of factText(fact).matchAll(pattern)) {
       const sequence = match[1];
@@ -115,6 +178,10 @@ function directionCardTitle(
   facts: DirectionFact[],
   fallback: string,
 ) {
+  const namedObject = facts.find((fact) => /\.name$/u.test(normalizedFieldPath(fact)));
+  if (namedObject && factText(namedObject).length >= 2) {
+    return factText(namedObject).slice(0, 24);
+  }
   const context = facts.map(factText).join(" ");
   if (/甜|泡茶|茶香/u.test(context)) return "泡茶水的“甜”";
   if (/真|山泉|源头|澄澈/u.test(context)) return "山泉水的“真”";
@@ -141,9 +208,11 @@ function directionCardContent(facts: DirectionFact[]) {
   if (/复用|收起|拆装|运输/u.test(context)) {
     return "以可拆装、可运输和可再次部署的构件系统支撑活动后的收起与复用。";
   }
-  return facts
+  const genericContent = facts
+    .filter((fact) => !/\.name$/u.test(normalizedFieldPath(fact)))
     .map((fact) => factText(fact).replace(/\s+/gu, " ").trim())
-    .find(Boolean) ?? "基于当前任务书事实形成可编辑的设计方向。";
+    .find((value) => value.length >= 8);
+  return genericContent ?? "基于当前任务书事实形成可编辑的设计方向。";
 }
 
 /**
@@ -169,7 +238,7 @@ export function smallModeDesignDirectionCards(
         .sort(([left], [right]) => Number(left) - Number(right))
         .slice(0, 3)
         .map(([installationId, group]) => ({
-          fallback: `装置${installationId}设计方向`,
+          fallback: `节点${installationId}设计方向`,
           facts: group,
         }))
     : facts.length

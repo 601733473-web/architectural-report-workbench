@@ -106,6 +106,7 @@ type PrepareExportRequest = {
   format: "pdf" | "docx";
   taskId?: string;
   layoutOverflowPageIds?: string[];
+  forceSmallModeCopyRegeneration?: boolean;
   projectFacts: DesignReportProjectFacts;
   pagePlan: DesignReportPagePlan;
   documents?: InputDocument[];
@@ -779,6 +780,7 @@ export async function POST(request: Request) {
               "headline_en",
               "core_message_en",
               "body_en",
+              "image_titles_en",
               "diagram_labels_en",
               "callouts_en",
               "toc_sections_en",
@@ -1067,17 +1069,54 @@ export async function POST(request: Request) {
           true,
         );
       }
-      // The slot is intentionally refreshed even when incomingHasRequestedSlot
-      // is true; the old !incomingHasRequestedSlot branch is retained only as
-      // a compatibility marker while replacing stale small-mode recipes
-      // from older snapshots.
-      void incomingHasRequestedSlot;
       let imagePage = imageRequestPagePlan.pages.find(
         (page) => page.page_id === payload.pageId,
       );
       let imageSlot = imagePage?.visual_task?.image_slots.find(
         (slot) => slot.slot_id === payload.slotId,
       );
+      if (
+        imagePage &&
+        !imageSlot &&
+        incomingHasRequestedSlot &&
+        isSmallBuildingMode(
+          payload.projectFacts.task_mode ?? DEFAULT_TASK_MODE,
+        )
+      ) {
+        // Older small-building projects may have stored S2/S3 for a page
+        // that is now intentionally a single S1 frame. Keep the user's
+        // requested slot id as an alias for the rebuilt canonical slot so the
+        // generated result can be merged back into the existing project
+        // without deleting or regenerating any other image.
+        const canonicalSlots = imagePage.visual_task?.image_slots ?? [];
+        if (canonicalSlots.length === 1) {
+          imageRequestPagePlan = {
+            ...imageRequestPagePlan,
+            pages: imageRequestPagePlan.pages.map((page) => {
+              if (page.page_id !== payload.pageId || !page.visual_task) {
+                return page;
+              }
+              return {
+                ...page,
+                visual_task: {
+                  ...page.visual_task,
+                  image_slots: page.visual_task.image_slots.map((slot) =>
+                    slot.slot_id === canonicalSlots[0]?.slot_id
+                      ? { ...slot, slot_id: payload.slotId }
+                      : slot,
+                  ) as typeof page.visual_task.image_slots,
+                },
+              };
+            }),
+          };
+          imagePage = imageRequestPagePlan.pages.find(
+            (page) => page.page_id === payload.pageId,
+          );
+          imageSlot = imagePage?.visual_task?.image_slots.find(
+            (slot) => slot.slot_id === payload.slotId,
+          );
+        }
+      }
       if (imagePage && !imageSlot) {
         imageRequestPagePlan = updatePageVisualTask(
           visualProjectFacts,
@@ -1259,6 +1298,10 @@ export async function POST(request: Request) {
                 0,
               ) +
               modeled.promptCall.inputTokens +
+              imageCalls.reduce(
+                (sum, call) => sum + call.inputTokens,
+                0,
+              ) +
               auditCalls.reduce(
                 (sum, call) => sum + call.inputTokens,
                 0,
@@ -1269,6 +1312,10 @@ export async function POST(request: Request) {
                 0,
               ) +
               modeled.promptCall.outputTokens +
+              imageCalls.reduce(
+                (sum, call) => sum + call.outputTokens,
+                0,
+              ) +
               auditCalls.reduce(
                 (sum, call) => sum + call.outputTokens,
                 0,
@@ -1442,7 +1489,11 @@ export async function POST(request: Request) {
             payload.pagePlan,
             payload.format,
             runtimeOverride,
-            { layoutOverflowPageIds: payload.layoutOverflowPageIds },
+            {
+              layoutOverflowPageIds: payload.layoutOverflowPageIds,
+              forceSmallModeCopyRegeneration:
+                payload.forceSmallModeCopyRegeneration,
+            },
           );
         } catch (modelError) {
           throw requiredModelFailure("导出终稿整理", modelError);
