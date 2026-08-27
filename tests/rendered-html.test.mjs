@@ -2033,10 +2033,16 @@ test("server-renders the multi-project reporting workbench without reference cat
   assert.match(html, /生成整套终稿文案/);
   assert.match(html, /生成整套 AI 图纸/);
   assert.match(html, /导出 PPTX/);
-  assert.match(html, /primary-actions-rail/);
+  assert.match(html, /workflow-rail-actions/);
   assert.ok(
-    html.indexOf("primary-actions-rail") > html.indexOf("workflow-rail"),
-    "整套操作按钮应位于流程区下方",
+    html.indexOf("workflow-rail-actions") >
+      html.indexOf('aria-label="首次使用操作路径"'),
+    "文案与整套 AI 图纸按钮应位于流程条右侧",
+  );
+  assert.doesNotMatch(html, /左侧管理项目资料，中间选择页面，右侧完成当前页。/);
+  assert.ok(
+    html.indexOf("export-pptx-button") > html.indexOf("export-pdf-button"),
+    "PPTX 导出按钮应紧跟在 PDF 导出按钮之后",
   );
   assert.doesNotMatch(visibleHtml, /框架就绪|内容就绪/);
   assert.doesNotMatch(html, />Gate A</);

@@ -519,19 +519,19 @@ button {
   white-space: nowrap;
 }
 
-.primary-actions-rail {
-  min-height: 60px;
+.workflow-rail-actions {
+  min-width: 0;
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  padding: 8px 26px;
-  border-bottom: 1px solid var(--line);
-  background: rgb(255 255 255 / 82%);
+  gap: 8px;
 }
 
-.primary-actions-rail .topbar-primary-actions {
-  width: 100%;
-  justify-content: flex-end;
+.workflow-rail-action {
+  min-width: 0;
+  flex: 1 1 0;
+  padding-inline: 10px;
+  white-space: nowrap;
 }
 
 .topbar-more-tools > summary {
@@ -681,13 +681,6 @@ button.workflow-step:hover:not(:disabled) {
 .workflow-step:disabled {
   cursor: default;
   opacity: 0.58;
-}
-
-.workflow-rail-help {
-  margin: 0;
-  color: var(--muted);
-  font-size: var(--fs-xs);
-  line-height: 1.45;
 }
 
 .text-architecture-backdrop {
@@ -8322,8 +8315,7 @@ blockquote {
 }
 
 .workbench-shell .workflow-rail-intro span,
-.workbench-shell .workflow-step small,
-.workbench-shell .workflow-rail-help {
+.workbench-shell .workflow-step small {
   color: var(--muted);
   font-size: var(--fs-sm);
 }
@@ -8626,11 +8618,7 @@ blockquote {
   }
 
   .workflow-rail {
-    grid-template-columns: minmax(155px, 0.8fr) repeat(4, minmax(130px, 0.72fr));
-  }
-
-  .workflow-rail-help {
-    display: none;
+    grid-template-columns: minmax(155px, 0.8fr) repeat(4, minmax(130px, 0.72fr)) minmax(300px, 1fr);
   }
 }
 
@@ -8673,11 +8661,6 @@ blockquote {
     width: 100%;
   }
 
-  .primary-actions-rail {
-    justify-content: stretch;
-    padding: 8px 16px;
-  }
-
   .project-summary {
     width: 100%;
     justify-content: flex-start;
@@ -8687,7 +8670,7 @@ blockquote {
   .workflow-rail {
     height: auto;
     overflow-x: auto;
-    grid-template-columns: 190px repeat(4, 165px);
+    grid-template-columns: 190px repeat(4, 165px) 360px;
     padding: 8px 16px;
   }
 

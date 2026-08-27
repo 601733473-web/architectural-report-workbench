@@ -8676,6 +8676,19 @@ export function Workbench({
               ? "模型整理 PDF"
               : "导出 PDF"}
           </button>
+          <button
+            className="secondary-button export-pptx-button"
+            onClick={() => void exportPptx()}
+            disabled={!hasProjectSource || Boolean(busy)}
+            title="把当前两条管线的页面文字导出为可编辑文本框，并嵌入已有项目图片"
+          >
+            {busy === "export-pptx" ? (
+              <LoaderCircle className="spin" size={15} />
+            ) : (
+              <Presentation size={15} />
+            )}
+            {busy === "export-pptx" ? "正在导出 PPTX" : "导出 PPTX"}
+          </button>
           {!hasProjectSource ? (
             <button
               className="primary-button"
@@ -8968,15 +8981,9 @@ export function Workbench({
             <small>PDF 与设计说明</small>
           </span>
         </div>
-        <p className="workflow-rail-help">
-          左侧管理项目资料，中间选择页面，右侧完成当前页。
-        </p>
-      </section>
-
-      <section className="primary-actions-rail" aria-label="整套操作">
-        <div className="topbar-primary-actions">
+        <div className="workflow-rail-actions" aria-label="整套操作">
           <button
-            className="primary-button topbar-primary-action"
+            className="primary-button workflow-rail-action"
             onClick={() => void generateAllPageCopy()}
             disabled={!hasProjectSource || Boolean(busy)}
             title="按当前任务书、当前设计方向和当前页面框架生成整套终稿文案"
@@ -8989,7 +8996,7 @@ export function Workbench({
             生成整套终稿文案
           </button>
           <button
-            className="primary-button topbar-primary-action"
+            className="primary-button workflow-rail-action"
             onClick={
               busy === "visual-image-all"
                 ? toggleVisualBatchPause
@@ -9015,19 +9022,6 @@ export function Workbench({
                 ? "继续生成 AI 图纸"
                 : "暂停生成 AI 图纸"
               : "生成整套 AI 图纸"}
-          </button>
-          <button
-            className="primary-button topbar-primary-action"
-            onClick={() => void exportPptx()}
-            disabled={!hasProjectSource || Boolean(busy)}
-            title="把当前两条管线的页面文字导出为可编辑文本框，并嵌入已有项目图片"
-          >
-            {busy === "export-pptx" ? (
-              <LoaderCircle className="spin" size={15} />
-            ) : (
-              <Presentation size={15} />
-            )}
-            {busy === "export-pptx" ? "正在导出 PPTX" : "导出 PPTX"}
           </button>
         </div>
       </section>
