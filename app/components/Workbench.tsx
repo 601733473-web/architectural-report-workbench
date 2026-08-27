@@ -8676,62 +8676,6 @@ export function Workbench({
               ? "模型整理 PDF"
               : "导出 PDF"}
           </button>
-          <div className="topbar-primary-actions" aria-label="常用操作">
-            <button
-              className="primary-button topbar-primary-action"
-              onClick={() => void generateAllPageCopy()}
-              disabled={!hasProjectSource || Boolean(busy)}
-              title="按当前任务书、当前设计方向和当前页面框架生成整套终稿文案"
-            >
-              {busy === "generate-all" ? (
-                <LoaderCircle className="spin" size={15} />
-              ) : (
-                <Sparkles size={15} />
-              )}
-              生成整套终稿文案
-            </button>
-            <button
-              className="primary-button topbar-primary-action"
-              onClick={
-                busy === "visual-image-all"
-                  ? toggleVisualBatchPause
-                  : () => void generateAllVisualImages()
-              }
-              disabled={
-                !hasProjectSource ||
-                (Boolean(busy) && busy !== "visual-image-all")
-              }
-              title={
-                busy === "visual-image-all"
-                  ? "暂停后不会启动新的图片请求；继续时自动跳过已经生成的图"
-                  : "仅生成尚未完成的图片槽；已生成图片不会重复调用模型"
-              }
-            >
-              {busy === "visual-image-all" ? (
-                visualBatchPaused ? <Play size={15} /> : <Pause size={15} />
-              ) : (
-                <ImageIcon size={15} />
-              )}
-              {busy === "visual-image-all"
-                ? visualBatchPaused
-                  ? "继续生成 AI 图纸"
-                  : "暂停生成 AI 图纸"
-                : "生成整套 AI 图纸"}
-            </button>
-            <button
-              className="primary-button topbar-primary-action"
-              onClick={() => void exportPptx()}
-              disabled={!hasProjectSource || Boolean(busy)}
-              title="把当前两条管线的页面文字导出为可编辑文本框，并嵌入已有项目图片"
-            >
-              {busy === "export-pptx" ? (
-                <LoaderCircle className="spin" size={15} />
-              ) : (
-                <Presentation size={15} />
-              )}
-              {busy === "export-pptx" ? "正在导出 PPTX" : "导出 PPTX"}
-            </button>
-          </div>
           {!hasProjectSource ? (
             <button
               className="primary-button"
@@ -9027,6 +8971,65 @@ export function Workbench({
         <p className="workflow-rail-help">
           左侧管理项目资料，中间选择页面，右侧完成当前页。
         </p>
+      </section>
+
+      <section className="primary-actions-rail" aria-label="整套操作">
+        <div className="topbar-primary-actions">
+          <button
+            className="primary-button topbar-primary-action"
+            onClick={() => void generateAllPageCopy()}
+            disabled={!hasProjectSource || Boolean(busy)}
+            title="按当前任务书、当前设计方向和当前页面框架生成整套终稿文案"
+          >
+            {busy === "generate-all" ? (
+              <LoaderCircle className="spin" size={15} />
+            ) : (
+              <Sparkles size={15} />
+            )}
+            生成整套终稿文案
+          </button>
+          <button
+            className="primary-button topbar-primary-action"
+            onClick={
+              busy === "visual-image-all"
+                ? toggleVisualBatchPause
+                : () => void generateAllVisualImages()
+            }
+            disabled={
+              !hasProjectSource ||
+              (Boolean(busy) && busy !== "visual-image-all")
+            }
+            title={
+              busy === "visual-image-all"
+                ? "暂停后不会启动新的图片请求；继续时自动跳过已经生成的图"
+                : "仅生成尚未完成的图片槽；已生成图片不会重复调用模型"
+            }
+          >
+            {busy === "visual-image-all" ? (
+              visualBatchPaused ? <Play size={15} /> : <Pause size={15} />
+            ) : (
+              <ImageIcon size={15} />
+            )}
+            {busy === "visual-image-all"
+              ? visualBatchPaused
+                ? "继续生成 AI 图纸"
+                : "暂停生成 AI 图纸"
+              : "生成整套 AI 图纸"}
+          </button>
+          <button
+            className="primary-button topbar-primary-action"
+            onClick={() => void exportPptx()}
+            disabled={!hasProjectSource || Boolean(busy)}
+            title="把当前两条管线的页面文字导出为可编辑文本框，并嵌入已有项目图片"
+          >
+            {busy === "export-pptx" ? (
+              <LoaderCircle className="spin" size={15} />
+            ) : (
+              <Presentation size={15} />
+            )}
+            {busy === "export-pptx" ? "正在导出 PPTX" : "导出 PPTX"}
+          </button>
+        </div>
       </section>
 
       {showHistory ? (

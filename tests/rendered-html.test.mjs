@@ -1689,7 +1689,15 @@ test("A3 text auto-fits its frame and never uses an ellipsis as the overflow res
   );
   assert.match(
     css,
-    /\.small-mode-rendering-analysis-card\s*\{[\s\S]*?margin-bottom:\s*clamp\(42px, 14%, 76px\);/,
+    /\.small-mode-rendering-analysis-card\s*\{[\s\S]*?margin-top:\s*2cm;[\s\S]*?margin-bottom:\s*0;/,
+  );
+  assert.match(
+    css,
+    /\.small-mode-rendering-main-card\s*\{[\s\S]*?height:\s*calc\(100% \+ 2cm\);/,
+  );
+  assert.match(
+    css,
+    /\.small-mode-rendering-copy\s*\{[\s\S]*?position:\s*relative;[\s\S]*?z-index:\s*2;/,
   );
   assert.match(
     css,
@@ -2021,6 +2029,11 @@ test("server-renders the multi-project reporting workbench without reference cat
   assert.match(html, /生成整套终稿文案/);
   assert.match(html, /生成整套 AI 图纸/);
   assert.match(html, /导出 PPTX/);
+  assert.match(html, /primary-actions-rail/);
+  assert.ok(
+    html.indexOf("primary-actions-rail") > html.indexOf("workflow-rail"),
+    "整套操作按钮应位于流程区下方",
+  );
   assert.doesNotMatch(visibleHtml, /框架就绪|内容就绪/);
   assert.doesNotMatch(html, />Gate A</);
   assert.doesNotMatch(html, />Gate B</);

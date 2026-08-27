@@ -519,6 +519,21 @@ button {
   white-space: nowrap;
 }
 
+.primary-actions-rail {
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 8px 26px;
+  border-bottom: 1px solid var(--line);
+  background: rgb(255 255 255 / 82%);
+}
+
+.primary-actions-rail .topbar-primary-actions {
+  width: 100%;
+  justify-content: flex-end;
+}
+
 .topbar-more-tools > summary {
   list-style: none;
 }
@@ -5380,6 +5395,7 @@ blockquote {
   grid-template-columns: minmax(280px, 44%) minmax(0, 1fr);
   gap: 3.2%;
   align-items: stretch;
+  overflow: visible;
 }
 
 .small-mode-rendering-analysis-layout .small-mode-page-copy {
@@ -5387,6 +5403,7 @@ blockquote {
   gap: 4%;
   padding: 2.5% 0;
   min-height: 0;
+  overflow: visible;
 }
 
 .small-mode-rendering-copy {
@@ -5394,6 +5411,8 @@ blockquote {
   grid-template-rows: auto minmax(0, 1fr);
   min-height: 0;
   overflow: hidden;
+  position: relative;
+  z-index: 2;
 }
 
 .small-mode-rendering-copy .small-mode-page-core {
@@ -5410,12 +5429,15 @@ blockquote {
 }
 
 .small-mode-rendering-analysis-card {
-    grid-template-rows: minmax(0, 1fr);
-    height: 100%;
-    /* The analysis image has no caption. Reserve the same bottom band as the
-       effect image so both image frames end on one baseline. */
-    margin-bottom: clamp(42px, 14%, 76px);
-  }
+  grid-template-rows: minmax(0, 1fr);
+  height: 100%;
+  /* Drop the analysis frame by 2 cm. The right card grows by the same amount
+     below, keeping both lower edges aligned without covering the copy. */
+  margin-top: 2cm;
+  margin-bottom: 0;
+  position: relative;
+  z-index: 1;
+}
 
 .small-mode-rendering-analysis-card > div:first-child,
 .small-mode-rendering-main-card > div:first-child {
@@ -5469,7 +5491,9 @@ blockquote {
 
 .small-mode-rendering-main-card {
   width: auto;
-  height: 100%;
+  height: calc(100% + 2cm);
+  position: relative;
+  z-index: 1;
 }
 
 .small-mode-rendering-analysis-layout
@@ -8642,6 +8666,11 @@ blockquote {
 
   .topbar-primary-actions {
     width: 100%;
+  }
+
+  .primary-actions-rail {
+    justify-content: stretch;
+    padding: 8px 16px;
   }
 
   .project-summary {
