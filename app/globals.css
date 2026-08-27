@@ -5410,6 +5410,11 @@ blockquote {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   min-height: 0;
+  /* The analysis frame moves down by 2 cm; extend the copy frame by the
+     same amount so the body keeps its usable height and its lower edge
+     remains on the same layout baseline. */
+  height: calc(100% + 2cm);
+  padding-bottom: 2cm;
   overflow: hidden;
   position: relative;
   z-index: 2;

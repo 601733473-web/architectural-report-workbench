@@ -1701,6 +1701,10 @@ test("A3 text auto-fits its frame and never uses an ellipsis as the overflow res
   );
   assert.match(
     css,
+    /\.small-mode-rendering-copy\s*\{[\s\S]*?height:\s*calc\(100% \+ 2cm\);[\s\S]*?padding-bottom:\s*2cm;/,
+  );
+  assert.match(
+    css,
     /\.a3-generated-multi-grid article \{[\s\S]*?grid-template-rows:[\s\S]*?var\(--a3-multi-caption-title-row\)[\s\S]*?var\(--a3-multi-caption-detail-row\);/,
   );
   assert.match(
